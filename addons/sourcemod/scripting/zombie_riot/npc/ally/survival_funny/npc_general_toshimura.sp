@@ -69,7 +69,7 @@ static any ClotSummon(int client, float vecPos[3], float vecAng[3])
 	return Barrack_Combine_Commander(client, vecPos, vecAng);
 }
 
-methodmap Barrack_Combine_Commander < BarrackBody
+methodmap General_Toshimura < CClotBody
 {
 	public void PlayIdleSound()
 	{
