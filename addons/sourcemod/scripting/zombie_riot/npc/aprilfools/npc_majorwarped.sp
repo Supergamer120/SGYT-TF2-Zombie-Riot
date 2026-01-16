@@ -45,7 +45,7 @@ methodmap MajorWarped < CClotBody
 	
 	public MajorWarped(float vecPos[3], float vecAng[3], int ally)
 	{
-		MajorWarped npc = view_as<MajorWarped>(CClotBody(vecPos, vecAng, "models/bots/soldier_boss/bot_soldier_boss.mdl", "2.0", "300000", ally, _, true));
+		MajorWarped npc = view_as<MajorWarped>(CClotBody(vecPos, vecAng, "models/bots/soldier_boss/bot_soldier_boss.mdl", "2.25", "300000", ally, _, true));
 		
 		i_NpcWeight[npc.index] = 999;
 		npc.SetActivity("ACT_MP_RUN_PRIMARY");
