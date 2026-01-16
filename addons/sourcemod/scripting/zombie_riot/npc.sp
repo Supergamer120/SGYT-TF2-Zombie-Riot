@@ -2418,6 +2418,7 @@ Action NpcSpecificOnTakeDamage(int victim, int &attacker, int &inflictor, float 
 #include "npc/aprilfools/npc_troll_pistol.sp"
 #include "npc/aprilfools/npc_troll_rpg.sp"
 #include "npc/aprilfools/npc_troll_melee.sp"
+#include "npc/aprilfools/npc_majorwarped.sp"
 
 #include "npc/construction/enemies/npc_eirasus.sp"
 #include "npc/construction/enemies/npc_haltera.sp"
