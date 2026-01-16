@@ -997,6 +997,7 @@ void NPC_ConfigSetup()
 	TrollPistol_OnMapStart_NPC();
 	TrollRPG_OnMapStart_NPC();
 	TrollBrawler_OnMapStart_NPC();
+	MagorWarped_OnMapStart_NPC();
 
 	//Expidonsa Rogue forces in Construction
 	Eirasus_OnMapStart_NPC();
