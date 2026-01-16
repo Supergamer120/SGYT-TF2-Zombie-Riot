@@ -4,7 +4,7 @@
 static const char g_DeathSounds[] = "mvm/giant_soldier/giant_soldier_explode.wav";
 static const char g_MeleeAttackSounds[] = "mvm/giant_soldier/giant_soldier_rocket_shoot_crit.wav";
 
-void MajorVoided_MapStart()
+void MajorWarped_MapStart()
 {
 	PrecacheModel("models/bots/soldier_boss/bot_soldier_boss.mdl");
 	PrecacheSound(g_DeathSounds);
@@ -12,8 +12,8 @@ void MajorVoided_MapStart()
 	PrecacheSound("misc/halloween/hwn_dance_howl.wav");
 	PrecacheSound("weapons/barret_arm_zap.wav");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Major Voided");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_majorvoided");
+	strcopy(data.Name, sizeof(data.Name), "Major Warpedd");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_majorwarped");
 	strcopy(data.Icon, sizeof(data.Icon), "soldier_major_crits");
 	data.IconCustom = false;
 	data.Flags = 0;
@@ -25,10 +25,10 @@ void MajorVoided_MapStart()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return MajorVoided(vecPos, vecAng, team);
+	return MajorWarped(vecPos, vecAng, team);
 }
 
-methodmap MajorVoided < CClotBody
+methodmap MajorWarped < CClotBody
 {
 	public void PlayHurtSound()
 	{
@@ -43,9 +43,9 @@ methodmap MajorVoided < CClotBody
 		EmitSoundToAll(g_MeleeAttackSounds, this.index, SNDCHAN_VOICE, BOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME, _);
 	}
 	
-	public MajorVoided(float vecPos[3], float vecAng[3], int ally)
+	public MajorWarped(float vecPos[3], float vecAng[3], int ally)
 	{
-		MajorVoided npc = view_as<MajorVoided>(CClotBody(vecPos, vecAng, "models/bots/soldier_boss/bot_soldier_boss.mdl", "2.0", "300000", ally, _, true));
+		MajorWarped npc = view_as<MajorWarped>(CClotBody(vecPos, vecAng, "models/bots/soldier_boss/bot_soldier_boss.mdl", "2.0", "300000", ally, _, true));
 		
 		i_NpcWeight[npc.index] = 999;
 		npc.SetActivity("ACT_MP_RUN_PRIMARY");
@@ -94,7 +94,7 @@ methodmap MajorVoided < CClotBody
 
 static void ClotThink(int iNPC)
 {
-	MajorVoided npc = view_as<MajorVoided>(iNPC);
+	MajorWarped npc = view_as<MajorWarped>(iNPC);
 
 	float gameTime = GetGameTime(npc.index);
 	if(npc.m_flNextDelayTime > gameTime)
@@ -228,9 +228,9 @@ static void ClotThink(int iNPC)
 	}
 }
 
-static void MajorVoided_DownedThink(int entity)
+static void MajorWarped_DownedThink(int entity)
 {
-	MajorVoided npc = view_as<MajorVoided>(entity);
+	MajorWarped npc = view_as<MajorWarped>(entity);
 	npc.SetActivity("ACT_MP_STUN_MIDDLE");
 	npc.AddGesture("ACT_MP_STUN_BEGIN");
 	npc.Update();
@@ -239,7 +239,7 @@ static void MajorVoided_DownedThink(int entity)
 
 static Action ClotTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	MajorVoided npc = view_as<MajorVoided>(victim);
+	MajorWarped npc = view_as<MajorWarped>(victim);
 	
 	if(!npc.Anger && damage >= GetEntProp(npc.index, Prop_Data, "m_iHealth"))
 	{
@@ -251,7 +251,7 @@ static Action ClotTakeDamage(int victim, int &attacker, int &inflictor, float &d
 		npc.StopPathing();
 		npc.m_flNextThinkTime = GetGameTime() + 2.0;
 
-		func_NPCThink[npc.index] = MajorVoided_DownedThink;
+		func_NPCThink[npc.index] = MajorWarped_DownedThink;
 		
 		float vecMe[3]; WorldSpaceCenter(npc.index, vecMe);
 		spawnRing_Vectors(vecMe, 450.0 * 2.0, 0.0, 0.0, 5.0, "materials/sprites/laserbeam.vmt", 0, 0, 212, 255, 1, 1.95, 5.0, 0.0, 1);
@@ -278,7 +278,7 @@ static Action ClotTakeDamage(int victim, int &attacker, int &inflictor, float &d
 
 static void ClotDeath(int entity)
 {
-	MajorVoided npc = view_as<MajorVoided>(entity);
+	MajorWarped npc = view_as<MajorWarped>(entity);
 
 	float vecMe[3]; WorldSpaceCenter(npc.index, vecMe);
 
@@ -289,7 +289,7 @@ static void ClotDeath(int entity)
 	int team = GetTeam(npc.index);
 
 	b_NpcIsTeamkiller[npc.index] = true;
-	Explode_Logic_Custom(999999.9, npc.index, npc.index, -1, vecMe, 450.0 , 1.0, _, true, 40, _, _, _, MajorVoidedExplodePre);
+	Explode_Logic_Custom(999999.9, npc.index, npc.index, -1, vecMe, 450.0 , 1.0, _, true, 40, _, _, _, MajorWarpedExplodePre);
 	b_NpcIsTeamkiller[npc.index] = false;
 
 	int health = ReturnEntityMaxHealth(npc.index) / 4;
@@ -324,7 +324,7 @@ static void ClotDeath(int entity)
 		RemoveEntity(npc.m_iWearable2);
 }
 
-static float MajorVoidedExplodePre(int attacker, int victim, float damage, int weapon)
+static float MajorWarpedExplodePre(int attacker, int victim, float damage, int weapon)
 {
 	if(b_thisNpcIsABoss[victim] || b_thisNpcIsARaid[victim])
 		return 10000.0;	// 10k dmg vs bosses
