@@ -2572,7 +2572,7 @@
 	{
 		"en"	"10 years.\n{green}Yakuza themed weapons allow their special stance to always gain HEAT"
 		"it"	"10 anni.\n{green}Le armi a tema Yakuza permettono alla loro posizione speciale di guadagnare sempre calore"
-		"ko"	"10년의 세월.\n{green}용과 같이 관련 무기(도지마의 용)의 전설 스타일이 언제나 히트를 획득합니다."
+		"ko"	"10년의 세월.\n{green}용과 같이 관련 무기(도지마의 용)의 특수 스타일이 언제나 히트를 획득할 수 있습니다."
 	}
 	"Soul of Darkest Dungeon"
 	{

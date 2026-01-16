@@ -303,7 +303,7 @@
 	"The Trash Cannon"
 	{
 		"en"		"The Trash Cannon"
-		"ko"		"쓰레기 대포"
+		"ko"		"폐기물 대포"
 	}
 	"Outlaw's Railcannon"
 	{
@@ -1768,7 +1768,7 @@
 	"Compacted Rounds"
 	{
 		"en"		"Compacted Rounds"
-		"ko"		"압축형 탄약"
+		"ko"		"압축된 탄약"
 	}
 	"Antidote Coated Bullets"
 	{
@@ -2311,7 +2311,7 @@
 	"Concentrated Agelitus"
 	{
 		"en"		"Concentrated Agelitus"
-		"ko"		"집중된 어질리투스"
+		"ko"		"농축된 어질리투스"
 	}
 	"Passive Perks"
 	{
@@ -2365,6 +2365,21 @@
 	{
 		"en"		"Hardened Stance"
 		"ko"		"단단한 골격"
+	}
+	"Living Armor"
+	{
+		"en"		"Living Armor"
+		"ko"		"생체 장갑"
+	}
+	"Living Armor Desc"
+	{
+		"en"		"-Armor now regens over 15 seconds if not hurt\n-Armor icon changes\n-Max Armor is halved\n-Armor protects only 50％ instead of 75％\n-Cant get armor from buildings\n-Armor corrosion disables this perk"
+		"ko"		"-피해를 입지 않으면 아머가 15초에 거쳐 재생\n-아머 아이콘 변경, 최대 아머가 절반으로 감소\n-아머의 피해 방어가 75%에서 50%로 감소\n-구조물에서 아머 획득 불가, 아머 부식이 있으면 퍽 비활성화"
+	}
+	"Living Armor Chat"
+	{
+		"en"		"When buying or selling this perk, you lose all armor, and cant regen armor if done outside of setup for some time."
+		"ko"		"이 퍽을 구매 및 판매할 때, 모든 아머를 잃게 되며, 준비 단계가 아니었다면 일시적으로 아머 재생이 중단됩니다."
 	}
 	"Sticky Support Grenades"
 	{
@@ -2543,7 +2558,7 @@
 	"Kahmlsteins Last Will"
 	{
 		"en"		"Kahmlsteins Last Will"
-		"ko"		"카멜슈타인의 마지막 의지"
+		"ko"		"카멜슈타인의 유언장"
 	}
 	"Matrix's Curse"
 	{
@@ -3664,17 +3679,17 @@
 	"Megawatt Massacre"
 	{
 		"en"	"Megawatt Massacre"
-		"ko"	"메가와트 매서커"
+		"ko"	"메가와트 대학살"
 	}
 	"Crisis Conductor"
 	{
 		"en"	"Crisis Conductor"
-		"ko"	"크라이시스 컨덕터"
+		"ko"	"고비 지휘자"
 	}
 	"Mortal Blackout"
 	{
 		"en"	"Mortal Blackout"
-		"ko"	"모탈 블랙아웃"
+		"ko"	"필멸의 소등"
 	}
 	"Junker Staff"
 	{
@@ -3884,7 +3899,7 @@
 	"Greater Garbage"
 	{
 		"en"		"Greater Garbage"
-		"ko"		"대형 쓰레기 대포"
+		"ko"		"대형 폐기물 대포"
 	}
 	"Trash Metal"
 	{
@@ -4124,12 +4139,12 @@
 	"Telum Pro Lege"
 	{
 		"en"		"Telum Pro Lege"
-		"ko"		"텔룸 프로 레지(법적 심판 무기)"
+		"ko"		"법적 심판 무기"
 	}
 	"Exactio Legis"
 	{
 		"en"		"Exactio Legis"
-		"ko"		"엑사티오 레지스(법 집행자)"
+		"ko"		"법 집행자"
 	}
 	"Полнолуние"
 	{
@@ -4294,7 +4309,7 @@
 	"Completionist Wand"
 	{
 		"en"		"Completionist Wand"
-		"ko"		"완벽주의자의 완드"
+		"ko"		"완벽주의자 완드"
 	}
 	"A Little Bit Of A Fast Wand"
 	{
@@ -4384,12 +4399,12 @@
 	"Berserker Brew"
 	{
 		"en"		"Berserker Brew"
-		"ko"		"광전사 브루"
+		"ko"		"광전사 포션"
 	}
 	"Unstable Concoction"
 	{
 		"en"		"Unstable Concoction"
-		"ko"		"불안정한 화합물"
+		"ko"		"불안정한 혼합물"
 	}
 	"Lead to Australium"
 	{
@@ -4414,7 +4429,7 @@
 	"Permanent Brew"
 	{
 		"en"		"Permanent Brew"
-		"ko"		"영원의 브루"
+		"ko"		"영원의 포션"
 	}
 	"Transforming Tonic Pap"
 	{
@@ -4429,7 +4444,7 @@
 	"Snowey Attraction Staff"
 	{
 		"en"		"Snowey Attraction Staff"
-		"ko"		"백설의 이끌림의 스태프"
+		"ko"		"백설 이끌림의 스태프"
 	}
 	"Chainblade"
 	{
@@ -5384,14 +5399,14 @@
 		"en" "Plasmic Surprise"
 		"es" "Sorpresa Plasmica"
 		"it" "Sorpresa plasmatica"
-		"ko" "플라즈믹 서프라이즈"
+		"ko" "플라즈마 서프라이즈"
 	}
 	"Plasmic Dosage"
 	{
 		"en" "Plasmic Dosage"
 		"es" "Dosis Plasmica"
 		"it" "Dosaggio plasmatico"
-		"ko" "투약형 플라즈마"
+		"ko" "투약용 플라즈마"
 	}
 	"Plasm-ubblinator"
 	{
@@ -5528,7 +5543,7 @@
 	{
 		"en"	"The Crimson"
 		"it"	"Il Cremisi"
-		"ko"	"''그림자처럼''"
+		"ko"	"그림자처럼"
 	}
 	"Effect:"
 	{
