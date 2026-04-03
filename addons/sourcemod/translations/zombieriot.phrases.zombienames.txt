@@ -8110,6 +8110,10 @@
 		"en"	"Australian Spider"
 		"ko"	"호주 거미"
 	}
+	"Australian Spider"
+	{
+		"en"	"A Massive spider from Australia. \n-Very fast. \n-Attakcs very fast \n-Very small \n-Very much a spider"
+	}
 	"Suction Medic"
 	{
 		"en"	"Suction Medic"
