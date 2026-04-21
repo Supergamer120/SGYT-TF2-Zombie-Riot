@@ -2150,13 +2150,30 @@ static void DefaultAirStrikeTalk(Castellan npc, float gameTime)
 			{
 				NPCPritToChat(npc.index, "{steelblue}", "Castellan_Talk_Ability2-3", false, false);
 				npc.m_flAttackHappens_2 = gameTime + 1.35;
-				npc.m_bAirStrikeTalk = 6;
+				case 0:npc.m_bAirStrikeTalk = 13;
+			}
+			/*if(!npc.m_iHealthBar)
+			{
+				NPCPritToChat(npc.index, "{steelblue}", "Castellan_Talk_Ability2-4", false, false);
+				npc.m_flAttackHappens_2 = gameTime + 1.35;int roll = GetRandomInt(1, 2);
+				{
+					case 0:npc.m_bAirStrikeTalk = 16;
+					// if case 0 is used again make it use strike talk 6
+					case 1:npc.m_bAirStrikeTalk = 19;
+					// if case 1 is used again make it use strike talk 11
+				}*/
 			}
 			else if(npc.m_bHalfRage)
 			{
 				NPCPritToChat(npc.index, "{steelblue}", "Castellan_Talk_Ability2-2", false, false);
 				npc.m_flAttackHappens_2 = gameTime + 1.35;
-				npc.m_bAirStrikeTalk = 3;
+				int roll = GetRandomInt(1, 2);
+				{
+					case 0:npc.m_bAirStrikeTalk = 3;
+					// if case 0 is used again make it use strike talk 6
+					case 1:npc.m_bAirStrikeTalk = 8;
+					// if case 1 is used again make it use strike talk 11
+				}
 			}
 			else
 			{
@@ -2205,25 +2222,151 @@ static void DefaultAirStrikeTalk(Castellan npc, float gameTime)
 		{
 			if(npc.m_flAttackHappens_2 < gameTime)
 			{
-				NPCPritToChat_Override("Victoria Atomizer", "{blue}", "Atomizer_Talk_Support-4", false);
-				npc.m_flAttackHappens_2 = gameTime + 0.8;
-				npc.m_bAirStrikeTalk=7;
+				NPCPritToChat_Override("Victoria Atomizer", "{blue}", "Atomizer_Talk_Support-7", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.6;
+				npc.m_bAirStrikeTalk=5;
 			}
 		}
 		case 7:
 		{
 			if(npc.m_flAttackHappens_2 < gameTime)
 			{
-				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-10", false);
-				npc.m_flAttackHappens_2 = gameTime + 0.8;
-				npc.m_bAirStrikeTalk=8;
+				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-14", false);
+				npc.m_bAirStrikeTalk=0;
+				npc.m_flAttackHappens_2=0.0;
 			}
 		}
 		case 8:
 		{
 			if(npc.m_flAttackHappens_2 < gameTime)
 			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-13", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=7;
+			}
+		}
+		case 9:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-15", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=8;
+			}
+		}
+		case 10:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-15", false);
+				npc.m_bAirStrikeTalk=0;
+				npc.m_flAttackHappens_2=0.0;
+			}
+		}
+		case 11:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-14", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=8;
+			}
+		}
+		case 12:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-14", false);
+				npc.m_bAirStrikeTalk=0;
+				npc.m_flAttackHappens_2=0.0;
+			}
+		}
+		case 13:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Atomizer", "{blue}", "Atomizer_Talk_Support-4", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=10;
+			}
+		}
+		case 14:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-10", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=11;
+			}
+		}
+		case 15:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
 				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-10", false);
+				npc.m_bAirStrikeTalk=0;
+				npc.m_flAttackHappens_2=0.0;
+			}
+		}
+		case 16:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-12", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=8;
+			}
+		}
+		case 17:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Atomizer", "{blue}", "Atomizer_Talk_Support-5", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.8;
+				npc.m_bAirStrikeTalk=10;
+			}
+		}
+		case 18:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-11", false);
+				npc.m_bAirStrikeTalk=0;
+				npc.m_flAttackHappens_2=0.0;
+			}
+		}
+		case 19:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Harrison", "{skyblue}", "Harrison_Talk_Support-13", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.6;
+				npc.m_bAirStrikeTalk=13;
+			}
+		}
+		case 20:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Huscarls", "{lightblue}", "Huscarls_Talk_Support-12", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.6;
+				npc.m_bAirStrikeTalk=14;
+			}
+		}
+		case 21:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Atomizer", "{blue}", "Atomizer_Talk_Support-6", false);
+				npc.m_flAttackHappens_2 = gameTime + 0.6;
+				npc.m_bAirStrikeTalk=15;
+			}
+		}
+		case 22:
+		{
+			if(npc.m_flAttackHappens_2 < gameTime)
+			{
+				NPCPritToChat_Override("Victoria Castellan", "{steelblue}", "Castellan_Talk_Ability2-5", false);
 				npc.m_bAirStrikeTalk=0;
 				npc.m_flAttackHappens_2=0.0;
 			}
@@ -2665,3 +2808,4 @@ stock int Victoria_GetPayback(int entity, bool inversion, bool ICantSEE)
 	}
 	return ClosestTarget;
 }
+
