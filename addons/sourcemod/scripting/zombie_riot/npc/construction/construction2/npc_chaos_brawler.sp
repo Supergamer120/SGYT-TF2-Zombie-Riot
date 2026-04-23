@@ -100,7 +100,7 @@ static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
 	return ChaosBrawler(vecPos, vecAng, team);
 }
-methodmap ChaoslBrawler < CClotBody
+methodmap ChaosBrawler < CClotBody
 {
 	public void PlayIdleSound() {
 		if(this.m_flNextIdleSound > GetGameTime(this.index))
