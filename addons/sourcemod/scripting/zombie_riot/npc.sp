@@ -1221,6 +1221,7 @@ void NPC_ConfigSetup()
 	ChaosBladeThrowerOnMapStart();
 	ChaosFencer_OnMapStart_NPC();
 	AlmagestProximaOnMapStart();
+	ChaosBrawlerOnMapStart();
 	
 	DungeonLoot_MapStart();
   
@@ -2721,3 +2722,4 @@ Action NpcSpecificOnTakeDamage(int victim, int &attacker, int &inflictor, float 
 #include "npc/construction/construction2/npc_lantean_drone_projectile.sp"
 #include "npc/construction/construction2/npc_starship_beacon.sp"
 #include "npc/construction/npc_dungeon_loot.sp"
+#include "npc/construction/construction2/npc_chaos_brawler.sp"
