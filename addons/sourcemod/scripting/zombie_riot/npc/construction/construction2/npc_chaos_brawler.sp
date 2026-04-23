@@ -88,8 +88,8 @@ void ChaosBrawler_OnMapStart_NPC()
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Chaos Brawler");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_chaos_brawler");
-	strcopy(data.Icon, sizeof(data.Icon), "heavy_champ");
-	data.IconCustom = false;
+	strcopy(data.Icon, sizeof(data.Icon), "chaos_insane");
+	data.IconCustom = true;
 	data.Flags = 0;
 	data.Category = Type_Outlaws;
 	data.Func = ClotSummon;
