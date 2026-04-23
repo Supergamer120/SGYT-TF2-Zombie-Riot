@@ -271,7 +271,7 @@ public void ChaosBrawler_ClotThink(int iNPC)
 					{
 						npc.PlayMeleeHitSound();
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB, -1, _, vecHit);
-Elemental_AddChaosDamage(target, npc.index, 300, false, true); 
+						Elemental_AddChaosDamage(target, npc.index, 300, false, true); 
 					}
 				}
 				delete swingTrace;
