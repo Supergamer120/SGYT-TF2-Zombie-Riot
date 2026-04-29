@@ -456,24 +456,21 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_agent_thompson");
 				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraDamage = 0.80;
-				enemy.ExtraSpeed = 1.30;
-				enemy.ExtraThinkSpeed = 0.8;
+				enemy.ExtraDamage = 0.75;;
 			}
 			case 19:
 			{
 				enemy.Index = NPC_GetByPlugin("npc_twins");
 				enemy.Health = RoundToFloor((4500000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.Data = "Im_The_raid;My_Twin";
-				enemy.ExtraDamage = 0.80;
-				enemy.ExtraSpeed = 1.30;
-				enemy.ExtraThinkSpeed = 0.90;
+				enemy.ExtraDamage = 0.75;
+				enemy.ExtraSpeed = 1.10;
 			}
 			case 20:
 			{
 				enemy.Index = NPC_GetByPlugin("npc_agent_johnson");
 				enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraDamage = 0.75; // johnson gets way too much damage in freeplay, reduce it
+				enemy.ExtraDamage = 0.70; // johnson gets way too much damage in freeplay, reduce it
 				enemy.ExtraThinkSpeed = 0.6;
 				enemy.ExtraSpeed = 1.50;
 			}
@@ -591,15 +588,17 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 				enemy.Health = RoundToFloor((750000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.Data = "wave_40";
 				enemy.ExtraThinkSpeed = 1.15;
+				enemy.ExtraDamage = 0.8;
+				enemy.ExtraSpeed = 0.9;
 			}
 			case 38:
 			{
 				enemy.Index = NPC_GetByPlugin("npc_black_heavy_soul");
 				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.Data = "wave_40";
-				enemy.ExtraSpeed = 0.9;
 				enemy.ExtraThinkSpeed = 1.15;
-				enemy.ExtraDamage = 0.90;
+				enemy.ExtraDamage = 0.8;
+				enemy.ExtraSpeed = 0.9;
 			}
 			case 39:
 			{
