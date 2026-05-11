@@ -1064,11 +1064,39 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 10:	
 		{
-			CPrintToChatAll("{green}Calmaticus! {gold}- {red}Aah, the good ol' days when the speed module had no limits...");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{green}Calmaticus! {gold}- {red}Aah, the good ol' days when the speed module had no limits...");
+				}
+				default:
+				{
+					CPrintToChatAll("{green}Calmaticus! {gold}- {red}The soirce of the Xeno infection");
+				}
+			}
 		}
 		case 11:	
 		{
-			CPrintToChatAll("{green}MR. X! {gold}- {red}Mister who? That should say Vivithorn.");
+			switch(GetRandomInt(1, 4))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{green}Vivithorn! {gold}- {red}The activater of the Xeno virus.");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{green}Virothorn! {gold}- {red}The original name for Vivithorn before it was the "ro" part was forgoten.");
+				}
+				case 3:
+				{
+					CPrintToChatAll("{green}Mr.Sex! {gold}- {red}Don't look at his sex files");
+				}
+				default:
+				{
+					CPrintToChatAll("{green}MR. X! {gold}- {red}Mister who? That should say Vivithorn.");
+				}
+			}
 		}
 		case 12:
 		{
@@ -1080,7 +1108,21 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 14:
 		{
-			CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Does he actually speak though? *note* he does.");
+			switch(GetRandomInt(1, 4))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Thankfully he's should be dead after the incident at the palace");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Hopefully he's gone after Kahml's sacrafice.");
+				}
+				default:
+				{
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Does he actually speak though?");
+				}
+			}
 		}
 		case 15:
 		{
@@ -1144,7 +1186,13 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 30:
 		{
-			CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
+			switch(GetRandomInt(1, 4))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
+				}
+			}
 		}
 		case 31:
 		{
