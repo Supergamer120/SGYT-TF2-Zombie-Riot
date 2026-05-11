@@ -1108,7 +1108,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 14:
 		{
-			switch(GetRandomInt(1, 4))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
@@ -1189,6 +1189,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			switch(GetRandomInt(1, 4))
 			{
 				case 1:
+				{
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
+				}
+				default:
 				{
 					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
 				}
