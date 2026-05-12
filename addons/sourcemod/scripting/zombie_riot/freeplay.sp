@@ -1256,7 +1256,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 37:
 		{
-			CPrintToChatAll("{purple}NO RANDOM KRANZ V3! {gold}- {red}Whats with the ''no random'' part? Also version 3?");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{purple}NO RANDOM KRANZ V3! {gold}- {red}Whats with the ''No Random'' part? Also version 3?");
+				}
+				default:
+				{
+					CPrintToChatAll("{purple}NO RANDOM KRANZ V3! {gold}- {red}Whats with the ''V3'' part? Also not random?");
+				}
+			}
 		}
 		case 38:
 		{
