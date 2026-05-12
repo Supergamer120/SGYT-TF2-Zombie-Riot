@@ -1029,7 +1029,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 3:
 		{
-			CPrintToChatAll("{yellow}SILVESTER {white}& {darkblue}WALDCH! {gold}- {red}Enjoy eating rocks!");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{yellow}SILVESTER {white}& {darkblue}WALDCH! {gold}- {red}The better silv duo fight!");
+				}
+				default:
+				{
+					CPrintToChatAll("{yellow}SILVESTER {white}& {darkblue}WALDCH! {gold}- {red}Enjoy eating rocks!");
+				}
+			}
 		}
 		case 4:
 		{
@@ -1068,11 +1078,11 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{green}Calmaticus! {gold}- {red}Aah, the good ol' days when the speed module had no limits...");
+					CPrintToChatAll("{green}CALMATICUS! {gold}- {red}Aah, the good ol' days when the speed module had no limits...");
 				}
 				default:
 				{
-					CPrintToChatAll("{green}Calmaticus! {gold}- {red}The soirce of the Xeno infection");
+					CPrintToChatAll("{green}CALMATICUS! {gold}- {red}The source of the Xeno infection");
 				}
 			}
 		}
@@ -1082,15 +1092,15 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{green}Vivithorn! {gold}- {red}The activater of the Xeno virus.");
+					CPrintToChatAll("{green}VIVITHORN! {gold}- {red}The activater of the Xeno virus.");
 				}
 				case 2:
 				{
-					CPrintToChatAll("{green}Virothorn! {gold}- {red}The original name for Vivithorn before it was the "ro" part was forgoten.");
+					CPrintToChatAll("{green}VIROTHORN! {gold}- {red}Oops, misspelled Vivithorn. :P");
 				}
 				case 3:
 				{
-					CPrintToChatAll("{green}Mr.Sex! {gold}- {red}Don't look at his sex files");
+					CPrintToChatAll("{green}MR.SEX! {gold}- {red}Don't look at his sex files");
 				}
 				default:
 				{
@@ -1130,7 +1140,25 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 16:
 		{
-			CPrintToChatAll("{lightblue}NEMAL! {gold}- {red}and silvester, of course!");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{lightblue}NEMAL! {gold}- {red}and silvester, of course!");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{yellow}SILVESTER! {gold}- {red}and nemal, of course!");
+				}
+				case 3:
+				{
+					CPrintToChatAll("{yellow}SILVESTER {white}& {lightblue}NEMAL! {gold}- {red}The better silv duo fight!");
+				}
+				default:
+				{
+					CPrintToChatAll("{lightblue}NEMAL {white}& {yellow}SILVESTER! {gold}- {red}The better silv duo fight!");
+				}
+			}
 		}
 		case 17:
 		{
@@ -1192,9 +1220,13 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				{
 					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
 				}
+				case 2:
+				{
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}This robot seems different from the other ones.");
+				}
 				default:
 				{
-					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Wonder who the {darkblue}creator {red}of this robot is?");
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}");
 				}
 			}
 		}
