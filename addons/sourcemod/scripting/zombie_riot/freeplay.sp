@@ -1112,6 +1112,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				{
 					CPrintToChatAll("{green}CALMATICUS! {gold}- {red}Aah, the good ol' days when the speed module had no limits...");
 				}
+				case 2:
+				{
+					CPrintToChatAll("{green}NEMESIS! {gold}- {red}Nemesis? That should say Calmaticus.");
+				}
 				default:
 				{
 					CPrintToChatAll("{green}CALMATICUS! {gold}- {red}The source of the Xeno infection");
