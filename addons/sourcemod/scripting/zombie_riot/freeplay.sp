@@ -1073,7 +1073,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 6:
 		{
-			CPrintToChatAll("{aqua}STELLA {white}& {crimson}KARLAS! {gold}- {red}Hope you like spinning blades!");
+			switch(GetRandomInt(1, 5))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{aqua}STELLA {white}& {crimson}KARLAS! {gold}- {red}Hope you like stella's laser of death!");
+				}
+				default:
+				{
+					CPrintToChatAll("{crimson}KARLAS {white}& {aqua}STELLA! {gold}- {red}Hope you like dealing with all of karlas's swords!");
+				}
+			}
 		}
 		case 7:	
 		{
