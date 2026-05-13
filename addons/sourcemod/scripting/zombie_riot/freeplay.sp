@@ -1252,15 +1252,29 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 36:
 		{
-			CPrintToChatAll("{red}MAZEAT {green}FABULOUS {purple}SQUAD {crimson}X {red}E{orange}L{yellow}I{green}T{blue}E{purple}! {gold}- {red}Oh it's so over for you guys...");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{red}MAZEAT {green}FABULOUS {purple}SQUAD {crimson}X {red}E{orange}L{yellow}I{green}T{blue}E{purple}! {gold}- {red}April Fools >:P!!!! oh.. im late...");
+				}
+				default:
+				{
+					CPrintToChatAll("{red}MAZEAT {green}FABULOUS {purple}SQUAD {crimson}X {red}E{orange}L{yellow}I{green}T{blue}E{purple}! {gold}- {red}Oh it's so over for you guys...");
+				}
+			}
 		}
 		case 37:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
 					CPrintToChatAll("{purple}NO RANDOM KRANZ V3! {gold}- {red}Whats with the ''No Random'' part? Also version 3?");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{purple}NO RANDOM KRANZ V3! {gold}- {red}April Fools >:P!!!! oh.. im late...");
 				}
 				default:
 				{
@@ -1270,11 +1284,35 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 38:
 		{
-			CPrintToChatAll("{black}BLACK HEAVY SOUL! {gold}- {red}The evil soul. But why is he a saiyan?");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{black}BLACK HEAVY SOUL! {gold}- {red}The evil soul. But why is he a saiyan?");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{black}BLACK HEAVY SOUL! {gold}- {red}April Fools >:P!!!! oh.. im late...");
+				}
+				default:
+				{
+					CPrintToChatAll("{black}BLACK HEAVY SOUL! {gold}- {red}He killed the others, now you guys must kill him");
+				}
+			}
 		}
 		case 39:
 		{
-			CPrintToChatAll("{red}KEVINMERY2009! {gold}- {red}I took data of your strongest mercenary and turned him into a boss!");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{red}KEVINMERY2009! {gold}- {red}April Fools >:P!!!! oh.. im late...");
+				}
+				default:
+				{
+					CPrintToChatAll("{red}KEVINMERY2009! {gold}- {red}I took data of your strongest mercenary and turned him into a boss!");
+				}
+			}
 		}
 		default:
 		{
