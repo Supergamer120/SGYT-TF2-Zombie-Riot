@@ -1029,11 +1029,23 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 3:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 5))
 			{
 				case 1:
 				{
 					CPrintToChatAll("{yellow}SILVESTER {white}& {darkblue}WALDCH! {gold}- {red}The better silv duo fight!");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{darkblue}WALDCH {white}& {yellow}SILVESTER ! {gold}- {red}Enjoy getting sniped from across the map");
+				}
+				case 3:
+				{
+					CPrintToChatAll("{yellow}SILVESTER! {gold}- {red}and waldch, of course!");
+				}
+				case 4:
+				{
+					CPrintToChatAll("{darkblue}WALDCH! {gold}- {red}and silvester, of course!");
 				}
 				default:
 				{
@@ -1043,7 +1055,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 4:
 		{
-			CPrintToChatAll("{lightblue}GOD ALAXIOS! {gold}- {red}Face the full power of Atlantis!");
+			switch(GetRandomInt(1, 5))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{lightblue}GOD ALAXIOS! {gold}- {red}If alaxios is the "god of life" then who's the "god of death"");
+				}
+				default:
+				{
+					CPrintToChatAll("{lightblue}GOD ALAXIOS! {gold}- {red}Face the full power of Atlantis!");
+				}
+			}
 		}
 		case 5:
 		{
@@ -1126,7 +1148,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 				case 2:
 				{
-					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Hopefully he's gone after Kahml's sacrafice.");
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Hopefully he's gone after Kahmlsteins sacrafice.");
 				}
 				default:
 				{
