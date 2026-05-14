@@ -1172,7 +1172,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 15:
 		{
-			CPrintToChatAll("{purple}VHXIS! {gold}- {red}Fight against the void gatekeeper once more!");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{purple}VHXIS! {gold}- {red}Was it really the best idea to fight him?");
+				}
+				default:
+				{
+					CPrintToChatAll("{purple}VHXIS! {gold}- {red}Fight against the void gatekeeper once more!");
+				}
+			}
 		}
 		case 16:
 		{
@@ -1198,15 +1208,25 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 17:
 		{
-			CPrintToChatAll("{purple}TWIRL! {gold}- {red}Oh so you're strong? Fight her!");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{purple}TWIRL! {gold}- {red}Oh so you're strong? Fight her!");
+				}
+				default:
+				{
+					CPrintToChatAll("{purple}TWIRL! {gold}- {red}The ruler of ruina descends!");
+				}
+			}
 		}
 		case 18:
 		{
-			CPrintToChatAll("{community}Agent... thompson. {crimson}ew. I buffed him a bit");
+			CPrintToChatAll("{community}Agent... thompson. {crimson}ew.");
 		}
 		case 19:
 		{
-			CPrintToChatAll("{forestgreen}The.... twins. {crimson}eew. I buffed them a bit");
+			CPrintToChatAll("{forestgreen}The.... twins. {crimson}eew.");
 		}
 		case 20:
 		{
@@ -1234,7 +1254,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 26:
 		{
-			CPrintToChatAll("{darkviolet}LELOUCH! {gold}- {red}The chaos-afflicted ruinian i've spoken about before...");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{darkviolet}LELOUCH! {gold}- {red}How did Chaos give him info about that pocket dimension thing... {snow}The Curtain, it's called Koshi.");
+				}
+				default:
+				{
+					CPrintToChatAll("{darkviolet}LELOUCH! {gold}- {red}The chaos-afflicted ruinian i've spoken about before...");
+				}
+			}
 		}
 		case 27:
 		{
@@ -1262,13 +1292,23 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 				default:
 				{
-					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}");
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Remember to be careful your surrounding, there may be a mine next to you, or a sniper aiming right at you");
 				}
 			}
 		}
 		case 31:
 		{
-			CPrintToChatAll("{rare}VINCENT! {gold}- {red}Lets see how much he yaps this time.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{rare}VINCENT! {gold}- {red}The only sentiant robot from that place.");
+				}
+				default:
+				{
+					CPrintToChatAll("{rare}VINCENT! {gold}- {red}Lets see how much he yaps this time.");
+				}
+			}
 		}
 		case 32:
 		{
