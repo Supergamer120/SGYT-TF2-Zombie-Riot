@@ -1272,7 +1272,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 28:
 		{
-			CPrintToChatAll("{rare}C.A.T.! {gold}- {red}It now considers you a trespassers of the laboratories.");
+			switch(GetRandomInt(1, 4))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{rare}C.A.T.! {gold}- {red}Zeina look, C.A.T. looks like you. :P{snow}And you look like one of those Glugs, Koshi.");
+				}
+				default:
+				{
+					CPrintToChatAll("{rare}C.A.T.! {gold}- {red}It now considers you a trespassers of the laboratories.");
+				}
+			}
 		}
 		case 29:
 		{
@@ -1387,6 +1397,24 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				default:
 				{
 					CPrintToChatAll("{red}KEVINMERY2009! {gold}- {red}I took data of your strongest mercenary and turned him into a boss!");
+				}
+			}
+		}
+		case 40:
+		{
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{aqua}OVERLORD THE LAST {white}& {crimson}BLADEDANCE! {gold}- {red}Hope you like stella's laser of death!");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{aqua}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}The new owner of Bladedance's casino is a great guy, he's named Grandpa Bard");
+				}
+				default:
+				{
+					CPrintToChatAll("{crimson}BLADEDANCE {white}& {aqua}OVERLORD THE LAST! {gold}- {red}Hope you like dealing with all of karlas's swords!");
 				}
 			}
 		}
