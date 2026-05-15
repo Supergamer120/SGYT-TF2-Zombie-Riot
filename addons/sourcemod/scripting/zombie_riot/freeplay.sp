@@ -1406,15 +1406,15 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{aqua}OVERLORD THE LAST {white}& {crimson}BLADEDANCE! {gold}- {red}Hope you like stella's laser of death!");
+					CPrintToChatAll("{crimson}OVERLORD THE LAST {white}& {crimson}BLADEDANCE! {gold}- {red}Don't let Overlord the Last see you, or else you'll burn! burn! burn!!");
 				}
 				case 2:
 				{
-					CPrintToChatAll("{aqua}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}The new owner of Bladedance's casino is a great guy, he's named Grandpa Bard");
+					CPrintToChatAll("{crimson}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}The new owner of Bladedance's casino is a great guy, his name is Grandpa Bard, have you heard of him?");
 				}
 				default:
 				{
-					CPrintToChatAll("{crimson}BLADEDANCE {white}& {aqua}OVERLORD THE LAST! {gold}- {red}Hope you like dealing with all of karlas's swords!");
+					CPrintToChatAll("{crimson}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}Instead of other people you fought, he will spawn clones of himself!");
 				}
 			}
 		}
