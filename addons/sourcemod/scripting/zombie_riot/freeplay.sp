@@ -535,26 +535,33 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			}
 			case 13:
 			{
-				switch(GetRandomInt(1, 10))
+				switch(GetRandomInt(1, 4))
 				{
 					case 1: 
 					{
+						enemy.Index = NPC_GetByPlugin("npc_shadow_flowering_darkness");
+						enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.9);
+					}
+					{
 						enemy.Index = NPC_GetByPlugin("npc_whiteflower_boss");
-						enemy.Health = RoundToFloor((7000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 						enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.9);
 						enemy.ExtraMeleeRes *= 3.0;
 						enemy.ExtraRangedRes *= 3.0;
 					}
-						enemy.Index = NPC_GetByPlugin("npc_whiteflower_boss");
-						enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-						enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.5);
-						enemy.ExtraMeleeRes *= 3.0;
-						enemy.ExtraRangedRes *= 3.0;
-					}
+					default:
 					{
 						enemy.Index = NPC_GetByPlugin("npc_whiteflower_flowering_darkness");
 						enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 						enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.9);
+					}
+					{
+						enemy.Index = NPC_GetByPlugin("npc_whiteflower_boss");
+						enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.9);
+						enemy.ExtraMeleeRes *= 3.0;
+						enemy.ExtraRangedRes *= 3.0;
 					}
 				}
 			}
@@ -575,11 +582,23 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 				{
 					case 1: 
 					{
-						
-				enemy.Index = NPC_GetByPlugin("npc_nemal");
-				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.Data = "wave_40";
-				enemy.ExtraDamage = 0.75;
+						enemy.Index = NPC_GetByPlugin("npc_sensal");
+						enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+					{
+						enemy.Index = NPC_GetByPlugin("npc_nemal");
+						enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+					default: 
+					{	
+						enemy.Index = NPC_GetByPlugin("npc_nemal");
+						enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40";
+						enemy.ExtraDamage = 0.75;
+					}
+				}
 			}
 			case 17:
 			{
@@ -587,9 +606,21 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 				{
 					case 1: 
 					{
-						
-				enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
-				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
+						enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+					{
+						enemy.Index = NPC_GetByPlugin("npc_stella");
+						enemy.Health = RoundToFloor((2000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+					default: 
+					{
+						enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
+						enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+					}
+				}
 			}
 			case 18:
 			{
@@ -757,36 +788,6 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_bladedance");
 				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
-				enemy.Data = "bossrush_duo";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((400000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
-				enemy.Data = "bossrush_duo";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((400000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
-				enemy.Data = "bossrush_duo";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((400000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
-				enemy.Data = "bossrush_duo";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((400000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
-				enemy.Data = "bossrush_duo";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((400000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.ExtraSpeed = 1.5;
 				enemy.Data = "bossrush_duo";
 			}
@@ -1332,7 +1333,18 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 13:
 		{
-			CPrintToChatAll("{crimson}WHITEFLOWER! {gold}- {red}...minus his army, of course.");
+			switch(GetRandomInt(1, 3))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{crimson}FLOWERING DARKNESS {white}& {crimson}WHITEFLOWER! {gold}- {red}The boss and co-boss of w.f.'s forces.");
+				}
+				default:
+				{
+					CPrintToChatAll("{crimson}WHITEFLOWER {white}& {crimson}FLOWERING DARKNESS! {gold}- {red}...minus the army, of course.");
+				}
+			}
+		}
 		}
 		case 14:
 		{
