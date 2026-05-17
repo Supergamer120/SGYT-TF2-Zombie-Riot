@@ -788,7 +788,7 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_bladedance");
 				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.5;
+				enemy.ExtraSpeed = 1.75;
 				enemy.Data = "bossrush_duo";
 			}
 			default:
@@ -1238,7 +1238,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 4:
 		{
-			switch(GetRandomInt(1, 5))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1256,7 +1256,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 6:
 		{
-			switch(GetRandomInt(1, 5))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1289,7 +1289,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 10:	
 		{
-			switch(GetRandomInt(1, 2))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
@@ -1333,7 +1333,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 13:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1366,7 +1366,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 15:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1380,7 +1380,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 16:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 4))
 			{
 				case 1:
 				{
@@ -1402,7 +1402,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 17:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1448,7 +1448,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 26:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1466,7 +1466,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 28:
 		{
-			switch(GetRandomInt(1, 4))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
@@ -1484,7 +1484,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 30:
 		{
-			switch(GetRandomInt(1, 4))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
@@ -1546,7 +1546,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 37:
 		{
-			switch(GetRandomInt(1, 2))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
@@ -1564,7 +1564,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 38:
 		{
-			switch(GetRandomInt(1, 2))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
