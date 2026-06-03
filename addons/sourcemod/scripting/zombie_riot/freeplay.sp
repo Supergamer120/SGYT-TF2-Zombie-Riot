@@ -1208,7 +1208,25 @@ static Action Freeplay_RouletteMessage(Handle timer)
 	{
 		case 2:
 		{
-			CPrintToChatAll("{crimson}THE BLITZKRIEG! {gold}- {red}Prepare to fight against the rogue machine!");
+			switch(GetRandomInt(1, 4))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{crimson}THE BLITZKRIEG! {gold}- {red}How was Vivithorn smart enough to hack Blitzkreig?");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{crimson}THE BLITZKRIEG! {gold}- {snow}That mission to send Blitz that abandoned lab was an huge mistake sadly...");
+				}
+				case 3:
+				{
+					CPrintToChatAll("{crimson}THE BLITZKRIEG! {gold}- {snow}I remember Blitz before he was hacked. he was nice to us expidonsans.");
+				}
+				default:
+				{
+					CPrintToChatAll("{crimson}THE BLITZKRIEG! {gold}- {red}Prepare to fight against the rogue machine!");
+				}
+			}
 		}
 		case 3:
 		{
@@ -1220,7 +1238,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 				case 2:
 				{
-					CPrintToChatAll("{darkblue}WALDCH {white}& {yellow}SILVESTER ! {gold}- {red}Enjoy getting sniped from across the map");
+					CPrintToChatAll("{darkblue}WALDCH {white}& {yellow}SILVESTER! {gold}- {red}Enjoy getting sniped from across the map");
 				}
 				case 3:
 				{
@@ -1229,6 +1247,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				case 4:
 				{
 					CPrintToChatAll("{darkblue}WALDCH! {gold}- {red}and silvester, of course!");
+				}
+				case 5:
+				{
+					CPrintToChatAll("{yellow}SILVESTER {white}& {darkblue}WALDCH! {gold}- {yellow}Hey thanks again for saving me from the Xeno infection");
 				}
 				default:
 				{
@@ -1242,7 +1264,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{lightblue}GOD ALAXIOS! {gold}- {red}If alaxios is the "god of life" then who's the "god of death"");
+					CPrintToChatAll("{lightblue}GOD ALAXIOS! {gold}- {red}If Alaxios is the 'god of life', then who's the 'god of death'");
 				}
 				default:
 				{
@@ -1252,7 +1274,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 5:
 		{
-			CPrintToChatAll("{blue}SENSAL! {gold}- {red}He shall reap you, and your resistances!");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{blue}SENSAL! {gold}- {blue}Lets see how good you guys do against me.");
+				}
+				default:
+				{
+					CPrintToChatAll("{blue}SENSAL! {gold}- {red}He shall reap you, and your resistances!");
+				}
+			}
 		}
 		case 6:
 		{
@@ -1261,6 +1293,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				case 1:
 				{
 					CPrintToChatAll("{aqua}STELLA {white}& {crimson}KARLAS! {gold}- {red}Hope you like stella's laser of death!");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{crimson}KARLAS {white}& {aqua}STELLA! {gold}- {red}oh hey Karlas, you here to watch. {crimson}*nods head* >:)");
 				}
 				default:
 				{
@@ -1307,7 +1343,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 11:	
 		{
-			switch(GetRandomInt(1, 4))
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
@@ -1317,10 +1353,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				{
 					CPrintToChatAll("{green}VIROTHORN! {gold}- {red}Oops, misspelled Vivithorn. :P");
 				}
-				case 3:
+				/*case 3:
 				{
 					CPrintToChatAll("{green}MR.SEX! {gold}- {red}Don't look at his sex files");
-				}
+				}*/
 				default:
 				{
 					CPrintToChatAll("{green}MR. X! {gold}- {red}Mister who? That should say Vivithorn.");
@@ -1333,34 +1369,41 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 13:
 		{
-			switch(GetRandomInt(1, 2))
+			CPrintToChatAll("{crimson}WHITEFLOWER! {gold}- {red}...minus his army, of course.");
+		}
+		/*case 13:
+		{
+			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
-					CPrintToChatAll("{crimson}FLOWERING DARKNESS {white}& {crimson}WHITEFLOWER! {gold}- {red}The boss and co-boss of w.f.'s forces.");
+					CPrintToChatAll("{crimson}FLOWERING DARKNESS {white}& {crimson}WHITEFLOWER! {gold}- {red}The co-boss and boss of w.f.'s forces.");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{crimson}}WHITEFLOWER {white}& {crimson}FLOWERING DARKNESS! {gold}- {red}The boss and co-boss of w.f.'s forces.");
 				}
 				default:
 				{
 					CPrintToChatAll("{crimson}WHITEFLOWER {white}& {crimson}FLOWERING DARKNESS! {gold}- {red}...minus the army, of course.");
 				}
 			}
-		}
-		}
+		}*/
 		case 14:
 		{
 			switch(GetRandomInt(1, 3))
 			{
 				case 1:
 				{
-					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Thankfully he's should be dead after the incident at the palace");
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Thankfully it's should be dead after the incident at the palace");
 				}
 				case 2:
 				{
-					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Hopefully he's gone after Kahmlsteins sacrafice.");
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Hopefully it's gone after Kahmlsteins sacrafice.");
 				}
 				default:
 				{
-					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Does he actually speak though?");
+					CPrintToChatAll("{purple}UNSPEAKABLE! {gold}- {red}Does it actually speak though?");
 				}
 			}
 		}
@@ -1394,6 +1437,10 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				{
 					CPrintToChatAll("{yellow}SILVESTER {white}& {lightblue}NEMAL! {gold}- {red}The better silv duo fight!");
 				}
+				case 4:
+				{
+					CPrintToChatAll("{lightblue}NEMAL! {gold}- {lightblue}Aah you guys are fighting me!!! Yay!");
+				}
 				default:
 				{
 					CPrintToChatAll("{lightblue}NEMAL {white}& {yellow}SILVESTER! {gold}- {red}The better silv duo fight!");
@@ -1416,35 +1463,127 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 18:
 		{
-			CPrintToChatAll("{community}Agent... thompson. {crimson}ew.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{community}Agent... thompson. {crimson}eeew.");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{community}Agent... thompson. {crimson}eew.");
+				}
+				default:
+				{
+					CPrintToChatAll("{community}Agent... thompson. {crimson}ew.");
+				}
+			}
 		}
 		case 19:
 		{
-			CPrintToChatAll("{forestgreen}The.... twins. {crimson}eew.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{forestgreen}The.... twins. {crimson}eeew.");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{forestgreen}The.... twins. {crimson}eew.");
+				}
+				default:
+				{
+					CPrintToChatAll("{forestgreen}The.... twins. {crimson}ew.");
+				}
+			}
 		}
 		case 20:
 		{
-			CPrintToChatAll("{community}Agent... johnson. {crimson}ew. Had to juice him up a bit cause how bad he is");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{community}Agent... johnson. {crimson}eeew. Had to juice him up a bit cause how bad he is");
+				}
+				case 2:
+				{
+					CPrintToChatAll("{community}Agent... johnson. {crimson}eew. Had to juice him up a bit cause how bad he is");
+				}
+				default:
+				{
+					CPrintToChatAll("{community}Agent... johnson. {crimson}ew. Had to juice him up a bit cause how bad he is");
+				}
+			}	
 		}
 		case 21:
 		{
-			CPrintToChatAll("{darkgreen}Agent Smith. {crimson}*stink sound effect*");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{darkgreen}Agent Smith. {crimson}Agent Stinky");
+				}
+				default:
+				{
+					CPrintToChatAll("{darkgreen}Agent Smith. {crimson}*stink sound effect*");
+				}
+			}
 		}
 		case 22:
 		{
-			CPrintToChatAll("{blue}ATOMIZER! {gold}- {red}I wonder what that nitro fuel is made of...");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{blue}ATOMIZER! {gold}- {red}The captain of Vesta's Leatherboots Scoutsquad!");
+				}
+				default:
+				{
+					CPrintToChatAll("{blue}ATOMIZER! {gold}- {red}I wonder what that nitro fuel is made of...");
+				}
+			}
 		}
 		case 23:
 		{
-			CPrintToChatAll("{lightblue}HUSCARLS! {gold}- {red}Running around in circles just to hit a wall!");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{lightblue}HUSCARLS! {gold}- {red}The lieutenant of Vesta's Irongate defence unit!");
+				}
+				default:
+				{
+					CPrintToChatAll("{lightblue}HUSCARLS! {gold}- {red}Running around in circles just to hit a wall!");
+				}
+			}
 		}
 		case 24:
 		{
-			CPrintToChatAll("{skyblue}HARRISON! {gold}- {red}His rockets surely won't miss you!");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{skyblue}HARRISON! {gold}- {red}The lieutenant colonel of Vesta's Stormtrooper team!");
+				}
+				default:
+				{
+					CPrintToChatAll("{skyblue}HARRISON! {gold}- {red}His rockets surely won't miss you!");
+				}
+			}
 		}
 		case 25:	
 		{
-			CPrintToChatAll("{steelblue}CASTELLAN! {gold}- {red}In the name of victoria, he won't allow you further in!");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{steelblue}CASTELLAN! {gold}- {red}The colonel of Vesta's army!");
+				}
+				default:
+				{
+					CPrintToChatAll("{steelblue}CASTELLAN! {gold}- {red}In the name of Vesta, he won't allow you further in!");
+				}
+			}
 		}
 		case 26:
 		{
@@ -1462,7 +1601,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 27:
 		{
-			CPrintToChatAll("{gold}OMEGA! - {red}Waltzing straight to you.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{gold}OMEGA! - {red}Baldy.");
+				}
+				default:
+				{
+					CPrintToChatAll("{gold}OMEGA! - {red}Waltzing straight to you.");
+				}
+			}
 		}
 		case 28:
 		{
@@ -1480,7 +1629,17 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 29:
 		{
-			CPrintToChatAll("{rare}A.R.I.S.! {gold}- {red}C.A.T. must have failed at stopping you.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{rare}A.R.I.S.! {gold}- {red}What if you had to fight both A.R.I.S. and C.A.T. at the same time.");
+				}
+				default:
+				{
+					CPrintToChatAll("{rare}A.R.I.S.! {gold}- {red}C.A.T. must have failed at stopping you.");
+				}
+			}
 		}
 		case 30:
 		{
@@ -1496,7 +1655,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 				default:
 				{
-					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Remember to be careful your surrounding, there may be a mine next to you, or a sniper aiming right at you");
+					CPrintToChatAll("{darkblue}C.H.I.M.E.R.A.! {gold}- {red}Remember to be careful your surrounding, there may be a mine next to you, or a sniper aiming right at you.");
 				}
 			}
 		}
@@ -1516,19 +1675,59 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		}
 		case 32:
 		{
-			CPrintToChatAll("{pink}REILA! {gold}- {red}Make sure you attack Reila herself first. I buffed her cause she has no umbrals supporting her");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{pink}REILA! {gold}- {red}The construct will buff reila and itself, but gives you more time to kill reila.");
+				}
+				default:
+				{
+					CPrintToChatAll("{pink}REILA! {gold}- {red}Make sure you attack Reila herself first. I buffed her cause she has no umbrals supporting her.");
+				}
+			}
 		}
 		case 33:
 		{
-			CPrintToChatAll("{black}JKEI! {gold}- {red}Hope we don't have to fight more from the Almagest Corporation. I buffed him cause he has no allies with him.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{black}JKEI! {gold}- {red}What's the whole deal with these Almagest Corp. dudes? I should ask Reila.");
+				}
+				default:
+				{
+					CPrintToChatAll("{black}JKEI! {gold}- {red}Hope we don't have to fight more from the Almagest Corporation. I buffed him cause he has no allies with him.");
+				}
+			}
 		}
 		case 34:
 		{
-			CPrintToChatAll("{darkgray}SHADOWING DARKNESS! {gold}- {red}The hardest challenge we have programmed into this. Good luck beating her.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{darkgray}SHADOWING DARKNESS! {gold}- {snow}Good luck with her. Koshi made her the hardest challenge in the simulation");
+				}
+				default:
+				{
+					CPrintToChatAll("{darkgray}SHADOWING DARKNESS! {gold}- {red}The hardest challenge we have programmed into this. Good luck beating her.");
+				}
+			}
 		}
 		case 35:
 		{
-			CPrintToChatAll("{black}ZILIUS! {gold}- {snow}If you guys beat him, I'll join you as a thanks for saving me from him. {red}I made him stronger cause he doesn't have his army.");
+			switch(GetRandomInt(1, 2))
+			{
+				case 1:
+				{
+					CPrintToChatAll("{black}ZILIUS! {gold}- {red}Sorry this caused him to imprison you Zeina. {snow}It's alright Koshi, at least these guys freed me from him.");
+				}
+				default:
+				{
+					CPrintToChatAll("{black}ZILIUS! {gold}- {snow}If you guys beat him, I'll join you as a thanks for saving me from him. {red}I made him stronger cause he doesn't have his army.");
+				}
+			}
 		}
 		case 36:
 		{
@@ -1594,27 +1793,19 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 			}
 		}
-		case 40:
+		default:
 		{
-			switch(GetRandomInt(1, 3))
+			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
-					CPrintToChatAll("{crimson}OVERLORD THE LAST {white}& {crimson}BLADEDANCE! {gold}- {red}Don't let Overlord the Last see you, or else you'll burn! burn! burn!!");
-				}
-				case 2:
-				{
-					CPrintToChatAll("{crimson}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}The new owner of Bladedance's casino is a great guy, his name is Grandpa Bard, have you heard of him?");
+					CPrintToChatAll("{yellow}INFECTED SILVESTER! {gold}- {red}Wonder how the Xeno Infection bypassed his shield?");
 				}
 				default:
 				{
-					CPrintToChatAll("{crimson}BLADEDANCE {white}& {crimson}OVERLORD THE LAST! {gold}- {red}Instead of other people you fought, he will spawn clones of himself!");
+					CPrintToChatAll("{yellow}INFECTED SILVESTER! {gold}- {red}An infected menace!");
 				}
 			}
-		}
-		default:
-		{
-			CPrintToChatAll("{yellow}INFECTED SILVESTER! {gold}- {red}An infected menace!");
 		}
 	}
 
