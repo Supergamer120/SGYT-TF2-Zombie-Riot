@@ -198,9 +198,7 @@ public void Construction_AH_Ally(int entity, StringMap map)
 public void Construction_BadExpi_Collect()
 {
 	if(!Construction_FinalBattle())
-	{
 		CreateTimer(4.0, Timer_DialogueNewEnd, 0, TIMER_FLAG_NO_MAPCHANGE);
-	}
 }
 
 static Action Timer_DialogueNewEnd(Handle timer, int part)
@@ -209,11 +207,14 @@ static Action Timer_DialogueNewEnd(Handle timer, int part)
 	{
 		case 0:
 		{
-			CPrintToChatAll("{black}???{default}: Hah, I knew you'll fall for it.");
+			if(Dungeon_Mode())
+				CPrintToChatAll("{crimson}This takes place in the first construction, it is only placed here for gameplay reasons.");
+			
+			CPrintToChatAll("{black}???{default}: Hah, I knew you'd fall for it.");
 		}
 		case 1:
 		{
-			CPrintToChatAll("{black}???{default}: So that's where your located.");
+			CPrintToChatAll("{black}???{default}: So that's where you're located.");
 		}
 		case 2:
 		{
@@ -225,7 +226,7 @@ static Action Timer_DialogueNewEnd(Handle timer, int part)
 		}
 		case 4:
 		{
-			CPrintToChatAll("{black}???{default}: So die you damn forerunners.");
+			CPrintToChatAll("{black}???{default}: Die you damn forerunners.");
 		}
 		default:
 		{
@@ -332,7 +333,7 @@ public void Construction_RareWeapon_Collect()
 	char name[64];
 	float discount = 0.7;
 
-	switch(GetURandomInt() % 6)
+	switch(GetURandomInt() % 4)
 	{
 		case 0, 1:
 		{
@@ -348,12 +349,32 @@ public void Construction_RareWeapon_Collect()
 		{
 			strcopy(name, sizeof(name), "Whistle Stop");
 		}
+		/*
 		case 4, 5:
 		{
 			strcopy(name, sizeof(name), "Ancestor Launcher");
 		}
+		*/
 	}
 
 	Store_DiscountNamedItem(name, 999, discount);
 	CPrintToChatAll("{green}Recovered Items: {palegreen}%s", name);
+}
+
+
+
+
+public void Xeno_Resurgance_Enemy(int entity)
+{
+	if(i_NpcIsABuilding[entity])
+		return;
+
+	if(view_as<CClotBody>(entity).m_iBleedType != BLEEDTYPE_XENO)
+		ApplyStatusEffect(entity, entity, "Xeno Infection Buff", 9999.9);
+	else
+		ApplyStatusEffect(entity, entity, "Xeno Infection Buff Only", 9999.9);
+}
+public void Xeno_Resurgance_End()
+{
+	Rogue_RemoveNamedArtifact("Xeno Resurgance");
 }

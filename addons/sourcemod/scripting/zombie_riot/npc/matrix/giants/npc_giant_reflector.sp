@@ -274,6 +274,8 @@ public void GiantReflector_ClotThink(int iNPC)
 						if(target > 0) 
 						{
 							float damage = 45.0;
+							if(ShouldNpcDealBonusDamage(target))
+								damage *= 5.0;
 
 							SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB, -1, _, vecHit);
 
@@ -315,29 +317,32 @@ public Action GiantReflector_OnTakeDamage(int victim, int &attacker, int &inflic
     {
 		if(fl_MatrixReflect[attacker] <= GetGameTime())
 		{
-			fl_MatrixReflect[attacker] = GetGameTime() + 1.0;
-			float parrydamage = GetRandomFloat(50.0, 60.0);
-			parrydamage *= npc.m_flWaveScale;
-			//damage *= 0.1;//how much the npc takes
+			if(!(i_HexCustomDamageTypes[victim] & ZR_DAMAGE_DO_NOT_APPLY_BURN_OR_BLEED))
+			{
+				fl_MatrixReflect[attacker] = GetGameTime() + 1.0;
+				float parrydamage = GetRandomFloat(50.0, 60.0);
+				parrydamage *= npc.m_flWaveScale;
+				//damage *= 0.1;//how much the npc takes
 
-			Elemental_AddCorruptionDamage(attacker, npc.index, npc.index ? 25 : 25);
-			static float Entity_Position[3];
-			WorldSpaceCenter(attacker, Entity_Position );
-			DataPack pack = new DataPack();
-			pack.WriteCell(EntIndexToEntRef(attacker));
-			pack.WriteCell(EntIndexToEntRef(npc.index));
-			pack.WriteCell(EntIndexToEntRef(npc.index));
-			pack.WriteFloat(parrydamage);
-			pack.WriteCell(DMG_CLUB);
-			pack.WriteCell(-1.0);
-			pack.WriteFloat(0.0);
-			pack.WriteFloat(0.0);
-			pack.WriteFloat(1.0);
-			pack.WriteFloat(Entity_Position[0]);
-			pack.WriteFloat(Entity_Position[1]);
-			pack.WriteFloat(Entity_Position[2]);
-			pack.WriteCell(ZR_DAMAGE_REFLECT_LOGIC);
-			RequestFrame(CauseDamageLaterSDKHooks_Takedamage, pack);
+				Elemental_AddCorruptionDamage(attacker, npc.index, npc.index ? 25 : 25);
+				static float Entity_Position[3];
+				WorldSpaceCenter(attacker, Entity_Position );
+				DataPack pack = new DataPack();
+				pack.WriteCell(EntIndexToEntRef(attacker));
+				pack.WriteCell(EntIndexToEntRef(npc.index));
+				pack.WriteCell(EntIndexToEntRef(npc.index));
+				pack.WriteFloat(parrydamage);
+				pack.WriteCell(DMG_CLUB);
+				pack.WriteCell(-1.0);
+				pack.WriteFloat(0.0);
+				pack.WriteFloat(0.0);
+				pack.WriteFloat(1.0);
+				pack.WriteFloat(Entity_Position[0]);
+				pack.WriteFloat(Entity_Position[1]);
+				pack.WriteFloat(Entity_Position[2]);
+				pack.WriteCell(ZR_DAMAGE_REFLECT_LOGIC);
+				RequestFrame(CauseDamageLaterSDKHooks_Takedamage, pack);
+			}
 		}
     }
 		

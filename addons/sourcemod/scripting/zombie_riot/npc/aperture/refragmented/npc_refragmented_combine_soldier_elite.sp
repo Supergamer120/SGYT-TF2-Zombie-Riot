@@ -183,22 +183,8 @@ methodmap RefragmentedCombineElite < CClotBody
 		
 		npc.m_iAttacksTillReload = 30;
 
-		npc.m_flMeleeArmor = 0.1;
-		npc.m_flRangedArmor = 0.1;
-
-		npc.m_iWearable2 = TF2_CreateGlow_White("models/combine_super_soldier.mdl", npc.index, 1.15);
-		if(IsValidEntity(npc.m_iWearable2))
-		{
-			SetEntProp(npc.m_iWearable2, Prop_Send, "m_bGlowEnabled", false);
-			SetEntityRenderMode(npc.m_iWearable2, RENDER_ENVIRONMENTAL);
-			TE_SetupParticleEffect("utaunt_signalinterference_parent", PATTACH_ABSORIGIN_FOLLOW, npc.m_iWearable2);
-			TE_WriteNum("m_bControlPoint1", npc.m_iWearable2);	
-			TE_SendToAll();
-		}
-
-		SetEntityRenderMode(npc.index, RENDER_GLOW);
-		SetEntityRenderColor(npc.index, 0, 0, 125, 200);
-
+		RefragmentedBase_Init(npc.index);
+		
 		npc.m_iWearable1 = npc.EquipItem("anim_attachment_RH", "models/weapons/w_irifle.mdl");
 		SetVariantString("1.15");
 		AcceptEntityInput(npc.m_iWearable1, "SetModelScale");
@@ -253,23 +239,9 @@ public void RefragmentedCombineElite_ClotThink(int iNPC)
 		npc.m_flSpeed = 260.0;
 	}
 	
+	RefragmentedBase_OnThink(npc.index, 10.0);
+	
 	int PrimaryThreatIndex = npc.m_iTarget;
-
-	float vecTarget2[3]; WorldSpaceCenter(PrimaryThreatIndex, vecTarget2);
-	float VecSelfNpc2[3]; WorldSpaceCenter(npc.index, VecSelfNpc2);
-	float distance = GetVectorDistance(vecTarget2, VecSelfNpc2, true);
-	float vecMe[3]; WorldSpaceCenter(npc.index, vecMe);
-	if(distance < (NORMAL_ENEMY_MELEE_RANGE_FLOAT_SQUARED * 0.25) && !i_IsABuilding[PrimaryThreatIndex])
-	{
-		npc.PlayHurtSound();
-		SDKHooks_TakeDamage(npc.index, PrimaryThreatIndex, PrimaryThreatIndex, 10.0, DMG_TRUEDAMAGE, -1, _, vecMe);
-		//Explode_Logic_Custom(10.0, npc.index, npc.index, -1, vecMe, 15.0, _, _, false, 1, false);
-		SetEntityRenderColor(npc.index, 180, 0, 0, 200);
-	}
-	if(distance > (NORMAL_ENEMY_MELEE_RANGE_FLOAT_SQUARED * 0.25) && !i_IsABuilding[PrimaryThreatIndex])
-	{
-		SetEntityRenderColor(npc.index, 0, 0, 125, 200);
-	}
 	
 	if(IsValidEnemy(npc.index, PrimaryThreatIndex))
 	{
@@ -322,9 +294,7 @@ public void RefragmentedCombineElite_ClotThink(int iNPC)
 			if(npc.m_flNextRangedSpecialAttack < GetGameTime(npc.index) && flDistanceToTarget > 62500 && flDistanceToTarget < 122500 && npc.m_flReloadDelay < GetGameTime(npc.index))
 			{
 				float vPredictedPos[3]; PredictSubjectPosition(npc, PrimaryThreatIndex,_,_, vPredictedPos);
-				int projectile = npc.FireParticleRocket(vPredictedPos, 3000.0, 400.0, 150.0, "burningplayer_blueglow", true);
-				SDKUnhook(projectile, SDKHook_StartTouch, Rocket_Particle_StartTouch);
-				SDKHook(projectile, SDKHook_StartTouch, Gay_Rocket_Particle_StartTouch);
+				npc.FireParticleRocket(vPredictedPos, 700.0, 400.0, 150.0, "burningplayer_blueglow", true);
 				npc.m_flNextRangedSpecialAttack = GetGameTime(npc.index) + 5.0;
 				npc.PlayRangedAttackSecondarySound();
 			}
@@ -390,7 +360,7 @@ public void RefragmentedCombineElite_ClotThink(int iNPC)
 					vecDir[2] = vecDirShooting[2] + x * vecSpread * vecRight[2] + y * vecSpread * vecUp[2]; 
 					NormalizeVector(vecDir, vecDir);
 					float WorldSpaceVec[3]; WorldSpaceCenter(npc.index, WorldSpaceVec);
-					FireBullet(npc.index, npc.m_iWearable1, WorldSpaceVec, vecDir, 10.0, 9000.0, DMG_BULLET, "bullet_tracer01_red");
+					FireBullet(npc.index, npc.m_iWearable1, WorldSpaceVec, vecDir, 20.0, 9000.0, DMG_BULLET, "bullet_tracer01_red");
 					
 					npc.PlayRangedSound();
 				}
@@ -432,7 +402,7 @@ public void RefragmentedCombineElite_ClotThink(int iNPC)
 								if(target > 0) 
 								{
 									{
-										SDKHooks_TakeDamage(target, npc.index, npc.index, 60.0, DMG_CLUB, -1, _, vecHit);
+										SDKHooks_TakeDamage(target, npc.index, npc.index, 90.0, DMG_CLUB, -1, _, vecHit);
 									}
 									
 									Custom_Knockback(npc.index, target, 400.0);
@@ -484,44 +454,6 @@ public Action RefragmentedCombineElite_OnTakeDamage(int victim, int &attacker, i
 	return Plugin_Changed;
 }
 
-public void Gay_Rocket_Particle_StartTouch(int entity, int target)
-{
-	if(target > 0 && target < MAXENTITIES)	//did we hit something???
-	{
-		int owner = GetEntPropEnt(entity, Prop_Send, "m_hOwnerEntity");
-		if(!IsValidEntity(owner))
-		{
-			owner = 0;
-		}
-		
-		int inflictor = h_ArrowInflictorRef[entity];
-		if(inflictor != -1)
-			inflictor = EntRefToEntIndex(h_ArrowInflictorRef[entity]);
-
-		if(inflictor == -1)
-			inflictor = owner;
-			
-		float ProjectileLoc[3];
-		GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
-
-		if(b_should_explode[entity])	//should we "explode" or do "kinetic" damage
-		{
-			SDKHooks_TakeDamage(target, owner, inflictor, 50.0, DMG_TRUEDAMAGE, -1);	//acts like a kinetic rocket
-		}
-
-	}
-	else
-	{
-		int particle = EntRefToEntIndex(i_WandParticle[entity]);
-		//we uhh, missed?
-		if(IsValidEntity(particle))
-		{
-			RemoveEntity(particle);
-		}
-	}
-	RemoveEntity(entity);
-}
-
 public void RefragmentedCombineElite_NPCDeath(int entity)
 {
 	RefragmentedCombineElite npc = view_as<RefragmentedCombineElite>(entity);
@@ -532,6 +464,6 @@ public void RefragmentedCombineElite_NPCDeath(int entity)
 	
 	if(IsValidEntity(npc.m_iWearable1))
 		RemoveEntity(npc.m_iWearable1);
-	if(IsValidEntity(npc.m_iWearable2))
-		RemoveEntity(npc.m_iWearable2);
+	
+	RefragmentedBase_OnDeath(npc.index);
 }

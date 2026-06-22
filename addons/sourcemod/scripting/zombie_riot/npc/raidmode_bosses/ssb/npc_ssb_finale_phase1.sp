@@ -1821,6 +1821,7 @@ methodmap SSBChair < CClotBody
 		RaidModeTime = GetGameTime(npc.index) + SSBChair_RaidTime;
 		RaidBossActive = EntIndexToEntRef(npc.index);
 		RaidAllowsBuildings = false;
+		RaidAllowLastman = true;
 
 		npc.m_iTeamGlow = TF2_CreateGlow(npc.index);
 		npc.m_bTeamGlowDefault = false;
@@ -2247,7 +2248,7 @@ void SSBChair_SummonAlly(int ssb, char[] plugin_name, int health = 0, int count,
 	}
 	else
 	{
-		int postWaves = CurrentRound - Waves_GetMaxRound();
+		int postWaves = CurrentRound[Rounds_Default] - Waves_GetMaxRound();
 		Freeplay_AddEnemy(postWaves, enemy, count);
 		if(count > 0)
 		{
@@ -2292,12 +2293,10 @@ int SSBChair_CreateProjectile(SSBChair owner, char model[255], float pos[3], flo
 		ActivateEntity(prop);
 		
 		SetEntityModel(prop, model);
-		char scaleChar[16];
-		Format(scaleChar, sizeof(scaleChar), "%f", scale);
-		DispatchKeyValue(prop, "modelscale", scaleChar);
 		
 		SetEntPropEnt(prop, Prop_Data, "m_hOwnerEntity", owner.index);
 		SetEntProp(prop, Prop_Data, "m_takedamage", 0, 1);
+		SetEntPropFloat(prop, Prop_Send, "m_flModelScale", scale);
 		
 		char skinChar[16];
 		Format(skinChar, 16, "%i", skin);

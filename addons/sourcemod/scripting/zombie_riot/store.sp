@@ -11,6 +11,12 @@ enum
 	PAP_DESC_PREVIEW
 }
 
+enum
+{
+	VIEW_TEUTON_NONE,
+	VIEW_TEUTON_ONLY,
+	VIEW_TEUTON_EXCEPTION
+}
 
 enum struct ItemInfo
 {
@@ -84,6 +90,13 @@ enum struct ItemInfo
 	Function FuncReload4;
 	Function FuncOnDeploy;
 	Function FuncOnHolster;
+	Function Func_OnPlayerRunCmd;
+	Function Func_WeaponCreated;
+	Function Func_MapStart;
+	Function Func_OnKill;
+	Function Func_TakeDamage_Take;
+	Function Func_TakeDamage_Deal;
+	Function Func_TakeDamage_Post;
 
 	Function FuncOnPap;
 
@@ -124,6 +137,7 @@ enum struct ItemInfo
 	int UnboxRarity;
 	bool CannotBeSavedByCookies;
 	Function FuncOnBuy;
+	Function FuncOnUnequipOrSell;
 	int PackBranches;
 	int PackSkip;
 
@@ -351,6 +365,42 @@ enum struct ItemInfo
 		kv.GetString(buffer, buffer, sizeof(buffer));
 		this.FuncOnHolster = GetFunctionByName(null, buffer);
 
+		Format(buffer, sizeof(buffer), "%sfunc_onplayerruncmd", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_OnPlayerRunCmd = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_ontakedamage_take", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_TakeDamage_Take = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_ontakedamage_take_post", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_TakeDamage_Post = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_onkill", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_OnKill = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_ontakedamage_deal", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_TakeDamage_Deal = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_weaponcreated", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_WeaponCreated = GetFunctionByName(null, buffer);
+
+		Format(buffer, sizeof(buffer), "%sfunc_mapstart", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.Func_MapStart = GetFunctionByName(null, buffer);
+
+		if(this.Func_MapStart != INVALID_FUNCTION)
+		{
+			Call_StartFunction(null, this.Func_MapStart);
+			Call_Finish();
+
+		}
+
+
 		Format(buffer, sizeof(buffer), "%sfunc_onpap", prefix);
 		kv.GetString(buffer, buffer, sizeof(buffer));
 		this.FuncOnPap = GetFunctionByName(null, buffer);
@@ -437,6 +487,10 @@ enum struct ItemInfo
 		kv.GetString(buffer, buffer, sizeof(buffer));
 		this.FuncOnBuy = GetFunctionByName(null, buffer);
 
+		Format(buffer, sizeof(buffer), "%sfunc_onunequip", prefix);
+		kv.GetString(buffer, buffer, sizeof(buffer));
+		this.FuncOnUnequipOrSell = GetFunctionByName(null, buffer);
+
 		/*Format(buffer, sizeof(buffer), "%stier", prefix);
 		this.Tier = kv.GetNum(buffer, -1);
 		
@@ -489,6 +543,7 @@ enum struct Item
 	bool NoKit;
 	bool ForceAllowWithKit; //For wrenches.
 	bool Internal_ClickEnhance;
+	int ViewTeutonOnly;
 	
 	ArrayList ItemInfos;
 	
@@ -563,6 +618,7 @@ static const char AmmoNames[][] =
 	"N/A"
 };
 
+static Handle AutoSaveTimer;
 static ArrayList StoreItems;
 static int NPCOnly[MAXPLAYERS];
 static int NPCCash[MAXPLAYERS];
@@ -575,6 +631,7 @@ static bool UsingChoosenTags[MAXPLAYERS];
 static int LastMenuPage[MAXPLAYERS];
 static int CurrentMenuPage[MAXPLAYERS];
 static int CurrentMenuItem[MAXPLAYERS];
+static Item LastBoughtWeapon[MAXPLAYERS];
 
 static bool HasMultiInSlot[MAXPLAYERS][6];
 static Function HolsterFunc[MAXPLAYERS] = {INVALID_FUNCTION, ...};
@@ -642,6 +699,7 @@ void Store_WeaponSwitch(int client, int weapon)
 
 	if(weapon != -1)
 	{
+		EntityFuncPlayerRunCmd[client] = EntityFuncPlayerRunCmd[weapon];
 		if(StoreWeapon[weapon] > 0)
 		{
 			static ItemInfo info;
@@ -712,6 +770,8 @@ float Ability_Check_Cooldown(int client, int what_slot, int thisWeapon = -1)
 stock float CooldownReductionAmount(int client)
 {
 	float Cooldown = 1.0;
+	if(CvarInfiniteCash.BoolValue)
+		Cooldown *= 0.01;
 	if(MazeatItemHas())
 	{
 		Cooldown *= 0.66;
@@ -730,6 +790,8 @@ stock float CooldownReductionAmount(int client)
 	}
 	if(i_CurrentEquippedPerk[client] & PERK_ENERGY_DRINK)
 		Cooldown *= 0.85;
+	if(i_CurrentEquippedPerk[client] & PERK_ENERGY_DRINK_X)
+		Cooldown *= 0.6;
 		
 	return Cooldown;
 }
@@ -740,32 +802,56 @@ void Ability_Apply_Cooldown(int client, int what_slot, float cooldown, int thisW
 	if(weapon != -1)
 	{
 		if(StoreWeapon[weapon] > 0)
-		{
-			static Item item;
-			StoreItems.GetArray(StoreWeapon[weapon], item);
-#if defined ZR
-			if(!ignoreCooldown)
-				cooldown *= CooldownReductionAmount(client);
-#endif
-			
-			switch(what_slot)
-			{
-				case 1:
-					item.Cooldown1[client] = cooldown + GetGameTime();
-				
-				case 2:
-					item.Cooldown2[client] = cooldown + GetGameTime();
-				
-				case 3:
-					item.Cooldown3[client] = cooldown + GetGameTime();
-				
-				default:
-					ThrowError("Invalid slot %d", what_slot);
-			}
-			
-			StoreItems.SetArray(StoreWeapon[weapon], item);
-		}
+			Store_ApplyCooldownIndex(client, StoreWeapon[weapon], what_slot, cooldown, ignoreCooldown);
 	}
+}
+
+void Store_ApplyCooldownIndex(int client, int index, int what_slot, float cooldown, bool ignoreCooldown = false)
+{
+	static Item item;
+	StoreItems.GetArray(index, item);
+#if defined ZR
+	if(!ignoreCooldown)
+		cooldown *= CooldownReductionAmount(client);
+#endif
+	
+	switch(what_slot)
+	{
+		case 1:
+			item.Cooldown1[client] = cooldown + GetGameTime();
+		
+		case 2:
+			item.Cooldown2[client] = cooldown + GetGameTime();
+		
+		case 3:
+			item.Cooldown3[client] = cooldown + GetGameTime();
+		
+		default:
+			ThrowError("Invalid slot %d", what_slot);
+	}
+	
+	StoreItems.SetArray(index, item);
+}
+
+stock float Store_GetCooldownIndex(int client, int index, int what_slot)
+{
+	static Item item;
+	StoreItems.GetArray(index, item);
+
+	switch(what_slot)
+	{
+		case 1:
+			return item.Cooldown1[client] - GetGameTime();
+		
+		case 2:
+			return item.Cooldown2[client] - GetGameTime();
+		
+		case 3:
+			return item.Cooldown3[client] - GetGameTime();
+	}
+
+	ThrowError("Invalid slot %d", what_slot);
+	return 0.0;
 }
 
 void Store_OpenItemPage(int client)
@@ -1001,6 +1087,7 @@ int Store_CycleItems(int client, int slot, bool ChangeWeapon = true)
 
 void Store_ConfigSetup()
 {
+	delete AutoSaveTimer;
 	Zero(f_ConfirmSellDo);
 	ClearAllTempAttributes();
 	delete StoreTags;
@@ -1021,6 +1108,8 @@ void Store_ConfigSetup()
 	
 //	delete StoreBalanceLog;
 	StoreItems = new ArrayList(sizeof(Item));
+
+	VScript_SetupStoreTable();
 	
 	char buffer[PLATFORM_MAX_PATH];
 	BuildPath(Path_SM, buffer, sizeof(buffer), CONFIG_CFG, "weapons");
@@ -1051,6 +1140,22 @@ void Store_ConfigSetup()
 //	BuildPath(Path_SM, buffer, sizeof(buffer), CONFIG_CFG, "weapons_usagelog");
 //	StoreBalanceLog = new KeyValues("UsageLog");
 //	StoreBalanceLog.ImportFromFile(buffer);
+
+	AutoSaveTimer = CreateTimer(10.0, AutoSaveTime, 1);
+}
+
+static Action AutoSaveTime(Handle timer, int client)
+{
+	int user = client + 1;
+	if(user > MaxClients)
+		user = client;
+	
+	AutoSaveTimer = CreateTimer(10.0, AutoSaveTime, user);
+
+	if(IsClientInGame(client) && !IsFakeClient(client))
+		Database_SaveGameData(client, DBPrio_Normal);
+	
+	return Plugin_Continue;
 }
 
 static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, bool rogueSell, const char[][] whitelist, int whitecount, const char[][] blacklist, int blackcount)
@@ -1095,9 +1200,9 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 			{
 				for(int a; a < filters; a++)
 				{
-					for(int b; b < whitecount; b++)
+					for(int b; b < blackcount; b++)
 					{
-						if(StrEqual(buffers[a], whitelist[b], false))
+						if(StrEqual(buffers[a], blacklist[b], false))
 						{
 							item.Hidden = true;
 							break;
@@ -1110,7 +1215,7 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 			}
 		}
 	}
-	
+
 	item.Starter = view_as<bool>(kv.GetNum("starter"));
 	item.WhiteOut = view_as<bool>(kv.GetNum("whiteout"));
 	item.IgnoreSlots = view_as<bool>(kv.GetNum("ignore_equip_region"));
@@ -1118,11 +1223,18 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 	item.NoKit = view_as<bool>(kv.GetNum("nokit", noKits ? 1 : 0));
 	item.ForceAllowWithKit = view_as<bool>(kv.GetNum("forcewithkits"));
 	item.Internal_ClickEnhance = view_as<bool>(kv.GetNum("enhanceweapon_click"));
+	item.ViewTeutonOnly = kv.GetNum("teuton_only", VIEW_TEUTON_NONE);
 	kv.GetString("textstore", item.Name, sizeof(item.Name));
 	item.GiftId = item.Name[0] ? Items_NameToId(item.Name) : -1;
 	kv.GetSectionName(item.Name, sizeof(item.Name));
 	item.Name[0] = CharToUpper(item.Name[0]);
 	
+	// VSript Table
+	kv.SetNum("parent", item.Section);
+	kv.SetNum("hidden", item.Hidden ? 1 : 0);
+	kv.SetNum("rogue_always_sell", item.RogueAlwaysSell ? 1 : 0);
+	kv.SetNum("nokit", item.NoKit ? 1 : 0);
+
 	if(isItem)
 	{
 		item.Scale = kv.GetNum("scale");
@@ -1137,6 +1249,10 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 		item.NPCWeapon = kv.GetNum("npc_type", -1);
 		item.NPCWeaponAlways = item.NPCWeapon > 9;
 		item.ChildKit = hiddenType == 2;
+		
+		// VSript Table
+		kv.SetNum("childkit", hiddenType == 2 ? 1 : 0);
+		VScript_AddStoreTable(kv, item.Name);
 
 		if(!item.ChildKit)
 		{
@@ -1158,7 +1274,7 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 		ItemInfo info;
 		info.SetupKV(kv, item.Name);
 		item.ItemInfos.PushArray(info);
-			
+
 		if(item.ParentKit)
 		{
 			if(kv.GotoFirstSubKey())
@@ -1189,6 +1305,9 @@ static void ConfigSetup(int section, KeyValues kv, int hiddenType, bool noKits, 
 	}
 	else if(kv.GotoFirstSubKey())
 	{
+		// VSript Table
+		VScript_AddStoreTable(kv, item.Name);
+
 		item.Slot = -1;
 		int sec = StoreItems.PushArray(item);
 		
@@ -1218,7 +1337,7 @@ bool Store_CanPapItem(int client, int index)
 				if(!parent.NPCSeller && !parent.RogueAlwaysSell)
 					return false;
 			}
-			else if(!item.NPCSeller && !item.RogueAlwaysSell)
+			else if(!item.NPCSeller && !RogueAlwaysSell(item))
 			{
 				return false;
 			}
@@ -1341,6 +1460,7 @@ void Store_PackMenu(int client, int index, int owneditemlevel = -1, int owner, b
 					}
 					
 					menu.Pagination = 6;
+					menu.ExitBackButton = true;
 					menu.ExitButton = true;
 					menu.Display(client, MENU_TIME_FOREVER);
 				}
@@ -1361,6 +1481,9 @@ public int Store_PackMenuH(Menu menu, MenuAction action, int client, int choice)
 		case MenuAction_Cancel:
 		{
 			ResetStoreMenuLogic(client);
+			
+			if(choice == MenuCancel_ExitBack)
+				MenuPage(client, -1);
 		}
 		case MenuAction_Select:
 		{
@@ -1482,6 +1605,8 @@ public int Store_PackMenuH(Menu menu, MenuAction action, int client, int choice)
 						Store_ApplyAttribs(client);
 						Store_GiveAll(client, GetClientHealth(client));
 					//	owner = EntRefToEntIndex(values[2]);
+						
+						LastBoughtWeapon[client] = item;
 
 						Function Func = info.FuncOnPap;
 
@@ -1565,6 +1690,10 @@ void Store_Reset()
 	for(int c; c<MAXPLAYERS; c++)
 	{
 		StarterCashMode[c] = true;
+		if(CvarInfiniteCash.BoolValue || PapModeDo == PAP_MODE_BUILDING_ONLY)
+		{
+			StarterCashMode[c] = false;
+		}
 		CashSpent[c] = 0;
 		CashSpentTotal[c] = 0;
 		CashSpentLoadout[c] = 0;
@@ -1636,6 +1765,17 @@ int Store_HasNamedItem(int client, const char[] name)
 	
 	ThrowError("Unknown item name %s", name);
 	return 0;
+}
+
+int Store_HasIndexItem(int client, int index)
+{
+	int length = StoreItems.Length;
+	if(index < 0 || index >= length)
+		return 0;
+	
+	static Item item;
+	StoreItems.GetArray(index, item);
+	return item.Owned[client];
 }
 
 void Store_SetNamedItem(int client, const char[] name, int amount)
@@ -1922,7 +2062,7 @@ void Store_ClientDisconnect(int client)
 {
 	Store_WeaponSwitch(client, -1);
 	
-	Database_SaveGameData(client);
+	Database_SaveGameData(client, DBPrio_High);
 
 	CashSpent[client] = 0;
 	CashSpentGivePostSetup[client] = 0;
@@ -1930,7 +2070,10 @@ void Store_ClientDisconnect(int client)
 	CashSpentTotal[client] = 0;
 	CashSpentLoadout[client] = 0;
 	StarterCashMode[client] = true;
-	
+	if(CvarInfiniteCash.BoolValue || PapModeDo == PAP_MODE_BUILDING_ONLY)
+	{
+		StarterCashMode[client] = false;
+	}
 	static Item item;
 	int length = StoreItems.Length;
 	for(int i; i<length; i++)
@@ -2064,8 +2207,8 @@ public void ReShowSettingsHud(int client)
 	menu2.AddItem("-85", buffer);
 	*/
 
-	Format(buffer, sizeof(buffer), "%T", "Taunt Speed increase", client);
-	if(b_TauntSpeedIncrease[client])
+	Format(buffer, sizeof(buffer), "%T", "Display Backwards Walk Notif", client);
+	if(b_BackwardsWalkNotif[client])
 	{
 		Format(buffer, sizeof(buffer), "%s %s", buffer, "[X]");
 	}
@@ -2546,7 +2689,10 @@ public int Settings_MenuPage(Menu menu, MenuAction action, int client, int choic
 				}
 				case -95:
 				{
-					StartTutorial(client);
+					if(Dungeon_Mode())
+						ExplainToClientDungeon(client, true);
+					else
+						StartTutorial(client);
 				}
 				case -64: //Lower Volume
 				{
@@ -2568,13 +2714,13 @@ public int Settings_MenuPage(Menu menu, MenuAction action, int client, int choic
 				}
 				case -71: 
 				{
-					if(b_TauntSpeedIncrease[client])
+					if(b_BackwardsWalkNotif[client])
 					{
-						b_TauntSpeedIncrease[client] = false;
+						b_BackwardsWalkNotif[client] = false;
 					}
 					else
 					{
-						b_TauntSpeedIncrease[client] = true;
+						b_BackwardsWalkNotif[client] = true;
 					}
 					ReShowSettingsHud(client);
 				}
@@ -2728,14 +2874,12 @@ void Store_DiscountNamedItem(const char[] name, int timed = 0, float discount = 
 			}
 
 			StoreItems.SetArray(i, item);
-			break;
+			return;
 		}
 	}
-}
 
-#define ZR_STORE_RESET (1 << 1) //This will reset the entire store to default
-#define ZR_STORE_DEFAULT_SALE (1 << 2) //This  will reset the current normally sold items, and put up a new set of items
-#define ZR_STORE_WAVEPASSED (1 << 3) //any storelogic that should be called when a wave passes
+	PrintToChatAll("ERROR: Store_DiscountNamedItem::%s:%d:%f unknown item", name, timed, discount);
+}
 
 void Store_RandomizeNPCStore(int StoreFlags, int addItem = 0, float override = -1.0)
 {
@@ -2743,7 +2887,7 @@ void Store_RandomizeNPCStore(int StoreFlags, int addItem = 0, float override = -
 	int length = StoreItems.Length;
 	int[] indexes = new int[length];
 	bool rogue = Rogue_Mode();
-	bool unlock = Rogue_UnlockStore();
+	int unlock = Rogue_UnlockStore();
 
 	static Item item;
 	static ItemInfo info;
@@ -2848,7 +2992,7 @@ void Store_RandomizeNPCStore(int StoreFlags, int addItem = 0, float override = -
 			{
 				if(item.GregOnlySell || (item.ItemInfos && item.GiftId == -1 && !item.NPCWeaponAlways && !item.GregBlockSell && (!item.Hidden)))
 				{
-					if(!item.NPCSeller && !item.RogueAlwaysSell)
+					if(!item.NPCSeller && !RogueAlwaysSell(item))
 					{
 						item.GetItemInfo(0, info);
 						if(info.Cost > 0 && info.Cost_Unlock < (GrigoriCashLogic / 3))
@@ -3040,7 +3184,7 @@ public Action Access_StoreViaCommand(int client, int args)
 
 void Store_Menu(int client)
 {
-	if(CvarInfiniteCash.BoolValue)
+	if(CvarInfiniteCash.BoolValue || PapModeDo == PAP_MODE_BUILDING_ONLY)
 	{
 		StarterCashMode[client] = false;
 	}
@@ -3115,6 +3259,8 @@ void Store_OpenGiftStore(int client, int entity, int price, bool barney)
 int PassClientBoughtLateGame(int client)
 {
 
+	if(PapModeDo == PAP_MODE_BUILDING_ONLY)
+		return 0;
 	//its too early in the wave, dont force clients to buy
 	if(CurrentCash <= 5000)
 		return 0;
@@ -3241,7 +3387,7 @@ static void MenuPage(int client, int section)
 					}
 				}
 			}
-			else if(CurrentRound < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
+			else if(CurrentRound[Rounds_Default] < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
 			{
 				Format(buffer, sizeof(buffer), "%T\n \n%s\n \n%s ", "TF2: Zombie Riot", client, buf, info.Custom_Name);
 			}
@@ -3485,7 +3631,7 @@ static void MenuPage(int client, int section)
 		}
 		else if(UsingChoosenTags[client])
 		{
-			if(CurrentRound < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
+			if(CurrentRound[Rounds_Default] < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
 			{
 				menu.SetTitle("%T\n%T\n%s\n \n ", starterPlayer ? "Starter Mode" : "TF2: Zombie Riot", client, "Cherrypick Weapon", client, buf);
 			}
@@ -3494,7 +3640,7 @@ static void MenuPage(int client, int section)
 				menu.SetTitle("%T\n%T\n%s\n%T\n ", starterPlayer ? "Starter Mode" : "TF2: Zombie Riot", client, "Cherrypick Weapon", client, buf, "Store Discount", client);
 			}
 		}
-		else if(CurrentRound < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
+		else if(CurrentRound[Rounds_Default] < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
 		{
 			menu.SetTitle("%T\n \n%s\n \n%s", starterPlayer ? "Starter Mode" : "TF2: Zombie Riot", client, buf, info.Custom_Name);
 		}
@@ -3524,7 +3670,7 @@ static void MenuPage(int client, int section)
 				menu.SetTitle("%T\n%T\n%T\n \n%s\n \n ", starterPlayer ? "Starter Mode" : "TF2: Zombie Riot", client, "The World Machine's Items", client,"All Items are 20％ off here!", client, buf);
 			}
 		}
-		else if(CurrentRound < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
+		else if(CurrentRound[Rounds_Default] < 2 || Rogue_NoDiscount() || Construction_Mode() || Dungeon_Mode() || !Waves_InSetup())
 		{
 			if(UsingChoosenTags[client])
 			{
@@ -3649,6 +3795,10 @@ static void MenuPage(int client, int section)
 		if(!Waves_Started())
 		{
 			StarterCashMode[client] = true;
+		}	
+		if(CvarInfiniteCash.BoolValue || PapModeDo == PAP_MODE_BUILDING_ONLY)
+		{
+			StarterCashMode[client] = false;
 		}
 		return;
 	}
@@ -3736,6 +3886,16 @@ static void MenuPage(int client, int section)
 				// Block showing items if only sell
 				continue;
 			}
+
+			//do not display pap in the menu if its building only.
+			if(PapModeDo == PAP_MODE_BUILDING_ONLY && item.Internal_ClickEnhance)
+				continue;
+			
+			if (item.ViewTeutonOnly == VIEW_TEUTON_ONLY && IsEntityAlive(client))
+				continue;
+			
+			if (item.ViewTeutonOnly == VIEW_TEUTON_EXCEPTION && !IsEntityAlive(client))
+				continue;
 			
 			if(item.GiftId != -1 && !Items_HasIdItem(client, item.GiftId))
 				continue;
@@ -3836,8 +3996,11 @@ static void MenuPage(int client, int section)
 					{
 						continue;
 					}
-					else if(!item.WhiteOut && Rogue_UnlockStore() && !item.NPCSeller && !item.RogueAlwaysSell && !CvarInfiniteCash.BoolValue)
+					else if(!item.WhiteOut && Rogue_UnlockStore() && !item.NPCSeller && (item.Hidden || (!RogueAlwaysSell(item))) && !CvarInfiniteCash.BoolValue)
 					{
+						if(Rogue_UnlockStore() > 1)
+							continue;
+						
 						Format(buffer, sizeof(buffer), "%s [↑]", info.Custom_Name);
 					}
 					else if(!item.WhiteOut && info.Cost_Unlock > 1000 && !Rogue_UnlockStore() && info.Cost_Unlock > CurrentCash)
@@ -3908,7 +4071,6 @@ static void MenuPage(int client, int section)
 				}
 			}
 		}
-			
 	}
 
 	if(UsingChoosenTags[client])
@@ -4424,11 +4586,47 @@ public int Store_MenuPage(Menu menu, MenuAction action, int client, int choice)
 							if(item.Internal_ClickEnhance)
 							{
 								DoNormal = 0;
-								int activeweapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
-								if(IsValidEntity(activeweapon) && StoreWeapon[activeweapon] > 0)
+								
+								int index1;
+								static Item item1;
+								
+								if (TeutonType[client])
 								{
-									static Item item1;
-									StoreItems.GetArray(StoreWeapon[activeweapon], item1);
+									// We can't hold any weapon as a teuton, so we search for our last-purchased weapon instead
+									Item itemLastBought;
+									itemLastBought = LastBoughtWeapon[client];
+									if (itemLastBought.Owned[client])
+									{
+										int length = StoreItems.Length;
+										for(int i; i<length; i++)
+										{
+											StoreItems.GetArray(i, item1);
+											if(StrEqual(itemLastBought.Name, item1.Name, false))
+											{
+												index1 = i;
+												break;
+											}
+										}
+									}
+									
+									// Couldn't find our last weapon... likely because we don't own it anymore (or never owned one at all)
+									if (index1 <= 0)
+										DoNormal = 2;
+								}
+								else
+								{
+									// We're not a teuton! Use our active weapon
+									int weapon = GetEntPropEnt(client, Prop_Send, "m_hActiveWeapon");
+									if (IsValidEntity(weapon))
+									{
+										index1 = StoreWeapon[weapon];
+										if (index1 > 0)
+											StoreItems.GetArray(index, item1);
+									}
+								}
+								
+								if(index1 > 0)
+								{
 									int level = item1.Owned[client]-1;
 									if(item1.ParentKit || level < 0)
 										level = 0;
@@ -4462,7 +4660,7 @@ public int Store_MenuPage(Menu menu, MenuAction action, int client, int choice)
 									if(CanBePapped)
 									{
 										DoNormal = 0;
-										Store_PackMenu(client, StoreWeapon[activeweapon], -1, client);
+										Store_PackMenu(client, index1, -1, client);
 									}
 								}
 								else
@@ -4673,6 +4871,8 @@ public int Store_MenuItemInt(Menu menu, MenuAction action, int client, int choic
 									subItem.Owned[client] = item.Owned[client];
 									subItem.Equipped[client] = true;
 									StoreItems.SetArray(i, subItem);
+									
+									LastBoughtWeapon[client] = subItem;
 								}
 							}
 							
@@ -4718,6 +4918,8 @@ public int Store_MenuItemInt(Menu menu, MenuAction action, int client, int choic
 								}
 								
 								ClientCommand(client, "playgamesound \"mvm/mvm_bought_upgrade.wav\"");
+								
+								LastBoughtWeapon[client] = item;
 							}
 						}
 						
@@ -4866,6 +5068,9 @@ public int Store_MenuItemInt(Menu menu, MenuAction action, int client, int choic
 					bool OwnedBefore = view_as<bool>(item.Owned[client]);
 					if(level < 1 || NPCOnly[client] == 2 || NPCOnly[client] == 3)
 						level = 1;
+
+					if(PapModeDo == PAP_MODE_BUILDING_ONLY)
+						OwnedBefore = false;
 
 					//can be papped ? See if yes
 					ItemInfo info2;
@@ -5292,6 +5497,12 @@ void Store_ApplyAttribs(int client)
 	map.SetValue("343", 1.0); //sentry attackspeed fix
 	map.SetValue("526", 1.0);//
 	map.SetValue("4049", 1.0);// Elemental Res
+	
+	if(PapModeDo == PAP_MODE_BUILDING_ONLY)
+	{
+		map.SetValue("4056", 0.05);	// Out of battle regen
+		map.SetValue("4061", 0.02);
+	}
 
 	map.SetValue("442", 1.0);	// Move Speed
 	map.SetValue("49", 1);	// no doublejumps
@@ -5314,13 +5525,19 @@ void Store_ApplyAttribs(int client)
 	else
 	{
 		
-		float MovementSpeed = 330.0;
+		float MovementSpeed = PapModeDo == PAP_MODE_BUILDING_ONLY ? 360.0 : 330.0;
 		
 		if(VIPBuilding_Active())
 		{
 			MovementSpeed = 419.0;
 			map.SetValue("443", 1.25);
 		}
+	
+		if(i_CurrentEquippedPerk[client] & PERK_MARATHON)
+		{
+			MovementSpeed += 20.0;
+		}
+
 		map.SetValue("107", RemoveExtraSpeed(ClassForStats, MovementSpeed));		// Move Speed
 	}
 
@@ -5362,20 +5579,28 @@ void Store_ApplyAttribs(int client)
 	{
 		map.SetValue("178", 0.65); //Faster Weapon Switch
 	}
-	
-	if(i_CurrentEquippedPerk[client] & PERK_MORNING_COFFEE) //increase sentry damage! Not attack rate, could end ugly.
-	{		
-		map.SetValue("287", 0.65);
-	}
-	else
+	if(i_CurrentEquippedPerk[client] & PERK_HASTY_HOPS_X)
 	{
-		map.SetValue("287", 0.5);
+		map.SetValue("178", (1.0 / 1.65)); //Faster Weapon Switch
 	}
+
+	float BuildingDmgSet = 2.0;
+	if(i_CurrentEquippedPerk[client] & PERK_MORNING_COFFEE_X)
+	{
+		BuildingDmgSet *= 1.35;
+	}
+	if(i_CurrentEquippedPerk[client] & PERK_MORNING_COFFEE) //increase sentry damage! Not attack rate, could end ugly.
+	{
+		BuildingDmgSet *= 1.17;
+	}
+
+	map.SetValue("287", BuildingDmgSet);
+	
 	map.SetValue("95", 1.0);
 
 	float value;
 	char buffer1[12];
-	if(!i_ClientHasCustomGearEquipped[client])
+	if(i_ClientHasCustomGearEquipped[client] < 2)
 	{
 		static ItemInfo info;
 		char buffer2[32];
@@ -5517,6 +5742,7 @@ void Store_ApplyAttribs(int client)
 	//Get the previous count to get back all their stats.
 	int clientid = GetSteamAccountID(client);
 	WeaponSpawn_Reapply(client, client, clientid);
+	StatusEffect_ApplySpeedPlayer(client);
 }
 
 void Store_GiveAll(int client, int health, bool removeWeapons = false)
@@ -5566,6 +5792,7 @@ void Store_GiveAllInternal(int client, int health, bool removeWeapons = false)
 	else if(StoreItems)
 	{
 		Store_RemoveSpecificItem(client, "Teutonic Longsword", false);
+		Store_RemoveSpecificItem(client, "Teutonic Longsword Shadow", false);
 	}
 	//OverridePlayerModel(client);
 	//stickies can stay, we delete any non spike stickies.
@@ -5623,7 +5850,7 @@ void Store_GiveAllInternal(int client, int health, bool removeWeapons = false)
 	b_HasGlassBuilder[client] = false;
 	b_LeftForDead[client] = false;
 	b_StickyExtraGrenades[client] = false;
-	b_HasMechanic[client] = false;
+//	b_HasMechanic[client] = false;
 	b_AggreviatedSilence[client] = false;
 	b_ProximityAmmo[client] = false;
 	b_ExpertTrapper[client] = false;
@@ -5632,7 +5859,7 @@ void Store_GiveAllInternal(int client, int health, bool removeWeapons = false)
 	b_CanSeeBuildingValues_Force[client] = false;
 	b_Reinforce[client] = false;
 	i_MaxSupportBuildingsLimit[client] = 0;
-	b_PlayerWasAirbornKnockbackReduction[client] = false;
+	b_PlayerWasAirbornKnockbackReduction[client] = 0;
 	BannerOnEntityCreated(client);
 	FullmoonEarlyReset(client);
 
@@ -5825,6 +6052,11 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 						else
 							CrossbowGiveDhook(entity, true);
 					}
+					if(saveslot == TFWeaponSlot_Melee)
+					{	
+						//this melee weapon will deal 0 damage from tf2's view
+						Attributes_Set(entity, 476, 0.0);
+					}
 					HidePlayerWeaponModel(client, entity, true);
 
 				}
@@ -6001,6 +6233,11 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 					EntityFuncAttack2[entity] = info.FuncAttack2;
 					EntityFuncAttack3[entity] = info.FuncAttack3;
 					EntityFuncReload4[entity]  = info.FuncReload4;
+					EntityFuncPlayerRunCmd[entity]  = info.Func_OnPlayerRunCmd;
+					EntityFuncTakeDamage[entity][0]  = info.Func_TakeDamage_Deal;
+					EntityFuncTakeDamage[entity][1]  = info.Func_TakeDamage_Take;
+					EntityFuncTakeDamage[entity][2]  = info.Func_TakeDamage_Post;
+					EntityFuncOnKill[entity]  = info.Func_OnKill;
 					
 					b_Do_Not_Compensate[entity] 				= info.NoLagComp;
 					b_Only_Compensate_CollisionBox[entity] 		= info.OnlyLagCompCollision;
@@ -6040,6 +6277,13 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 					{
 						Store_SwapToItem(client, entity);
 						use = false;
+					}
+					if(info.Func_WeaponCreated != INVALID_FUNCTION)
+					{
+						Call_StartFunction(null, info.Func_WeaponCreated);
+						Call_PushCell(client);
+						Call_PushCell(entity);
+						Call_Finish();
 					}
 				}
 			}
@@ -6155,10 +6399,10 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 					{
 						b_StickyExtraGrenades[client] = true;
 					}
-					if(info.SpecialAdditionViaNonAttribute == 7) //Mechanic
-					{
-						b_HasMechanic[client] = true;
-					}
+				//	if(info.SpecialAdditionViaNonAttribute == 7) //Mechanic
+				//	{
+				//		b_HasMechanic[client] = true;
+				//	}
 					if(info.SpecialAdditionViaNonAttribute == 8)
 					{
 						i_MaxSupportBuildingsLimit[client] += info.SpecialAdditionViaNonAttributeInfo;
@@ -6274,15 +6518,26 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 			if(Attributes_Has(entity, 97))
 				Attributes_SetMulti(entity, 97, 0.7);
 		}
+		if(i_CurrentEquippedPerk[client] & PERK_HASTY_HOPS_X)
+		{
+			//dont give it if it doesnt have it.
+			if(Attributes_Has(entity, 97))
+				Attributes_SetMulti(entity, 97, (1.0 / 1.65));
+		}
 
 		if(i_CurrentEquippedPerk[client] & PERK_MORNING_COFFEE)
 		{
 			if(Attributes_Has(entity, 6))
 				Attributes_SetMulti(entity, 6, 0.85);
 		}
+		if(i_CurrentEquippedPerk[client] & PERK_MORNING_COFFEE_X)
+		{
+			if(Attributes_Has(entity, 6))
+				Attributes_SetMulti(entity, 6, (1.0 / 1.35));
+		}
 
 		//DEADSHOT!
-		if(i_CurrentEquippedPerk[client] & PERK_MARKSMAN_BEER)
+		if((i_CurrentEquippedPerk[client] & PERK_MARKSMAN_BEER) || (i_CurrentEquippedPerk[client] & PERK_MARKSMAN_BEER_X))
 		{	
 			//dont give it if it doesnt have it.
 			if(Attributes_Has(entity, 103))
@@ -6348,13 +6603,13 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 		Enable_StarShooter(client, entity);
 		Enable_Passanger(client, entity);
 		Enable_MG42(client, entity);
-		Reset_stats_Irene_Singular_Weapon(entity);
+		Reset_stats_Amphi_Singular_Weapon(entity);
 		Reset_stats_MG42_Singular_Weapon(entity);
 		Activate_Beam_Wand_Pap(client, entity);
 		Activate_Yamato(client, entity);
 		Activate_Fantasy_Blade(client, entity);
 		Activate_Quincy_Bow(client, entity);
-		Enable_Irene(client, entity);
+		Enable_Amphi(client, entity);
 		Enable_LappLand(client, entity);
 		Enable_PHLOG(client, entity);
 		Enable_OceanSong(client, entity);
@@ -6403,7 +6658,7 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 		WeaponNailgun_Enable(client, entity);
 		Blacksmith_Enable(client, entity);
 		Enable_West_Weapon(client, entity);
-		Enable_Victorian_Launcher(client, entity);
+		Enable_Vestan_Launcher(client, entity);
 		Enable_Chainsaw(client, entity);
 		//Activate_Cosmic_Weapons(client, entity);
 		Merchant_Enable(client, entity);
@@ -6425,7 +6680,8 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 		Enable_KitOmega(client, entity);
 		Enable_PurgeKit(client, entity);
 		GemCrafter_Enable(client, entity);
-
+		VehicleFullAPC_WeaponEnable(client, entity);
+		Enable_ExploARWeapon(client, entity);
 		//give all revelant things back
 		WeaponSpawn_Reapply(client, entity, StoreWeapon[entity]);
 	}
@@ -6433,14 +6689,48 @@ int Store_GiveItem(int client, int index, bool &use=false, bool &found=false)
 	return entity;
 }
 
-int Store_GiveSpecificItem(int client, const char[] name)
+void Store_GiveItemIndex(int client, int index, int owned = 1, bool equipped = true, int sell = 0)
+{
+	if(index < 0 || index >= StoreItems.Length)
+		return;
+	
+	static Item item;
+	StoreItems.GetArray(index, item);
+	Store_EquipSlotCheck(client, item);
+
+	int level = owned - 1;
+	
+	static ItemInfo info;
+	for(; level >= 0; level--)
+	{
+		if(item.GetItemInfo(level, info))
+			break;
+	}
+	
+	item.Owned[client] = level + 1;
+	item.Equipped[client] = equipped;
+	item.BuyPrice[client] = sell;
+	item.Sell[client] = sell;
+	item.BuyWave[client] = -1;
+	StoreItems.SetArray(index, item);
+
+	if(!TeutonType[client] && !i_ClientHasCustomGearEquipped[client])
+	{
+		CheckMultiSlots(client);
+		Manual_Impulse_101(client, GetClientHealth(client));
+		Store_ApplyAttribs(client);
+		Store_GiveAll(client, GetClientHealth(client));
+	}
+}
+
+int Store_GiveSpecificItem(int client, const char[] name, bool UpdateSlots = true, int CompareWeaponArray = -1)
 {
 	static Item item;
 	int length = StoreItems.Length;
 	for(int i; i<length; i++)
 	{
 		StoreItems.GetArray(i, item);
-		if(StrEqual(name, item.Name, false))
+		if(StrEqual(name, item.Name, false) || CompareWeaponArray == i)
 		{
 			Store_EquipSlotCheck(client, item);
 
@@ -6454,7 +6744,9 @@ int Store_GiveSpecificItem(int client, const char[] name)
 			StoreItems.SetArray(i, item);
 			
 			int entity = Store_GiveItem(client, i, item.Equipped[client]);
-			CheckMultiSlots(client);
+			if(UpdateSlots)
+				CheckMultiSlots(client);
+			
 			return entity;
 		}
 	}
@@ -6522,6 +6814,13 @@ stock void Store_Unequip(int client, int index)
 	ItemInfo info;
 	if(item.GetItemInfo(0, info) && info.Cost <= 0)
 		item.Owned[client] = 0;
+		
+	if(info.FuncOnUnequipOrSell != INVALID_FUNCTION)
+	{
+		Call_StartFunction(null, info.FuncOnUnequipOrSell);
+		Call_PushCell(client);
+		Call_Finish();
+	}
 	
 	item.Equipped[client] = false;
 
@@ -6561,6 +6860,11 @@ bool Store_PrintLevelItems(int client, int level)
 		}
 	}
 	return found;
+}
+
+int Store_GetItemIndex(const char[] name)
+{
+	return StoreItems.FindString(name, Item::Name);
 }
 
 int Store_GetItemName(int index, int client = 0, char[] buffer, int leng, bool translate = true)
@@ -6719,8 +7023,11 @@ static void ItemCost(int client, Item item, int &cost)
 	cost += item.Scale * scaled; 
 	cost += item.CostPerWave * Waves_GetRoundScale();
 
-	if(Rogue_UnlockStore() && !item.NPCSeller && !item.RogueAlwaysSell && !CvarInfiniteCash.BoolValue)
+	if(Rogue_UnlockStore() && !item.NPCSeller && !RogueAlwaysSell(item) && !CvarInfiniteCash.BoolValue)
 	{
+		if(Rogue_UnlockStore() > 1)
+			cost = 999999;
+		
 		cost = RoundToNearest(float(cost) * 1.2); 
 	}
 	static ItemInfo info;
@@ -6777,25 +7084,6 @@ static void ItemCost(int client, Item item, int &cost)
 		{
 			cost = RoundToCeil(float(cost) * 0.9);
 		}
-		/*
-		if(!Rogue_Mode() && (CurrentRound != 0 || CurrentWave != -1) && cost)
-		{
-			switch(CurrentPlayers)
-			{
-				case 0:
-					CheckAlivePlayers();
-				
-				case 1:
-					cost = RoundToNearest(float(cost) * 0.9);
-				
-				case 2:
-					cost = RoundToNearest(float(cost) * 0.92);
-				
-				case 3:
-					cost = RoundToNearest(float(cost) * 0.95);
-			}
-		}
-		*/
 			
 	}
 	
@@ -6848,10 +7136,10 @@ static stock void ItemCostPap(const Item item, int &cost)
 				static Item parent;
 				StoreItems.GetArray(item.Section, parent);
 
-				if(!parent.NPCSeller && !parent.RogueAlwaysSell)
+				if(!parent.NPCSeller && !RogueAlwaysSell(parent))
 					NotFoundCost = true;
 			}
-			else if(!item.NPCSeller && !item.RogueAlwaysSell)
+			else if(!item.NPCSeller && !RogueAlwaysSell(item))
 			{
 				NotFoundCost = true;
 			}
@@ -7352,6 +7640,13 @@ void TryAndSellOrUnequipItem(int index, Item item, int client, bool ForceUneqip,
 			GetEntityClassname(active_weapon, buffer, sizeof(buffer));
 			if(IgnoreRestriction || (GetEntPropFloat(active_weapon, Prop_Send, "m_flNextPrimaryAttack") < GetGameTime() || GetEntPropFloat(active_weapon, Prop_Send, "m_flNextPrimaryAttack") >= FAR_FUTURE) && TF2_GetClassnameSlot(buffer, active_weapon) != TFWeaponSlot_PDA)
 			{
+				
+				if(info.FuncOnUnequipOrSell != INVALID_FUNCTION)
+				{
+					Call_StartFunction(null, info.FuncOnUnequipOrSell);
+					Call_PushCell(client);
+					Call_Finish();
+				}
 				Store_Unequip(client, index);
 				
 				Store_ApplyAttribs(client);
@@ -7375,7 +7670,12 @@ void TryAndSellOrUnequipItem(int index, Item item, int client, bool ForceUneqip,
 			GetEntityClassname(active_weapon, buffer, sizeof(buffer));
 			if(IgnoreRestriction || (GetEntPropFloat(active_weapon, Prop_Send, "m_flNextPrimaryAttack") < GetGameTime() || GetEntPropFloat(active_weapon, Prop_Send, "m_flNextPrimaryAttack") >= FAR_FUTURE) && TF2_GetClassnameSlot(buffer, active_weapon) != TFWeaponSlot_PDA)
 			{
-
+				if(info.FuncOnUnequipOrSell != INVALID_FUNCTION)
+				{
+					Call_StartFunction(null, info.FuncOnUnequipOrSell);
+					Call_PushCell(client);
+					Call_Finish();
+				}
 				int sell = item.Sell[client];
 				if(item.BuyWave[client] == Waves_GetRoundScale())
 					sell = item.BuyPrice[client];
@@ -7462,4 +7762,28 @@ bool Store_IsWeaponFaction(int client, int weapon, int faction)
 		return true;
 	
 	return false;
+}
+
+
+
+public void OnBuyOrSell_LivingArmor(int client)
+{
+	if(Armor_Charge[client] >= 0)
+		Armor_Charge[client] = 0;
+	if(f_LivingArmorPenalty[client] < GetGameTime())
+	{
+		SPrintToChat(client, "%t", "Living Armor Chat");
+		f_LivingArmorPenalty[client] = GetGameTime() + 0.1;
+	}
+	if(!Waves_InSetup())
+		f_LivingArmorPenalty[client] = GetGameTime() + 20.0;
+}
+
+bool RogueAlwaysSell(const Item item)
+{
+	if(PapModeDo == PAP_MODE_BUILDING_ONLY)
+		return false;
+
+	return item.RogueAlwaysSell;
+		
 }

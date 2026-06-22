@@ -62,9 +62,9 @@ void Diversionistico_OnMapStart_NPC()
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Diversionistico");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_diversionistico");
-	strcopy(data.Icon, sizeof(data.Icon), "diversionistico");
+	strcopy(data.Icon, sizeof(data.Icon), "spy");
 	data.IconCustom = true;
-	data.Flags = MVM_CLASS_FLAG_SUPPORT;
+	data.Flags = MVM_CLASS_FLAG_MISSION;
 	data.Category = Type_Expidonsa;
 	data.Func = ClotSummon;
 	NPCId = NPC_Add(data);
@@ -540,7 +540,18 @@ int TeleportDiversioToRandLocation(int iNPC, bool RespectOutOfBounds = false, fl
 			continue;
 		static float hullcheckmaxs_Player_Again[3];
 		static float hullcheckmins_Player_Again[3];
-		if(b_IsGiant[npc.index])
+		
+		if(f3_CustomMinMaxBoundingBox[npc.index][1] != 0.0)
+		{
+			hullcheckmaxs_Player_Again[0] = f3_CustomMinMaxBoundingBox[npc.index][0];
+			hullcheckmaxs_Player_Again[1] = f3_CustomMinMaxBoundingBox[npc.index][1];
+			hullcheckmaxs_Player_Again[2] = f3_CustomMinMaxBoundingBox[npc.index][2];
+
+			hullcheckmins_Player_Again[0] = -f3_CustomMinMaxBoundingBox[npc.index][0];
+			hullcheckmins_Player_Again[1] = -f3_CustomMinMaxBoundingBox[npc.index][1];
+			hullcheckmins_Player_Again[2] = 0.0;	
+		}
+		else if(b_IsGiant[npc.index])
 		{
 			hullcheckmaxs_Player_Again = view_as<float>( { 30.0, 30.0, 120.0 } );
 			hullcheckmins_Player_Again = view_as<float>( { -30.0, -30.0, 0.0 } );	
@@ -550,6 +561,7 @@ int TeleportDiversioToRandLocation(int iNPC, bool RespectOutOfBounds = false, fl
 			hullcheckmaxs_Player_Again = view_as<float>( { 24.0, 24.0, 82.0 } );
 			hullcheckmins_Player_Again = view_as<float>( { -24.0, -24.0, 0.0 } );		
 		}
+
 		if(IsBoxHazard(AproxRandomSpaceToWalkTo, hullcheckmins_Player_Again, hullcheckmaxs_Player_Again)) //Retry.
 			continue;
 

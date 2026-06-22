@@ -51,9 +51,6 @@ static const char g_TeleportSounds[][] = {
 static const char g_AngerSounds[][] = {
 	"mvm/mvm_tank_deploy.wav",
 };
-static const char g_LaserLoop[][] = {
-	"zombiesurvival/seaborn/loop_laser.mp3"
-};
 
 /*
 	Notepad:
@@ -256,7 +253,7 @@ void Lelouch_OnMapStart_NPC()
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Lelouch");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_lelouch");
-	data.Category = Type_BlueParadox;
+	data.Category = Type_Raid;
 	data.Func = ClotSummon;
 	data.Precache = ClotPrecache;
 	strcopy(data.Icon, sizeof(data.Icon), "lelouch"); 						//leaderboard_class_(insert the name)
@@ -406,11 +403,11 @@ methodmap Lelouch < CClotBody
 		}
 	}
 	public void PlayLaserLoopSound() {
-		if(fl_nightmare_cannon_core_sound_timer[this.index] > GetGameTime())
+		if(fl_RuinaLaserSoundTimer[this.index] > GetGameTime())
 			return;
 		
-		EmitCustomToAll(g_LaserLoop[GetRandomInt(0, sizeof(g_LaserLoop) - 1)], _, _, SNDLEVEL_RAIDSIREN, _, 0.7);
-		fl_nightmare_cannon_core_sound_timer[this.index] = GetGameTime() + 2.25;
+		EmitCustomToAll(g_RuinaLaserLoop[GetRandomInt(0, sizeof(g_RuinaLaserLoop) - 1)], _, _, SNDLEVEL_RAIDSIREN, _, 0.7);
+		fl_RuinaLaserSoundTimer[this.index] = GetGameTime() + 2.25;
 	}
 	public void PlayCrystalSounds()
 	{
@@ -621,7 +618,7 @@ methodmap Lelouch < CClotBody
 		SetVariantColor(view_as<int>({255, 255, 255, 255}));
 		AcceptEntityInput(npc.m_iTeamGlow, "SetGlowColor");
 
-		fl_nightmare_cannon_core_sound_timer[npc.index] = 0.0;
+		fl_RuinaLaserSoundTimer[npc.index] = 0.0;
 		b_Anchors_Created[npc.index] = false;
 		
 		MusicEnum music;
@@ -719,6 +716,7 @@ methodmap Lelouch < CClotBody
 		//this shouldnt ever start, no anti delay here.
 
 		RaidAllowsBuildings = false;
+		RaidAllowLastman = true;
 
 		char buffers[3][64];
 		ExplodeString(data, ";", buffers, sizeof(buffers), sizeof(buffers[]));
@@ -1257,7 +1255,7 @@ static void Crystal_Passive_Logic(Lelouch npc)
 
 	if(npc.m_flCrystalRevert < GameTime)
 	{
-		StopCustomSound(npc.index, SNDCHAN_STATIC, g_LaserLoop[GetRandomInt(0, sizeof(g_LaserLoop) - 1)]);
+		StopCustomSound(npc.index, SNDCHAN_STATIC, g_RuinaLaserLoop[GetRandomInt(0, sizeof(g_RuinaLaserLoop) - 1)]);
 		for(int y= 0 ; y < LELOUCH_MAX_CRYSTALS ; y++)
 		{
 			struct_Crystals[npc.index][y].state = 0;
@@ -1988,7 +1986,7 @@ static void Create_Anchors(Lelouch npc)
 	End_Animation(npc);
 
 	npc.m_flCrystalRevert = FAR_FUTURE;
-	StopCustomSound(npc.index, SNDCHAN_STATIC, g_LaserLoop[GetRandomInt(0, sizeof(g_LaserLoop) - 1)]);
+	StopCustomSound(npc.index, SNDCHAN_STATIC, g_RuinaLaserLoop[GetRandomInt(0, sizeof(g_RuinaLaserLoop) - 1)]);
 	for(int y= 0 ; y < LELOUCH_MAX_CRYSTALS ; y++)
 	{
 		struct_Crystals[npc.index][y].state = 0;
@@ -2087,6 +2085,8 @@ static int i_CreateAnchor(Lelouch npc, int loop, bool red = false)
 	int spawn_index = NPC_CreateByName("npc_ruina_magia_anchor", npc.index, AproxRandomSpaceToWalkTo, {0.0,0.0,0.0}, red ? TFTeam_Red : GetTeam(npc.index), Data);
 	if(spawn_index > MaxClients)
 	{
+		b_thisNpcIsABoss[spawn_index] = true;
+		b_NoHealthbar[spawn_index] = 1;
 		NpcStats_CopyStats(npc.index, spawn_index);
 		if(GetTeam(spawn_index) != TFTeam_Red)
 		{
@@ -2592,6 +2592,8 @@ static int i_CreateManipulation(Lelouch npc, float Spawn_Loc[3], float Spawn_Ang
 	int spawn_index = NPC_CreateByName("npc_ruina_manipulation", npc.index, Spawn_Loc, Spawn_Ang, GetTeam(npc.index), Model);
 	if(spawn_index > MaxClients)
 	{
+		b_thisNpcIsABoss[spawn_index] = true;
+		b_NoHealthbar[spawn_index] = 1;
 		NpcStats_CopyStats(npc.index, spawn_index);
 		if(GetTeam(npc.index) != TFTeam_Red)
 		{
@@ -2792,7 +2794,7 @@ static void LelouchSpawnEnemy(int alaxios, char[] plugin_name, int health = 0, i
 	}
 	else
 	{
-		int postWaves = CurrentRound - Waves_GetMaxRound();
+		int postWaves = CurrentRound[Rounds_Default] - Waves_GetMaxRound();
 		Freeplay_AddEnemy(postWaves, enemy, count);
 		if(count > 0)
 		{
@@ -2887,6 +2889,8 @@ static int i_summon_weaver(Lelouch npc)
 	int spawn_index = NPC_CreateByName("npc_interstellar_weaver", npc.index, Npc_Loc, ang, GetTeam(npc.index));
 	if(spawn_index > MaxClients)
 	{
+		b_thisNpcIsABoss[spawn_index] = true;
+		b_NoHealthbar[spawn_index] = 1;
 		NpcStats_CopyStats(npc.index, spawn_index);
 		if(GetTeam(npc.index) != TFTeam_Red)
 		{
@@ -3069,5 +3073,5 @@ void Lelouch_Lines(Lelouch npc, const char[] text)
 	if(b_test_mode[npc.index])
 		return;
 
-	CPrintToChatAll("%s %s", npc.GetName(), text);
+	PrintNPCMessageWithPrefixes(npc.index, NameColour, text, .messageColor = TextColour);
 }

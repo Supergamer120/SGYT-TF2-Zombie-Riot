@@ -59,7 +59,7 @@ void KevinMery_OnMapStart_NPC()
 	data.Precache = ClotPrecache;
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Mutation;
+	data.Category = Type_Raid;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 }
@@ -135,6 +135,7 @@ methodmap KevinMery < CClotBody
 
 		RaidBossActive = EntIndexToEntRef(npc.index);
 		RaidAllowsBuildings = false;
+		RaidAllowLastman = true;
 		
 		int iActivity = npc.LookupActivity("ACT_MP_RUN_MELEE_ALLCLASS");
 		if(iActivity > 0) npc.StartActivity(iActivity);
@@ -348,6 +349,24 @@ public void KevinMery_ClotThink(int iNPC)
 	
 	if(IsValidEnemy(npc.index, closest))
 	{
+		//Something something, don't try to cheese his knockback
+		int AntiCheeseReply = 0;
+		float vPredictedPosKevin[3];
+		PredictSubjectPosition(npc, npc.m_iTarget,_,_, vPredictedPosKevin);
+		vPredictedPosKevin = GetBehindTarget(npc.m_iTarget, 30.0 ,vPredictedPosKevin);
+		AntiCheeseReply = DiversionAntiCheese(npc.m_iTarget, npc.index, vPredictedPosKevin);
+		switch(AntiCheeseReply)
+		{
+			case 0:
+			{
+				//do nothing lol
+			}
+			case 1:
+			{
+				ApplyStatusEffect(npc.index, npc.index, "Trampling Prefix", 5.0);
+			}
+		}
+
 		float vecTarget[3]; WorldSpaceCenter(closest, vecTarget);
 			
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
@@ -493,8 +512,6 @@ static void KevinMery_SelfDefense(KevinMery npc, float gameTime, int target, flo
 								damage = 1.0;
 							}
 							SDKHooks_TakeDamage(targetTrace, npc.index, npc.index, damage, DMG_CLUB, -1, _, vecHit);
-							//Reduce damage after dealing
-							damage *= 0.92;
 							// On Hit stuff
 							bool Knocked = false;
 							if(!PlaySound)
@@ -633,7 +650,6 @@ public void KevinMery_NPCDeath(int entity)
 		npc.PlayDeathSound();	
 	}
 		
-	Music_SetRaidMusicSimple("vo/null.mp3", 60, false, 0.5);
 	if(IsValidEntity(npc.m_iWearable4))
 		RemoveEntity(npc.m_iWearable4);
 	if(IsValidEntity(npc.m_iWearable3))

@@ -298,7 +298,6 @@ static char VoteTitle[256];
 static char StartingItem[64];
 
 static ArrayList Curses;
-static ArrayList Artifacts;
 static ArrayList Floors;
 
 static int GameState;
@@ -314,7 +313,6 @@ static int LastFightCount;
 static int LastFightStage;
 static bool CurrentType;
 static ArrayList CurrentExclude;
-static ArrayList CurrentCollection;
 static ArrayList CurrentMissed;
 static int CurrentIngots;
 static int BonusLives;
@@ -427,6 +425,7 @@ void Rogue_MapStart()
 {
 	delete Voting;
 	delete Curses;
+	Rogue_CleanArtifacts();
 	delete Artifacts;
 	delete CurrentCollection;
 	RogueTheme = 0;
@@ -486,6 +485,7 @@ void Rogue_SetupVote(KeyValues kv, const char[] artifactOnly = "")
 	Floor floor;
 
 	delete Curses;
+	Rogue_CleanArtifacts();
 	delete Artifacts;
 	delete CurrentCollection;
 
@@ -851,6 +851,11 @@ void Rogue_StartSetup()	// Waves_RoundStart()
 	else if(StartingItem[0])
 	{
 		Rogue_GiveNamedArtifact(StartingItem);
+		
+		strcopy(WhatDifficultySetting, sizeof(WhatDifficultySetting), StartingItem);
+		strcopy(WhatDifficultySetting_Internal, sizeof(WhatDifficultySetting_Internal), StartingItem);
+		strcopy(WhatModifierSetting, sizeof(WhatModifierSetting), StartingItem);
+		WavesUpdateDifficultyName();
 	}
 
 	Rogue_SetProgressTime(wait, true, true);
@@ -866,6 +871,27 @@ void Rogue_StartSetup()	// Waves_RoundStart()
 	}
 }
 
+void Rogue_CleanArtifacts()
+{
+	if(CurrentCollection)
+	{
+		ArrayList list = CurrentCollection;
+		CurrentCollection = null;
+
+		Artifact artifact;
+		int length = list.Length;
+		for(int i; i < length; i++)
+		{
+			Artifacts.GetArray(list.Get(i), artifact);
+			if(artifact.FuncRemove != INVALID_FUNCTION)
+			{
+				Call_StartFunction(null, artifact.FuncRemove);
+				Call_Finish();
+			}
+		}
+		delete list;
+	}
+}
 void Rogue_RoundEnd()
 {
 	delete ProgressTimer;
@@ -978,6 +1004,12 @@ public Action Rogue_EndVote(Handle timer, float time)
 				Rogue_GiveNamedArtifact(vote.Name);
 				strcopy(StartingItem, sizeof(StartingItem), vote.Name);
 				Waves_SetReadyStatus(1);
+
+				strcopy(WhatDifficultySetting, sizeof(WhatDifficultySetting), StartingItem);
+				strcopy(WhatDifficultySetting_Internal, sizeof(WhatDifficultySetting_Internal), StartingItem);
+				strcopy(WhatModifierSetting, sizeof(WhatModifierSetting), vote.Name);
+				WavesUpdateDifficultyName();
+
 			}
 			else
 			{
@@ -2247,6 +2279,18 @@ static void StartStage(const Stage stage)
 		}
 	}
 
+	entity = -1;
+	while((entity = FindEntityByClassname(entity, "obj_vehicle")) != -1)
+	{
+		if(b_ThisNpcIsImmuneToNuke[entity])	// Temp car
+		{
+			RemoveEntity(entity);
+			continue;
+		}
+		
+		TeleportEntity(entity, pos, ang, NULL_VECTOR);
+	}
+
 	switch(RogueTheme)
 	{
 		case BlueParadox:
@@ -2549,7 +2593,7 @@ static void SetAllCamera(const char[] name = "", const char[] skyname = "")
 
 void Rogue_SetProgressTime(float time, bool hud, bool waitForPlayers = false)
 {
-	if(!Rogue_Mode())
+	if(!waitForPlayers && !Rogue_Mode())
 		return;
 	
 	delete ProgressTimer;
@@ -2745,11 +2789,20 @@ void Rogue_PlayerDowned(int client)
 
 bool Rogue_NoLastman()
 {
+	if(PapModeDo == PAP_MODE_BUILDING_ONLY)
+		return true;
+		
+	if(!ZR_AllowLastman())
+		return true;
+
 	return Rogue_Mode() && !Rogue_Paradox_Lastman();
 }
 
-bool Rogue_UnlockStore()
+int Rogue_UnlockStore()
 {
+	if(VScript_LockedWeapons())
+		return 2;
+	
 	return (Rogue_Mode() && RogueTheme == BlueParadox);
 }
 
@@ -2856,6 +2909,9 @@ void Rogue_GiveNamedArtifact(const char[] name, bool silent = false, bool noFail
 	
 	if(!CurrentCollection)
 		CurrentCollection = new ArrayList();
+
+	if(!silent && Dungeon_Mode())
+		EmitSoundToAll("ui/itemcrate_smash_rare.wav");
 	
 	Artifact artifact;
 	int length = Artifacts.Length;
@@ -3362,16 +3418,16 @@ bool Rogue_UpdateMvMStats()
 								switch(Rogue_GetUmbralLevel())
 								{
 									case 0:	// Most Friendly
-										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinity_best", MVM_CLASS_FLAG_NORMAL|MVM_CLASS_FLAG_ALWAYSCRIT, true);
+										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinitybestv2", MVM_CLASS_FLAG_NORMAL|MVM_CLASS_FLAG_ALWAYSCRIT, true);
 									
 									case 1, 2:
-										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinity_neutral", MVM_CLASS_FLAG_NORMAL, true);
+										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinityneutralv2", MVM_CLASS_FLAG_NORMAL, true);
 									
 									case 3:
-										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinity_bad", MVM_CLASS_FLAG_MINIBOSS, true);
+										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinitybadv3", MVM_CLASS_FLAG_MINIBOSS, true);
 									
 									default:	// Most Hated
-										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinity_worst", MVM_CLASS_FLAG_MINIBOSS|MVM_CLASS_FLAG_ALWAYSCRIT, true);
+										Waves_SetWaveClass(objective, i, CurrentUmbral, "affinityworstv2", MVM_CLASS_FLAG_MINIBOSS|MVM_CLASS_FLAG_ALWAYSCRIT, true);
 								}
 
 								continue;
@@ -3461,6 +3517,7 @@ void ForceClientViewOntoEntity(int client, int entity)
 		int viewcontrol = CreateEntityByName("prop_dynamic");
 		if (IsValidEntity(viewcontrol))
 		{
+			b_ThisEntityIgnored[viewcontrol] = true;	
 			GetEntPropVector(entity, Prop_Send, "m_angRotation", rotation);
 			GetEntPropVector(entity, Prop_Data, "m_vecOrigin", origin);
 			SetEntityModel(viewcontrol, "models/empty.mdl");

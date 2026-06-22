@@ -16,7 +16,7 @@ void ARISBeacon_OnMapStart_NPC()
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_aris_makeshift_beacon");
 	strcopy(data.Icon, sizeof(data.Icon), "");
 	data.Flags = -1;
-	data.Category = Type_Ally;
+	data.Category = Type_Hidden;
 	data.Func = ClotSummon;
 	data.Precache = ClotPrecache;
 	NPC_Add(data);
@@ -115,12 +115,7 @@ methodmap ARISBeacon < CClotBody
 		//counts as a static npc, means it wont count towards NPC limit.
 		AddNpcToAliveList(npc.index, 1);
 		
-		MakeObjectIntangeable(npc.index);
-		b_DoNotUnStuck[npc.index] = true;
-		b_NoKnockbackFromSources[npc.index] = true;
-		b_ThisEntityIgnored[npc.index] = true;
 		b_thisNpcIsARaid[npc.index] = true;
-		b_NoKillFeed[npc.index] = true;
 		
 		npc.m_flFullyActiveTime = GetGameTime() + ARISBEACON_BUILDUP_TIME;
 		

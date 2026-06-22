@@ -54,7 +54,7 @@ public void L4D2_Tank_OnMapStart_NPC()
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "L4D2 Tank");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_l4d2_tank");
-	strcopy(data.Icon, sizeof(data.Icon), "l4d2_tank");
+	strcopy(data.Icon, sizeof(data.Icon), "mb_l4dtank");
 	data.IconCustom = true;
 	data.Flags = 0;
 	data.Category = Type_Special;
@@ -197,7 +197,7 @@ methodmap L4D2_Tank < CClotBody
 			i_RaidGrantExtra[npc.index] = 1;
 		}
 
-		
+		b_thisNpcIsAMiniboss[npc.index] = true;
 		float wave = float(Waves_GetRoundScale()+1);
 		
 		wave *= 0.133333;

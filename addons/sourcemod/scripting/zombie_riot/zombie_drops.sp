@@ -156,30 +156,34 @@ public void DropPowerupChance(int entity)
 			}
 		}
 	}
-	i_KilledThisMany_Nuke += 1;
-	if(i_KilledThisMany_Nuke > i_KillTheseManyMorePowerup_Nuke || b_ForceSpawnNextTimeNuke)
+	if(!Dungeon_Mode())
 	{
-		if((GetRandomFloat(0.0, 1.0) * f_PowerupSpawnMulti) || b_ForceSpawnNextTimeNuke)
+		i_KilledThisMany_Nuke += 1;
+		if(i_KilledThisMany_Nuke > i_KillTheseManyMorePowerup_Nuke || b_ForceSpawnNextTimeNuke)
 		{
-			if(i_AllowNuke)
+			if((GetRandomFloat(0.0, 1.0) * f_PowerupSpawnMulti) || b_ForceSpawnNextTimeNuke)
 			{
-			//	i_AllowNuke = false;
-				
-				float VecOrigin[3];
-				GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
-				VecOrigin[2] += 54.0;
-				if(!IsPointHazard(VecOrigin) && !IsPointOutsideMap(VecOrigin)) //Is it valid?
+				if(i_AllowNuke)
 				{
-					b_ForceSpawnNextTimeNuke = false;
-					SpawnNuke(entity);
+				//	i_AllowNuke = false;
+					
+					float VecOrigin[3];
+					GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
+					VecOrigin[2] += 54.0;
+					if(!IsPointHazard(VecOrigin) && !IsPointOutsideMap(VecOrigin)) //Is it valid?
+					{
+						b_ForceSpawnNextTimeNuke = false;
+						SpawnNuke(entity);
+					}
+					else //Not a valid position, we must force it! next time we try!
+					{
+						b_ForceSpawnNextTimeNuke = true;
+					}
+					i_KilledThisMany_Nuke = 0;
 				}
-				else //Not a valid position, we must force it! next time we try!
-				{
-					b_ForceSpawnNextTimeNuke = true;
-				}
-				i_KilledThisMany_Nuke = 0;
 			}
 		}
+			
 	}
 	i_KilledThisMany_Maxammo += 1;
 	if(i_KilledThisMany_Maxammo > i_KillTheseManyMorePowerup_Maxammo || b_ForceSpawnNextTimeAmmo)
@@ -268,7 +272,6 @@ public void SpawnNuke(int entity)
 	{
 		b_ToggleTransparency[prop] = false;
 		DispatchKeyValue(prop, "model", NUKE_MODEL);
-		DispatchKeyValue(prop, "modelscale", "0.65");
 		DispatchKeyValue(prop, "StartDisabled", "false");
 		GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
 		DispatchKeyValue(prop, "Solid", "0");
@@ -277,6 +280,7 @@ public void SpawnNuke(int entity)
 		VecOrigin[2] += 54.0;
 		TeleportEntity(prop, VecOrigin, VecAngles, NULL_VECTOR);
 		DispatchSpawn(prop);
+		SetEntPropFloat(prop, Prop_Send, "m_flModelScale", 0.65);
 		SetEntityCollisionGroup(prop, 1);
 		AcceptEntityInput(prop, "DisableShadow");
 		AcceptEntityInput(prop, "DisableCollision");
@@ -353,7 +357,6 @@ void SpawnMaxAmmo(int entity, bool MenacinglyFlyToPlayer = false)
 	{
 		b_ToggleTransparency[prop] = false;
 		DispatchKeyValue(prop, "model", AMMO_MODEL);
-		DispatchKeyValue(prop, "modelscale", "1.0");
 		GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
 		DispatchKeyValue(prop, "StartDisabled", "false");
 		DispatchKeyValue(prop, "Solid", "0");
@@ -494,7 +497,6 @@ void SpawnHealth(int entity, bool MenacinglyFlyToPlayer = false)
 	{
 		b_ToggleTransparency[prop] = false;
 		DispatchKeyValue(prop, "model", HEALTH_MODEL);
-		DispatchKeyValue(prop, "modelscale", "1.0");
 		GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
 		DispatchKeyValue(prop, "StartDisabled", "false");
 		DispatchKeyValue(prop, "Solid", "0");
@@ -584,7 +586,6 @@ void SpawnMoney(int entity, bool MenacinglyFlyToPlayer = false)
 	{
 		b_ToggleTransparency[prop] = false;
 		DispatchKeyValue(prop, "model", MONEY_MODEL);
-		DispatchKeyValue(prop, "modelscale", "1.0");
 		GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
 		DispatchKeyValue(prop, "StartDisabled", "false");
 		DispatchKeyValue(prop, "Solid", "0");
@@ -723,7 +724,6 @@ public void SpawnGrigoriPowerup(int entity)
 	{
 		b_ToggleTransparency[prop] = false;
 		DispatchKeyValue(prop, "model", GRIGORI_POWERUP_MODEL);
-		DispatchKeyValue(prop, "modelscale", "0.65");
 		DispatchKeyValue(prop, "StartDisabled", "false");
 		GetEntPropVector(entity, Prop_Data, "m_vecOrigin", VecOrigin);
 		DispatchKeyValue(prop, "Solid", "0");
@@ -732,6 +732,7 @@ public void SpawnGrigoriPowerup(int entity)
 		VecOrigin[2] += 54.0;
 		TeleportEntity(prop, VecOrigin, VecAngles, NULL_VECTOR);
 		DispatchSpawn(prop);
+		SetEntPropFloat(prop, Prop_Send, "m_flModelScale", 0.65);
 		SetEntityCollisionGroup(prop, 1);
 		AcceptEntityInput(prop, "DisableShadow");
 		AcceptEntityInput(prop, "DisableCollision");

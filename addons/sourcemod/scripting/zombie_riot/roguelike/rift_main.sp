@@ -256,7 +256,15 @@ public float Rogue_Encounter_RiftShop()
 
 static void StartShopVote(bool first)
 {
-	ArrayList list = Rogue_CreateGenericVote(FinishShopVote, "Shop Encounter Title");
+	ArrayList list;
+	if(Dungeon_Mode())
+	{
+		list = Rogue_CreateGenericVote(FinishShopVote, "Shop Encounter Title Dungeon");
+	}
+	else
+	{
+		list = Rogue_CreateGenericVote(FinishShopVote, "Shop Encounter Title");
+	}
 	Vote vote;
 
 	strcopy(vote.Name, sizeof(vote.Name), "Better save up now");
@@ -444,11 +452,11 @@ static bool StartRiftVote(bool first)
 	ArrayList list = Rogue_CreateGenericVote(FinishRiftVote, "Rift Consume Encounter Title");
 	Vote vote;
 
-	int needToUseNow;
-	if(Rogue_GetFloor() == 4 && Rogue_HasNamedArtifact("Wordless Deed"))
-		needToUseNow = ConsumeLimit == 1 ? 2 : 1;
+//	int needToUseNow;
+//	if(Rogue_GetFloor() == 4 && Rogue_HasNamedArtifact("Wordless Deed"))
+//		needToUseNow = ConsumeLimit == 1 ? 2 : 1;
 	
-	if(!needToUseNow)
+//	if(!needToUseNow)
 	{
 		strcopy(vote.Name, sizeof(vote.Name), "Better save up now");
 		strcopy(vote.Desc, sizeof(vote.Desc), "Leave this encounter");
@@ -457,6 +465,7 @@ static bool StartRiftVote(bool first)
 	}
 
 	int found;
+	/*
 	if(needToUseNow == 2)	// Need to consume the item now!
 	{
 		strcopy(vote.Name, sizeof(vote.Name), "Wordless Deed");
@@ -465,12 +474,13 @@ static bool StartRiftVote(bool first)
 		list.PushArray(vote);
 		found++;
 	}
+	*/
 
 	ArrayList collection = Rogue_GetCurrentCollection();
 
 	if(collection)
 	{
-		vote.Locked = needToUseNow == 2;
+	//	vote.Locked = needToUseNow == 2;
 
 		Artifact artifact;
 		int length = collection.Length;
@@ -771,7 +781,7 @@ public void Rogue_Vote_Rift1(const Vote vote, int index)
 				Rogue_GiveNamedArtifact("Bob's Assistance", true, true);
 		}
 		case 1:
-		{
+		{	
 			Rogue_GiveNamedArtifact("Reila Assistance", true);
 			Rogue_GiveNamedArtifact("Wordless Deed");
 		}
@@ -836,6 +846,7 @@ public void Rogue_Rift1Good_Remove()
 	{
 		for(int client = 1; client <= MaxClients; client++)
 		{
+			
 			if(IsClientInGame(client))
 			{
 				Music_Stop_All(client);
@@ -1078,7 +1089,7 @@ public void Rogue_BookOfWeakness_Ally(int entity, StringMap map)
 public void Rogue_BookOfLiver_Ally(int entity, StringMap map)
 {
 	//give all perks at once
-	i_CurrentEquippedPerk[entity] = ((1 << 20) - 1);
+	i_CurrentEquippedPerk[entity] = (PERK_LOVER - 1);
 
 }
 public void Rogue_BookOfLiver_Remove(int entity)
@@ -1124,7 +1135,7 @@ public void Rogue_IncorruptableLeaf_TakeDamage(int victim, int &attacker, int &i
 	}
 	if(GiveRes)
 		if(!(damagetype & DMG_TRUEDAMAGE))
-			damage *= 0.85;
+			damage *= 0.75;
 }
 
 stock float Rogue_Rift_OptionalBonusBattle()

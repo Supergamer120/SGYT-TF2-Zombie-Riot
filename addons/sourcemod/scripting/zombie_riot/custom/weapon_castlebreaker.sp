@@ -4,7 +4,7 @@ static Handle h_TimerCastleBreakerWeaponManagement[MAXPLAYERS] = {null, ...};
 static bool b_AbilityActivated[MAXPLAYERS];
 static bool b_AbilityDone[MAXPLAYERS];
 static bool Change[MAXPLAYERS];
-static int i_VictoriaParticle[MAXPLAYERS];
+static int i_VestaParticle[MAXPLAYERS];
 static int CastleBreaker_WeaponPap[MAXPLAYERS];
 static float CastleBreaker_HUDDelay[MAXPLAYERS];
 
@@ -12,7 +12,6 @@ static int CastleBreaker_Cylinder[MAXPLAYERS];
 static float CastleBreaker_SoundsDelay[MAXPLAYERS];
 static int CashGainLimitWavePer_CastleBreaker[MAXPLAYERS];
 static float CastleBreaker_DoubleTapR[MAXPLAYERS];
-static bool CastleBreaker_ModeLock[MAXPLAYERS];
 
 #define MAX_CASH_PER_WAVE_CASTLEBREAKER 500
 
@@ -95,16 +94,13 @@ public void CastleBreaker_M1(int client, int weapon, bool crit, int slot)
 			SetDefaultHudPosition(client);
 			SetGlobalTransTarget(client);
 			ShowSyncHudText(client,  SyncHud_Notifaction, "%t", "Not Enough Ammo", Ammo_Cost);
-			if(!CastleBreaker_ModeLock[client])
-			{
-				Ability_Apply_Cooldown(client, 3, 5.0);
-				Change[client]=false;
-				DataPack pack;
-				CreateDataTimer(0.1, Timer_ChangeSound, pack, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
-				pack.WriteCell(GetClientUserId(client));
-				pack.WriteCell(EntIndexToEntRef(weapon));
-				pack.WriteCell(Change[client]);
-			}
+			Ability_Apply_Cooldown(client, 3, 5.0);
+			Change[client]=false;
+			DataPack pack;
+			CreateDataTimer(0.1, Timer_ChangeSound, pack, TIMER_FLAG_NO_MAPCHANGE|TIMER_REPEAT);
+			pack.WriteCell(GetClientUserId(client));
+			pack.WriteCell(EntIndexToEntRef(weapon));
+			pack.WriteCell(Change[client]);
 			return;
 		}
 		new_ammo -= 8;
@@ -150,37 +146,25 @@ public void CastleBreaker_Modechange(int client, int weapon, bool crit, int slot
 {
 	if(IsValidEntity(client))
 	{
-		bool ignore=false;
-		static float angles[3];
-		GetClientEyeAngles(client, angles);
-		if(angles[0] > 85.0)
-		{
-			if(CastleBreaker_DoubleTapR[client] < GetGameTime())
-				CastleBreaker_DoubleTapR[client] = GetGameTime() + 0.2;
-			else
-				ignore=true;
-		}
-		
-		if(!ignore && GetEntityFlags(client) & FL_DUCKING)
-		{
-			CastleBreaker_ModeLock[client]=!CastleBreaker_ModeLock[client];
-			ClientCommand(client, "playgamesound weapons/vaccinator_toggle.wav");
-			SetDefaultHudPosition(client);
-			SetGlobalTransTarget(client);
-			if(CastleBreaker_ModeLock[client])
-				ShowSyncHudText(client,  SyncHud_Notifaction, "Ability Lock");
-			else
-				ShowSyncHudText(client,  SyncHud_Notifaction, "Ability Unlock");
-			return;
-		}
-		
-		if(!ignore && CastleBreaker_ModeLock[client])
-		{
-			ClientCommand(client, "playgamesound items/medshotno1.wav");
-			SetDefaultHudPosition(client);
-			SetGlobalTransTarget(client);
-			ShowSyncHudText(client,  SyncHud_Notifaction, "Ability has Lock!");
-			return;
+		if(b_InteractWithReload[client])
+		{ 
+			bool R_AbilityBlock=false;
+			int building = EntRefToEntIndex(i2_MountedInfoAndBuilding[1][client]);
+			if(building != -1 && Building_Collect_Cooldown[building][client]<=0.0
+			&& IsInteractionBuilding(building))
+			{
+				static float angles[3];
+				GetClientEyeAngles(client, angles);
+				if(angles[0] < -70.0)
+				{
+					if(CastleBreaker_DoubleTapR[client] < GetGameTime())
+					{
+						CastleBreaker_DoubleTapR[client] = GetGameTime() + 0.2;
+						R_AbilityBlock=true;
+					}
+				}
+			}
+			if(R_AbilityBlock)return;
 		}
 		
 		int Ammo_Cost = 12;
@@ -293,7 +277,7 @@ public void Enable_CastleBreakerWeapon(int client, int weapon) // Enable managem
 		}
 		
 	}
-	if(Store_IsWeaponFaction(client, weapon, Faction_Victoria))	// Victoria
+	if(Store_IsWeaponFaction(client, weapon, Faction_Vesta))	// Vesta
 	{
 		for(int i = 1; i <= MaxClients; i++)
 		{
@@ -409,7 +393,7 @@ static void CreateCastleBreakerEffect(int client)
 	}
 	if(b_AbilityActivated[client])
 	{
-		int entity = EntRefToEntIndex(i_VictoriaParticle[client]);
+		int entity = EntRefToEntIndex(i_VestaParticle[client]);
 		if(!IsValidEntity(entity))
 		{
 			entity = EntRefToEntIndex(i_Viewmodel_PlayerModel[client]);
@@ -421,7 +405,7 @@ static void CreateCastleBreakerEffect(int client)
 				int particle = ParticleEffectAt(flPos, "eye_powerup_blue_lvl_3", 0.0);
 				AddEntityToThirdPersonTransitMode(entity, particle);
 				SetParent(entity, particle, "eyeglow_l");
-				i_VictoriaParticle[client] = EntIndexToEntRef(particle);
+				i_VestaParticle[client] = EntIndexToEntRef(particle);
 			}
 		}
 	}
@@ -430,10 +414,10 @@ static void CreateCastleBreakerEffect(int client)
 }
 static void DestroyCastleBreakerEffect(int client)
 {
-	int entity = EntRefToEntIndex(i_VictoriaParticle[client]);
+	int entity = EntRefToEntIndex(i_VestaParticle[client]);
 	if(IsValidEntity(entity))
 		RemoveEntity(entity);
-	i_VictoriaParticle[client] = INVALID_ENT_REFERENCE;
+	i_VestaParticle[client] = INVALID_ENT_REFERENCE;
 }
 
 static Action Timer_ChangeSound(Handle timer, DataPack pack)

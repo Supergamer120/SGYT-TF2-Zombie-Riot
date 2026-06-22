@@ -69,6 +69,18 @@ stock float fClamp(float fValue, float fMin, float fMax)
 
 	return fValue;
 }
+stock int iClamp(int iValue, int iMin, int iMax)
+{
+	if (iValue < iMin) {
+		return iMin;
+	}
+
+	if (iValue > iMax) {
+		return iMax;
+	}
+
+	return iValue;
+}
 
 stock int GetSpellbook(int client)
 {
@@ -270,13 +282,14 @@ void ResetReplications()
 	}
 }
 
-stock void CreateAttachedAnnotation(int client, int entity, float time, const char[] buffer)
+stock void CreateAttachedAnnotation(int client, int entity, float time, const char[] buffer, float offset = 0.0)
 {
 	Event event = CreateEvent("show_annotation");
 	if(event)
 	{
 		static float pos[3];
-		GetEntPropVector(entity, Prop_Send, "m_vecOrigin", pos);
+		GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", pos);
+		pos[2] += offset;
 		event.SetFloat("worldNormalX", pos[0]);
 		event.SetFloat("worldNormalY", pos[1]);
 		event.SetFloat("worldNormalZ", pos[2]);
@@ -738,10 +751,17 @@ stock void SetAmmo(int client, int type, int ammo)
 			ammo = 10;
 		//Never ever set lower then 1!!!
 		SetEntProp(client, Prop_Data, "m_iAmmo", ammo, _, Ammo_Metal_Sub);
+		RequestFrames(AutobuyMetalDelay, 2, EntIndexToEntRef(client), true);
 	}
 	SetEntProp(client, Prop_Data, "m_iAmmo", ammo, _, type);
+	//delay due to revive and allat
 }
-
+void AutobuyMetalDelay(int ref)
+{
+	int client = EntRefToEntIndex(ref);
+	if(IsValidClient(client))
+		AutobuyMetal(client);
+}
 #if defined _tf2items_included
 stock int SpawnWeapon(int client, char[] name, int index, int level, int qual, const int[] attrib, const float[] value, int count, int custom_classSetting = 0)
 {
@@ -750,10 +770,12 @@ stock int SpawnWeapon(int client, char[] name, int index, int level, int qual, c
 		custom_classSetting = 0;
 	}
 	int weapon = SpawnWeaponBase(client, name, index, level, qual, custom_classSetting);
+	
 	if(weapon != -1)
 	{
 		HandleAttributes(weapon, attrib, value, count); //Thanks suza! i love my min models
 	}
+	
 	return weapon;
 }
 
@@ -834,7 +856,7 @@ public void HandleAttributes(int weapon, const int[] attributes, const float[] v
 	}
 }
 
-void RemoveAllDefaultAttribsExceptStrings(int entity)
+stock void RemoveAllDefaultAttribsExceptStrings(int entity)
 {
 	Attributes_RemoveAll(entity);
 	
@@ -982,9 +1004,10 @@ stock float RemoveExtraSpeed(TFClassType class, float value)
 	}
 }
 
-void RequestFrames(RequestFrameCallback func, int frames, any data=0)
+void RequestFrames(RequestFrameCallback func, int frames, any data=0, bool NoCalcData = false)
 {
-	frames = RoundToNearest(TickrateModify * float(frames));
+	if(!NoCalcData)
+		frames = RoundToNearest(TickrateModify * float(frames));
 	DataPack pack = new DataPack();
 	pack.WriteCell(frames);
 	pack.WriteFunction(func);
@@ -1052,7 +1075,12 @@ int TF2_CreateGlow_White(const char[] model, int victim, float modelsize)
 	{
 	//	SetEntProp(entity, Prop_Data, "m_iInitialTeamNum", 2);
 	//	SetEntProp(entity, Prop_Send, "m_iTeamNum", 2);
-
+		
+		// Teleport the entity to its future parent before spawning it in case particles are attached, allows them to stop as intended
+		float origin[3];
+		GetAbsOrigin(victim, origin);
+		TeleportEntity(entity, origin);
+		
 		DispatchSpawn(entity);
 
 		SetEntityModel(entity, model);
@@ -1076,30 +1104,28 @@ int TF2_CreateGlow_White(const char[] model, int victim, float modelsize)
 stock void SetParent(int iParent, int iChild, const char[] szAttachment = "", const float vOffsets[3] = {0.0,0.0,0.0}, bool maintain_anyways = false)
 {
 	SetVariantString("!activator");
-	AcceptEntityInput(iChild, "SetParent", iParent, iChild);
+	AcceptEntityInput(iChild, "SetParent", iParent, iParent);
 	
-	if (szAttachment[0] != '\0') // Use at least a 0.01 second delay between SetParent and SetParentAttachment inputs.
+	if (szAttachment[0] == '\0') // Use at least a 0.01 second delay between SetParent and SetParentAttachment inputs.
+		return;
+
+	if(!StrEqual(szAttachment, "root"))
+		SetVariantString(szAttachment); // "head"
+
+	if (maintain_anyways || !AreVectorsEqual(vOffsets, view_as<float>({0.0,0.0,0.0}))) // NULL_VECTOR
 	{
-		if (szAttachment[0]) // do i even have anything?
+		if(!maintain_anyways)
 		{
-			SetVariantString(szAttachment); // "head"
+			float Vecpos[3];
 
-			if (maintain_anyways || !AreVectorsEqual(vOffsets, view_as<float>({0.0,0.0,0.0}))) // NULL_VECTOR
-			{
-				if(!maintain_anyways)
-				{
-					float Vecpos[3];
-
-					Vecpos = vOffsets;
-					SDKCall_SetLocalOrigin(iChild,Vecpos);
-				}
-				AcceptEntityInput(iChild, "SetParentAttachmentMaintainOffset", iParent, iChild);
-			}
-			else
-			{
-				AcceptEntityInput(iChild, "SetParentAttachment", iParent, iChild);
-			}
+			Vecpos = vOffsets;
+			SDKCall_SetLocalOrigin(iChild,Vecpos);
 		}
+		AcceptEntityInput(iChild, "SetParentAttachmentMaintainOffset", iParent, iChild);
+	}
+	else
+	{
+		AcceptEntityInput(iChild, "SetParentAttachment", iParent, iChild);
 	}
 }
 
@@ -1357,6 +1383,14 @@ stock int HealEntityGlobal(int healer,
 		if(!(flag_extrarules & (HEAL_ABSOLUTE)))
 			return 0;
 	}
+	if(HasSpecificBuff(receiver, "Wound Fatigue"))
+	{
+		//Ignore all healing that isnt absolute
+		if(!(flag_extrarules & (HEAL_ABSOLUTE)))
+			if(!(flag_extrarules & (HEAL_FLAG_AM)))
+				HealTotal *= 0.5;
+
+	}
 	if(HealTotal < 0)
 	{
 		if(healer > 0)
@@ -1371,6 +1405,9 @@ stock int HealEntityGlobal(int healer,
 
 	if(!(flag_extrarules & (HEAL_ABSOLUTE)))
 	{
+		if(ZR_Get_Modifier() == NOSTALGICA)
+			if(GetTeam(receiver) == TFTeam_Red)
+				HealTotal *= 0.75;
 #if defined ZR
 		if(HasSpecificBuff(healer, "Dimensional Turbulence"))
 		{
@@ -1390,7 +1427,7 @@ stock int HealEntityGlobal(int healer,
 			HealPenalty *= 0.75;
 		}
 
-		if((CurrentModifOn() == 3|| CurrentModifOn() == 2) && GetTeam(healer) != TFTeam_Red && GetTeam(receiver) != TFTeam_Red)
+		if((ZR_Get_Modifier() == 3|| ZR_Get_Modifier() == 2) && GetTeam(healer) != TFTeam_Red && GetTeam(receiver) != TFTeam_Red)
 		{
 			HealTotal *= 1.5;
 		}
@@ -2954,6 +2991,7 @@ stock int Target_Hit_Wand_Detection(int owner_projectile, int other_entity)
 		else
 			return -1;
 #else
+		if(GetTeam(owner_projectile) == GetTeam(other_entity))
 			return -1;
 #endif	
 	}
@@ -3062,7 +3100,7 @@ int CountPlayersOnRed(int alive = 0, bool saved = false)
 	for(int client=1; client<=MaxClients; client++)
 	{
 #if defined ZR
-		if(!b_IsPlayerABot[client] && b_HasBeenHereSinceStartOfWave[client] && IsClientInGame(client) && GetClientTeam(client)==2 && TeutonType[client] != TEUTON_WAITING)
+		if(!b_IsPlayerABot[client] && WasHereSinceStartOfWave(client) && IsClientInGame(client) && GetClientTeam(client)==2 && TeutonType[client] != TEUTON_WAITING)
 #else
 		if(!b_IsPlayerABot[client] && IsClientInGame(client) && GetClientTeam(client)==2)
 #endif
@@ -3113,7 +3151,7 @@ float ZRStocks_PlayerScalingDynamic(float rebels = 0.5, bool IgnoreMulti = false
 	{
 		if(!b_AntiLateSpawn_Allow[client])
 			continue;
-		if(!b_HasBeenHereSinceStartOfWave[client])
+		if(!WasHereSinceStartOfWave(client))
 			continue;
 		if(!b_IsPlayerABot[client] && IsClientInGame(client) && GetClientTeam(client)==2 && TeutonType[client] != TEUTON_WAITING)
 		{ 
@@ -3183,6 +3221,7 @@ void Projectile_DealElementalDamage(int victim, int attacker, float Scale = 1.0)
 	}
 }
 
+//bool OnlyWarnOnceEver = true;
 stock void Explode_Logic_Custom(float damage,
 int client, //To get attributes from and to see what is my enemy!
 int entity,	//Entity that gets forwarded or traced from/Distance checked.
@@ -3218,8 +3257,21 @@ int inflictor = 0)
 		if(explosion_range_dmg_falloff == EXPLOSION_RANGE_FALLOFF)
 			explosion_range_dmg_falloff = Attributes_Get(weapon, Attrib_OverrideExplodeDmgRadiusFalloff, EXPLOSION_RANGE_FALLOFF);
 	}
-#endif
-
+#endif	
+/*
+	if(explosionRadius >= 2100.0)
+	{
+		if(OnlyWarnOnceEver)
+		{
+			OnlyWarnOnceEver = false;
+			LogStackTrace("Please never go above 2k, patch this immedietly");
+			CPrintToChatAll("{crimson} A Bad error has accurred, you can still play, but please notify an admin and show this code: ''2100+''");
+		}
+		//why is this done? Any range above 2k causes immensive lag.
+		//at that point it  could just be global too.
+		explosionRadius = 2000.0;
+	}
+*/
 	//this should make explosives during raids more usefull.
 	if(!FromBlueNpc) //make sure that there even is any valid npc before we do these huge calcs.
 	{ 
@@ -3267,6 +3319,13 @@ int inflictor = 0)
 		} 
 	}
 	
+	if(ZR_Get_Modifier() == NOSTALGICA)
+	{
+		if(GetTeam(entity) == TFTeam_Red)
+		{
+			ExplosionDmgMultihitFalloff *= 0.75;
+		}
+	}
 	int damage_flags = 0;
 	int custom_flags = 0;
 	if((i_ExplosiveProjectileHexArray[entity] & EP_DEALS_CLUB_DAMAGE))
@@ -3458,6 +3517,7 @@ int inflictor = 0)
 			if(ShouldNpcDealBonusDamage(ClosestTarget))
 			{
 				damage_1 *= dmg_against_entity_multiplier; //enemy is an entityt that takes bonus dmg, and i am an npc.
+				damage_1 *= Attributes_Get(entityToEvaluateFrom, Attrib_MultiBuildingDamage, 1.0);
 			}
 			//against raids, any aoe ability should be better as they are usually alone or its only two.
 			if(b_thisNpcIsARaid[ClosestTarget])
@@ -3491,8 +3551,13 @@ int inflictor = 0)
 				//we apply 50% more range, reason being is that this goes for collision boxes, so it can be abit off
 				//idealy we should fire a trace and see the distance from the trace
 				//ill do it in abit if i dont forget.
-				float ExplosionRangeFalloff = Pow(explosion_range_dmg_falloff, (ClosestDistance/((explosionRadius * explosionRadius) * 1.5))); //this is 1000, we use squared for optimisations sake
-				damage_1 *= ExplosionRangeFalloff; //this is 1000, we use squared for optimisations sake
+				float ExplosionRangeFalloff = 1.0;
+				if(b_BoundingBoxVariant[ClosestTarget] != BBV_DontAlter)
+				{
+					//for very very big npcs.
+					ExplosionRangeFalloff = Pow(explosion_range_dmg_falloff, (ClosestDistance/((explosionRadius * explosionRadius) * 1.5))); //this is 1000, we use squared for optimisations sake
+					damage_1 *= ExplosionRangeFalloff; //this is 1000, we use squared for optimisations sake
+				}
 
 				damage_1 *= damage_reduction;
 				
@@ -3568,7 +3633,7 @@ stock void DisplayCritAboveNpc(int victim = -1, int client, bool sound, float po
 	if(victim != -1)
 	{
 		GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", chargerPos);
-		if(b_BoundingBoxVariant[victim] == 1)
+		if(b_BoundingBoxVariant[victim] == BBV_Giant)
 		{
 			chargerPos[2] += 120.0;
 		}
@@ -3850,13 +3915,13 @@ stock void SetPlayerActiveWeapon(int client, int weapon)
 #if defined ZR
 //	WeaponSwtichToWarningPostDestroyed(weapon);
 #endif
-	/*
+	//incase the above fails, do this instead.
 	char buffer[64];
 	GetEntityClassname(weapon, buffer, sizeof(buffer));
 	FakeClientCommand(client, "use %s", buffer); 					//allow client to change
 	SetEntPropEnt(client, Prop_Send, "m_hActiveWeapon", weapon);	//Force client to change.
 	OnWeaponSwitchPost(client, weapon);
-	*/
+	
 }
 
 stock void DHook_CreateDetour(GameData gamedata, const char[] name, DHookCallback preCallback = INVALID_FUNCTION, DHookCallback postCallback = INVALID_FUNCTION)
@@ -3896,7 +3961,7 @@ stock void ShowAnnotationToPlayer(int client, float pos[3], const char[] Text, f
 	SetEventFloat(event, "lifetime", lifetime);
 //	SetEventInt(event, "id", annotation_id*MAXPLAYERS + client + ANNOTATION_OFFSET);
 	SetEventString(event, "text", Text);
-	SetEventString(event, "play_sound", "vo/null.wav");
+	SetEventString(event, "play_sound", "common/null.wav");
 	SetEventInt(event, "visibilityBitfield", (1 << client));
 	FireEvent(event);
 	
@@ -3907,6 +3972,7 @@ public void GiveCompleteInvul(int client, float time)
 	f_ClientInvul[client] = GetGameTime() + time;
 	TF2_AddCondition(client, TFCond_UberchargedCanteen, time);
 	TF2_AddCondition(client, TFCond_MegaHeal, time);
+	ApplyStatusEffect(client, client, "Solid Stance", time);	
 }
 
 public void RemoveInvul(int client)
@@ -3939,15 +4005,9 @@ stock int SpawnFormattedWorldText(const char[] format, float origin[3], int text
 		
 		if(entity_parent != -1 && !teleport)
 		{
-			float vector[3];
-			GetAbsOrigin(entity_parent, vector);
-			
-			vector[0] += origin[0];
-			vector[1] += origin[1];
-			vector[2] += origin[2];
 
-			TeleportEntity(worldtext, vector, NULL_VECTOR, NULL_VECTOR);
-			SetParent(entity_parent, worldtext, "", origin);
+			SetParent(entity_parent, worldtext);
+			SDKCall_SetLocalOrigin(worldtext, origin);
 		}
 		else
 		{
@@ -5017,7 +5077,7 @@ stock void MakePlayerGiveResponseVoice(int client, int status)
 
 	switch(status)
 	{	
-		case 1: //Irene cocky talk
+		case 1: //Amphi cocky talk
 		{
 			switch(ClassShown)
 			{
@@ -5201,7 +5261,7 @@ void KillDyingGlowEffect(int client)
 }
 #endif	// ZR
 
-enum g_Collision_Group
+enum
 {
     COLLISION_GROUP_NONE  = 0,
     COLLISION_GROUP_DEBRIS,            // Collides with nothing but world and static stuff
@@ -5343,10 +5403,10 @@ stock void SpawnTimer(float time)
 	AcceptEntityInput(timer, "Enable");
 	SetEntProp(timer, Prop_Send, "m_bAutoCountdown", false);
 	GameRules_SetPropFloat("m_flStateTransitionTime", GetGameTime() + time);
-	
+#if defined ZR
 	if(!Construction_Mode() && !Dungeon_Mode())
 		f_AllowInstabuildRegardless = GetGameTime() + time;
-		
+#endif
 	CreateTimer(time, Timer_RemoveEntity, EntIndexToEntRef(timer));
 	
 	Event event = CreateEvent("teamplay_update_timer", true);
@@ -5850,6 +5910,10 @@ enum
 	TankThrowLogic = 4,
 	Boomerang = 5,
 	ShadowingSlicer = 6,
+	ReilaSlash = 7,
+	RedMist_AbnormSelect = 8,
+	RedMist_WasInAbnorm = 9,
+	DontUpdateHudClient = 10,
 }
 
 enum struct HitDetectionEnum
@@ -6004,7 +6068,7 @@ void Stocks_ColourPlayernormal(int client)
 	while(TF2U_GetWearable(client, entity, i))
 	{
 #if defined ZR
-		if(entity == EntRefToEntIndex(Armor_Wearable[client]) || i_WeaponVMTExtraSetting[entity] != -1)
+		if(i_WeaponVMTExtraSetting[entity] != -1)
 			continue;
 #endif
 
@@ -6060,4 +6124,46 @@ public float GetDistanceToGround(float pos[3])
 	delete trace;
 #endif
 	return GetVectorDistance(pos, otherLoc);
+}
+stock int TrailAttach_Bone(int player, char[] attachBone, char[] trail, int alpha, float lifetime=1.0, float startwidth=22.0, float endwidth=0.0, int rendermode)
+{
+	int trailEntity = CreateEntityByName("env_spritetrail");
+	if (IsValidEntity(trailEntity))
+	{
+		char tName[32];
+		GetEntPropString(player, Prop_Data, "m_iName", tName, sizeof(tName));
+		DispatchKeyValue(trailEntity, "targetname", "rpg_fortress");
+		DispatchKeyValue(trailEntity, "parentname", tName);
+
+		char sTemp[5];
+		IntToString(alpha, sTemp, sizeof(sTemp));
+		DispatchKeyValue(trailEntity, "renderamt", sTemp);
+
+		DispatchKeyValueFloat(trailEntity, "lifetime", lifetime);
+		DispatchKeyValueFloat(trailEntity, "startwidth", startwidth);
+		DispatchKeyValueFloat(trailEntity, "endwidth", endwidth);
+		DispatchKeyValue(trailEntity, "spritename", trail);
+		IntToString(rendermode, sTemp, sizeof(sTemp));
+		DispatchKeyValue(trailEntity, "rendermode", sTemp);
+		DispatchSpawn(trailEntity);
+		
+		SetVariantString("!activator");
+		AcceptEntityInput(trailEntity, "SetParent", player, player, 0);
+		SetVariantString(attachBone);
+		AcceptEntityInput(trailEntity, "SetParentAttachment", trailEntity, trailEntity, 0);
+
+		return trailEntity;
+	}
+		
+	return -1;
+}
+
+stock void StringToUpper(char[] buffer)
+{
+	int i; 
+	while (buffer[i] != '\0')
+	{
+		buffer[i] = CharToUpper(buffer[i]);
+		i++;
+	}
 }

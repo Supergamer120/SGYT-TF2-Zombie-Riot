@@ -58,9 +58,9 @@ void Diversionistico_Elitus_OnMapStart_NPC()
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Diversionistico Elitus");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_diversionistico_elitus");
-	strcopy(data.Icon, sizeof(data.Icon), "diversionistico");
+	strcopy(data.Icon, sizeof(data.Icon), "spy");
 	data.IconCustom = true;
-	data.Flags = MVM_CLASS_FLAG_SUPPORT;
+	data.Flags = MVM_CLASS_FLAG_MISSION;
 	data.Category = Type_Expidonsa;
 	data.Func = ClotSummon;
 	NPCId = NPC_Add(data);
@@ -459,7 +459,6 @@ void Diversionistico_ElitusSelfDefense(Diversionistico_Elitus npc, float gameTim
 						damageDealt *= 0.5;
 						ApplyStatusEffect(npc.index, target, "Anti-Waves", 2.0);
 					}
-
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_CLUB, -1, _, vecHit);
 
 					// Hit sound

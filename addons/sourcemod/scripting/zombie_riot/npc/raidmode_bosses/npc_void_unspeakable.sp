@@ -333,6 +333,7 @@ methodmap VoidUnspeakable < CClotBody
 			RaidModeTime = GetGameTime(npc.index) + 200.0;
 			RaidBossActive = EntIndexToEntRef(npc.index);
 			RaidAllowsBuildings = false;
+			RaidAllowLastman = true;
 			float value;
 			char buffers[3][64];
 			ExplodeString(data, ";", buffers, sizeof(buffers), sizeof(buffers[]));
@@ -554,7 +555,7 @@ public void VoidUnspeakable_ClotThink(int iNPC)
 			//always leaves creep onto the floor if enraged
 			GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 			ProjectileLoc[2] += 5.0;
-			VoidArea_SpawnNethersea(ProjectileLoc);
+			VoidArea_SpawnAbyss(ProjectileLoc);
 		}
 	}
 	if(LastMann && !AlreadySaidLastmann)
@@ -695,7 +696,7 @@ public Action VoidUnspeakable_OnTakeDamage(int victim, int &attacker, int &infli
 			float ProjectileLoc[3];	
 			GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 			ProjectileLoc[2] += 5.0;
-			VoidArea_SpawnNethersea(ProjectileLoc);
+			VoidArea_SpawnAbyss(ProjectileLoc);
 			switch(GetRandomInt(1,2))
 			{
 				case 1:
@@ -746,7 +747,7 @@ bool VoidUnspeakable_TeleToAnyAffectedOnVoid(VoidUnspeakable npc)
 		hullcheckmins = view_as<float>( { -30.0, -30.0, 0.0 } );
 		for(int EnemyLoop; EnemyLoop < MAXENTITIES; EnemyLoop ++)
 		{
-			if(IsValidEnemy(npc.index, EnemyLoop, true, true) && VoidArea_TouchingNethersea(EnemyLoop))
+			if(IsValidEnemy(npc.index, EnemyLoop, true, true) && VoidArea_TouchingAbyss(EnemyLoop))
 			{
 				//try to not always teleport to the same guy.
 				if(GetRandomFloat(0.0,1.0) > 0.1)
@@ -843,7 +844,7 @@ bool VoidUnspeakable_MatterAbsorber(VoidUnspeakable npc, float gameTime)
 		float ProjectileLoc[3];
 		GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 		ProjectileLoc[2] += 5.0;
-		VoidArea_SpawnNethersea(ProjectileLoc);
+		VoidArea_SpawnAbyss(ProjectileLoc);
 
 		HealEntityGlobal(npc.index, npc.index, flMaxhealth, 1.0, 0.0, HEAL_SELFHEAL);
 		float ProjLoc[3];
@@ -870,8 +871,8 @@ bool VoidUnspeakable_MatterAbsorber(VoidUnspeakable npc, float gameTime)
 		{
 			if(IsValidEnemy(npc.index, EnemyLoop, true, true))
 			{
-				if(Can_I_See_Enemy_Only(npc.index, EnemyLoop) && IsEntityAlive(EnemyLoop))
-				{ 	
+				if(!HasSpecificBuff(EnemyLoop, "Solid Stance") && Can_I_See_Enemy_Only(npc.index, EnemyLoop) && IsEntityAlive(EnemyLoop))
+				{
 					GetEntPropVector(EnemyLoop, Prop_Data, "m_vecAbsOrigin", cpos);
 					
 					MakeVectorFromPoints(pos, cpos, velocity);
@@ -981,7 +982,7 @@ bool VoidUnspeakable_MatterAbsorber(VoidUnspeakable npc, float gameTime)
 		float ProjectileLoc[3];
 		GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 		ProjectileLoc[2] += 5.0;
-		VoidArea_SpawnNethersea(ProjectileLoc);
+		VoidArea_SpawnAbyss(ProjectileLoc);
 		npc.m_flRangedArmor = 0.75;
 		npc.m_flMeleeArmor = 1.5;	
 
@@ -1020,7 +1021,7 @@ public void VoidUnspeakable_NPCDeath(int entity)
 	if(i_RaidGrantExtra[npc.index] == 6)
 	{
 		CPrintToChatAll("{purple}NEED TO RETURN TO THEM...");
-		CPrintToChatAll("{darkgray}Shadowing Darkness{default}: Ngh... The voices in my head cant even leave me.");	
+		CPrintToChatAll("{darkgray}Shadowing Darkness{default}: Ngh... The voices in my head can't even leave me.");	
 	}
 		
 	if(IsValidEntity(npc.m_iWearable8))
@@ -1330,7 +1331,7 @@ void VoidUnspeakable_DeathAnimationKahml(VoidUnspeakable npc, float gameTime)
 				case 16:
 				{
 					CPrintToChatAll("{black}Izan :{default} Exp-");
-					CPrintToChatAll("{white}Bob uses the item that Bladedance gave him a long time ago, and thus unbannished us out of the realm, shadowing darkness and izan couldnt reach us in time.");
+					CPrintToChatAll("{white}Bob uses the item that Bladedance gave him a long time ago, and thus unbannished us out of the realm, Shadowing Darkness and Izan couldnt reach us in time.");
 					
 					RequestFrame(KillNpc, EntIndexToEntRef(npc.index));
 					for(int client_check=1; client_check<=MaxClients; client_check++)

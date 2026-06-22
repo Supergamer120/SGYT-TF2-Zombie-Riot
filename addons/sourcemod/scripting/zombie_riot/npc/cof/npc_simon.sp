@@ -81,6 +81,11 @@ methodmap Simon < CClotBody
 		public get()							{ return fl_AbilityOrAttack[this.index][0]; }
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][0] = TempValueForProperty; }
 	}
+	property float m_flEscapeCan
+	{
+		public get()							{ return fl_AbilityOrAttack[this.index][1]; }
+		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][1] = TempValueForProperty; }
+	}
 	
 	public Simon(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
@@ -96,6 +101,16 @@ methodmap Simon < CClotBody
 		
 		i_NpcWeight[npc.index] = 3;
 		
+		if(StrContains(data, "firstspawn") != -1)
+		{
+			fl_Damage_Boost = 1.0;
+		}
+		npc.m_flEscapeCan = 1.0;
+		if(StrContains(data, "final") != -1)
+		{
+			npc.m_flEscapeCan = 0.0;
+		}
+
 		int body = EntRefToEntIndex(SimonRagdollRef);
 		if(body > MaxClients)
 			RemoveEntity(body);
@@ -117,10 +132,11 @@ methodmap Simon < CClotBody
 		{
 			RaidBossActive = EntIndexToEntRef(npc.index);
 			RaidModeTime = GetGameTime(npc.index) + 9000.0;
-			RaidModeScaling = 0.0;
+			RaidModeScaling = fl_Damage_Boost;
 			RaidAllowsBuildings = true;
+			RaidAllowLastman = false;
+			CPrintToChatAll("{crimson}%t","Simon Wants To Escape");
 		}
-		
 		
 		SDKHook(npc.index, SDKHook_OnTakeDamagePost, Simon_ClotDamagedPost);
 
@@ -262,8 +278,9 @@ public void Simon_ClotThink(int iNPC)
 		int maxhealth = ReturnEntityMaxHealth(npc.index);
 		if(!npc.m_bRetreating && npc.m_bHasKilled && health < (maxhealth / 2))
 		{
-			if(Waves_GetRoundScale() != (npc.m_bLostHalfHealth ? 39 : 34))
-				npc.m_bRetreating = true;
+			if(npc.m_flEscapeCan)
+				if(Waves_GetRoundScale() != (npc.m_bLostHalfHealth ? 39 : 34))
+					npc.m_bRetreating = true;
 		}
 		
 		if(!npc.m_bInjured && health < (maxhealth / 5))
@@ -523,6 +540,8 @@ public void Simon_ClotThink(int iNPC)
 					npc.m_fCreditsOnKill = 0.0;
 					SDKHooks_TakeDamage(npc.index, 0, 0, 99999999.9);
 					fl_Damage_Boost += 0.50;
+					ExcuteRelay("zr_simonescaped");
+					CPrintToChatAll("{crimson}%t","Simon Escaped");
 					return;
 				}
 				
@@ -545,6 +564,7 @@ public void Simon_ClotThink(int iNPC)
 					SDKHooks_TakeDamage(npc.index, 0, 0, 99999999.9);
 					fl_Damage_Boost += 0.50;
 					ExcuteRelay("zr_simonescaped");
+					CPrintToChatAll("{crimson}%t","Simon Escaped");
 					return;
 				}
 				

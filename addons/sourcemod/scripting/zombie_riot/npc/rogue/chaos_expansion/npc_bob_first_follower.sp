@@ -137,7 +137,7 @@ methodmap BobTheFirstFollower < CClotBody
 			}
 			case 7:
 			{
-				this.Speech("Ever since the seaborn stuff happened, you all have been a lot more reasonable.");
+				this.Speech("Ever since the dweller stuff happened, you all have been a lot more reasonable.");
 				this.SpeechDelay(5.0,"Could be PTSD.");
 			}
 			case 8:
@@ -192,7 +192,7 @@ methodmap BobTheFirstFollower < CClotBody
 			case 18:
 			{
 				this.Speech("You think I'd be sorry for attacking you?");
-				this.SpeechDelay(5.0, "You should be sorry for being so god damn careless with the seaborn.");
+				this.SpeechDelay(5.0, "You should be sorry for being so god damn careless with the dweller.");
 			}
 			case 19:
 			{
@@ -354,7 +354,7 @@ static void ClotThink(int iNPC)
 		npc.m_iTargetWalkTo = ally;
 	}
 
-	if(target > 0)
+	if(target > 0 && !IsInvuln(target))
 	{
 		float vecTarget[3]; WorldSpaceCenter(target, vecTarget);
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
@@ -410,7 +410,10 @@ static void ClotThink(int iNPC)
 						
 						npc.PlayMeleeHitSound();
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB|DMG_PREVENT_PHYSICS_FORCE);
-						IncreaseEntityDamageTakenBy(target, 0.02, 3.0, true);
+						if(npc.Anger)
+							ApplyStatusEffect(npc.index, target, "Bob Debuff Enrage", 10.0);
+						else
+							ApplyStatusEffect(npc.index, target, "Bob Debuff", 3.0);
 					}
 				}
 

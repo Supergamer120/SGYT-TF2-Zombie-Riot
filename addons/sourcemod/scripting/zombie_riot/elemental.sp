@@ -14,6 +14,7 @@ enum				// Types
 	Element_Plasma,		// 8
 	Element_Warped,		// 9
 	Element_ManaOverflow,		// 10
+	Element_Stagger,	// 11
 
 	Element_MAX
 }
@@ -30,7 +31,8 @@ static const char ElementName[][] =
 	"FOOD",
 	"PL",
 	"WW",
-	"MO"
+	"MO",
+	"ST"
 };
 
 static float LastTime[MAXENTITIES];
@@ -51,11 +53,11 @@ void Elemental_ClearDamage(int entity)
 stock bool Elemental_HasDamage(int entity, int type = -1)
 {
 	if(type != -1)
-		return view_as<bool>(ElementDamage[entity][type]);
+		return Elemental_GetDamage(entity, type) > 0;
 	
 	for(int i; i < Element_MAX; i++)
 	{
-		if(ElementDamage[entity][i])
+		if(Elemental_GetDamage(entity, i) > 0)
 			return true;
 	}
 	
@@ -69,7 +71,7 @@ stock bool Elemental_GoingCritical(int entity)
 	
 	for(int i; i < Element_MAX; i++)
 	{
-		if((ElementDamage[entity][i] * 5 / 4) > Elemental_TriggerDamage(entity, i))
+		if((Elemental_GetDamage(entity, i) * 5 / 4) > Elemental_TriggerDamage(entity, i))
 			return true;
 	}
 	
@@ -109,12 +111,33 @@ stock void Elemental_RemoveDamage(int entity, int type, int amount)
 stock float Elemental_DamageRatio(int entity, int type)
 {
 	if(entity > MaxClients)
-		return float(ElementDamage[entity][type]) / float(Elemental_TriggerDamage(entity, type));
+		return float(Elemental_GetDamage(entity, type)) / float(Elemental_TriggerDamage(entity, type));
 	
 	if(Armor_Charge[entity] >= 0 || Armor_DebuffType[entity] != type)
 		return 0.0;
 	
 	return float(-Armor_Charge[entity]) / float(Elemental_TriggerDamage(entity, type));
+}
+
+int Elemental_GetDamage(int entity, int type)
+{
+	if(entity <= MaxClients)
+	{
+		if(Armor_Charge[entity] >= 0)
+			return 0;
+		
+		return -Armor_Charge[entity];
+	}
+
+	int damage = ElementDamage[entity][type];
+
+	switch(type)
+	{
+		case Element_Stagger:
+			damage += ReturnEntityMaxHealth(entity) - GetEntProp(entity, Prop_Data, "m_iHealth");
+	}
+
+	return damage;
 }
 
 int Elemental_TriggerDamage(int entity, int type)
@@ -176,6 +199,21 @@ int Elemental_TriggerDamage(int entity, int type)
 		{
 			// Don't scale more with bosses
 		}*/
+		case Element_Stagger:
+		{
+			if(b_thisNpcIsARaid[entity] || EntRefToEntIndex(RaidBossActive) == entity)
+			{
+				divide *= 0.37;
+			}
+			else if(b_thisNpcIsABoss[entity])
+			{
+				divide *= 0.5;
+			}
+			else if(b_IsGiant[entity])
+			{
+				divide *= 0.667;
+			}
+		}
 		default:
 		{
 			//also works against superbosses.
@@ -226,16 +264,20 @@ bool Elemental_HurtHud(int entity, char Debuff_Adder[128])
 	
 	// Find the element that's closest to trigger
 	int low = -1;
-	int lowHealth = 1000000;
+	int lowHealth = 10000000;
 	for(int i; i < Element_MAX; i++)
 	{
-		if(ElementDamage[entity][i] > 0)
+		if(ElementDamage[entity][i])
 		{
-			int health = Elemental_TriggerDamage(entity, i) - ElementDamage[entity][i];
-			if(health < lowHealth)
+			int damage = Elemental_GetDamage(entity, i);
+			if(damage > 0)
 			{
-				low = i;
-				lowHealth = health;
+				int health = Elemental_TriggerDamage(entity, i) - damage;
+				if(health < lowHealth)
+				{
+					low = i;
+					lowHealth = health;
+				}
 			}
 		}
 	}
@@ -245,7 +287,7 @@ bool Elemental_HurtHud(int entity, char Debuff_Adder[128])
 		return false;
 	
 	// <CY 50%>
-	Format(Debuff_Adder, sizeof(Debuff_Adder), "<%s %d％>", ElementName[low], ElementDamage[entity][low] * 100 / Elemental_TriggerDamage(entity, low));
+	Format(Debuff_Adder, sizeof(Debuff_Adder), "<%s %d％>", ElementName[low], Elemental_GetDamage(entity, low) * 100 / Elemental_TriggerDamage(entity, low));
 	return true;
 }
 
@@ -262,7 +304,7 @@ static void ApplyElementalEvent(int victim, int attacker, int damage)
 	event.Cancel();
 }
 
-void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool sound = true, bool ignoreArmor = false, int weapon = -1)
+void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool sound = true, bool ignoreArmor = false, int weapon = -1, float slowdown = 0.9)
 {
 	if(i_IsVehicle[victim])
 	{
@@ -281,13 +323,13 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 		// Warped overrides
 		if(Armor_Charge[victim] < 0 && Armor_DebuffType[victim] == Element_Warped)
 			return;
-		
+
 		Armor_DebuffType[victim] = Element_Nervous;
 		if(f_ArmorCurrosionImmunity[victim][Element_Nervous] < GetGameTime() && (ignoreArmor || Armor_Charge[victim] < 1))
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -303,7 +345,7 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 					f_ArmorCurrosionImmunity[victim][Element_Nervous] = GetGameTime() + 5.0;
 					
 					if(!HasSpecificBuff(victim, "Fluid Movement"))
-						TF2_StunPlayer(victim, 5.0, 0.9, TF_STUNFLAG_SLOWDOWN);
+						TF2_StunPlayer(victim, 5.0, slowdown, TF_STUNFLAG_SLOWDOWN);
 
 					DealTruedamageToEnemy(0, victim, 500.0);
 					Force_ExplainBuffToClient(victim, "Nervous Impairment Elemental Damage");
@@ -312,6 +354,14 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 			
 			if(sound || !Armor_Charge[victim])
 				ClientCommand(victim, "playgamesound weapons/drg_pomson_drain_01.wav");
+		}
+	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		int health = Object_GetRepairHealth(victim);
+		if(health < 1 || ignoreArmor)
+		{
+			DealTruedamageToEnemy(0, victim, damage * 100.0);
 		}
 	}
 	else if(!b_NpcHasDied[victim])	// NPCs
@@ -338,7 +388,7 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Nervous;
 			ElementDamage[victim][Element_Nervous] += damage;
-			if(ElementDamage[victim][Element_Nervous] > trigger)
+			if(Elemental_GetDamage(victim, Element_Nervous) > trigger)
 			{
 				ElementDamage[victim][Element_Nervous] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Nervous] = GetGameTime() + 5.0;
@@ -387,14 +437,6 @@ void Elemental_AddNervousDamage(int victim, int attacker, int damagebase, bool s
 				ApplyElementalEvent(victim, attacker, damage);
 		}
 	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		int health = Object_GetRepairHealth(victim);
-		if(health < 1 || ignoreArmor)
-		{
-			DealTruedamageToEnemy(0, victim, damage * 100.0);
-		}
-	}
 }
 
 void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sound = true, bool ignoreArmor = false)
@@ -433,7 +475,7 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -473,7 +515,7 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 					SakratanGroupDebuff);
 					b_NpcIsTeamkiller[victim] = false;
 					f_ArmorCurrosionImmunity[victim][Element_Chaos]  = GetGameTime() + 10.0;
-					if(EnableSilentMode)
+					if(!EnableSilentMode)
 						Force_ExplainBuffToClient(victim, "Chaos Elemental Damage");
 					else
 						Force_ExplainBuffToClient(victim, "Chaos Elemental Damage High");
@@ -484,16 +526,20 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 				ClientCommand(victim, "playgamesound friends/friend_online.wav");
 		}
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Chaos));
 		if(damage < 1)
 			return;
 		
-		if(attacker > MaxClients/* || Rogue_Mode()*/ || ElementDamage[victim][Element_Warped] > 0)
+		if(attacker > MaxClients/* || Rogue_Mode()*/ || Elemental_GetDamage(victim, Element_Warped) > 0)
 		{
 			// Element mixing into Warped
-			if(view_as<CClotBody>(victim).m_iBleedType == BLEEDTYPE_VOID || GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Void) > 0.4 || ElementDamage[victim][Element_Void] > 0 || ElementDamage[victim][Element_Warped] > 0)
+			if(view_as<CClotBody>(victim).m_iBleedType == BLEEDTYPE_VOID || GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Void) > 0.4 || Elemental_GetDamage(victim, Element_Void) > 0 || Elemental_GetDamage(victim, Element_Warped) > 0)
 			{
 				Elemental_AddWarpedDamage(victim, attacker, damagebase, sound, ignoreArmor);
 				return;
@@ -518,7 +564,7 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Chaos;
 			ElementDamage[victim][Element_Chaos] += damage;
-			if(ElementDamage[victim][Element_Chaos] > trigger)
+			if(Elemental_GetDamage(victim, Element_Chaos) > trigger)
 			{
 				ElementDamage[victim][Element_Chaos] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Chaos]  = GetGameTime() + 5.0;
@@ -534,10 +580,6 @@ void Elemental_AddChaosDamage(int victim, int attacker, int damagebase, bool sou
 			if(attacker && attacker <= MaxClients)
 				ApplyElementalEvent(victim, attacker, damage);
 		}
-	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
 	}
 }
 
@@ -590,7 +632,7 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -606,7 +648,7 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 					float ProjectileLoc[3];
 					GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 					ProjectileLoc[2] += 5.0;
-					VoidArea_SpawnNethersea(ProjectileLoc, VoidWeaponDo);
+					VoidArea_SpawnAbyss(ProjectileLoc, VoidWeaponDo);
 					FramingInfestorSpread(victim);
 					EmitSoundToAll("npc/scanner/cbot_discharge1.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
 					f_ArmorCurrosionImmunity[victim][Element_Void] = GetGameTime() + 5.0;
@@ -619,6 +661,16 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 				ClientCommand(victim, "playgamesound npc/scanner/cbot_servoscared.wav ; playgamesound npc/scanner/cbot_servoscared.wav");
 		}
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		//removes repair of buildings.
+		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
+		Repair -= (damage / 2);
+		if(Repair <= 0)
+			Repair = 0;
+
+		SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		if(view_as<CClotBody>(victim).m_iBleedType == BLEEDTYPE_VOID)
@@ -628,10 +680,10 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 		if(damage < 1)
 			return;
 
-		if(attacker > MaxClients/* || Rogue_Mode()*/ || ElementDamage[victim][Element_Warped] > 0)
+		if(attacker > MaxClients/* || Rogue_Mode()*/ || Elemental_GetDamage(victim, Element_Warped) > 0)
 		{
 			// Element mixing into Warped
-			if(ElementDamage[victim][Element_Chaos] > 0 || ElementDamage[victim][Element_Warped] > 0)
+			if(Elemental_GetDamage(victim, Element_Chaos) > 0 || Elemental_GetDamage(victim, Element_Warped) > 0)
 			{
 				Elemental_AddWarpedDamage(victim, attacker, damagebase, sound, ignoreArmor);
 				return;
@@ -656,7 +708,7 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Void;
 			ElementDamage[victim][Element_Void] += damage;
-			if(ElementDamage[victim][Element_Void] > trigger)
+			if(Elemental_GetDamage(victim, Element_Void) > trigger)
 			{
 				ElementDamage[victim][Element_Void] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Void] = GetGameTime() + 5.0;
@@ -664,7 +716,7 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 				GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", ProjectileLoc);
 				ProjectileLoc[2] += 5.0;
 				EmitSoundToAll("npc/scanner/cbot_discharge1.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
-				VoidArea_SpawnNethersea(ProjectileLoc, VoidWeaponDo);
+				VoidArea_SpawnAbyss(ProjectileLoc, VoidWeaponDo);
 				//do not spread.
 				FramingInfestorSpread(victim);
 			}
@@ -672,16 +724,6 @@ void Elemental_AddVoidDamage(int victim, int attacker, int damagebase, bool soun
 			if(attacker && attacker <= MaxClients)
 				ApplyElementalEvent(victim, attacker, damage);
 		}
-	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		//removes repair of buildings.
-		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
-		Repair -= (damage / 2);
-		if(Repair <= 0)
-			Repair = 0;
-
-		SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
 	}
 }
 
@@ -737,6 +779,10 @@ void Elemental_AddCyroDamage(int victim, int attacker, int damagebase, int type)
 		// Cyro is treated as Chaos vs Players
 		Elemental_AddChaosDamage(victim, attacker, damagebase, _, true);
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Cyro));
@@ -750,7 +796,7 @@ void Elemental_AddCyroDamage(int victim, int attacker, int damagebase, int type)
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Cyro;
 			ElementDamage[victim][Element_Cyro] += damage;
-			if(ElementDamage[victim][Element_Cyro] > trigger)
+			if(Elemental_GetDamage(victim, Element_Cyro) > trigger)
 			{
 				ElementDamage[victim][Element_Cyro] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Cyro] = GetGameTime() + (9.5 + (type * 0.5));
@@ -761,10 +807,6 @@ void Elemental_AddCyroDamage(int victim, int attacker, int damagebase, int type)
 			if(attacker && attacker <= MaxClients)
 				ApplyElementalEvent(victim, attacker, damage);
 		}
-	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
 	}
 }
 
@@ -799,7 +841,7 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -833,6 +875,10 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 				EmitSoundToClient(victim, "beams/beamstart5.wav", victim, SNDCHAN_STATIC, _, _, 1.0, 60);
 		}
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Necrosis));
@@ -846,7 +892,7 @@ void Elemental_AddNecrosisDamage(int victim, int attacker, int damagebase, int w
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Necrosis;
 			ElementDamage[victim][Element_Necrosis] += damage;
-			if(ElementDamage[victim][Element_Necrosis] > trigger)
+			if(Elemental_GetDamage(victim, Element_Necrosis) > trigger)
 			{
 				ElementDamage[victim][Element_Necrosis] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Necrosis] = GetGameTime() + 7.5;
@@ -915,6 +961,10 @@ void Elemental_AddOsmosisDamage(int victim, int attacker, int damagebase)
 	{
 		// No effect currently for Necrosis vs Players
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Osmosis));
@@ -928,7 +978,7 @@ void Elemental_AddOsmosisDamage(int victim, int attacker, int damagebase)
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Osmosis;
 			ElementDamage[victim][Element_Osmosis] += damage;
-			if(ElementDamage[victim][Element_Osmosis] > trigger)
+			if(Elemental_GetDamage(victim, Element_Osmosis) > trigger)
 			{
 				ElementDamage[victim][Element_Osmosis] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Osmosis] = GetGameTime() + 15.0;
@@ -1007,7 +1057,7 @@ void Elemental_AddCorruptionDamage(int victim, int attacker, int damagebase, boo
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1016,13 +1066,12 @@ void Elemental_AddCorruptionDamage(int victim, int attacker, int damagebase, boo
 				{
 					Armor_Charge[victim] = 0;
 					
-					int count = RoundToCeil(2.0 * MultiGlobalEnemy);
-					Matrix_Spawning(attacker, count);
+					EmitSoundToAll("misc/freeze_cam.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
+					Matrix_Spawning(attacker, victim);
 
 					float MatrixLoc[3];
 					GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", MatrixLoc);
 					spawnRing_Vectors(MatrixLoc, 1.0, 0.0, 0.0, 10.0, "materials/sprites/laserbeam.vmt", 54, 77, 43, 255, 1, 1.0, 5.0, 8.0, 1, 125.0 * 2.0);
-					EmitSoundToAll("ambient/energy/weld1.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
 					f_ArmorCurrosionImmunity[victim][Element_Corruption] = GetGameTime() + 5.0;
 					Force_ExplainBuffToClient(victim, "Corruption Elemental Damage");
 				}
@@ -1031,6 +1080,15 @@ void Elemental_AddCorruptionDamage(int victim, int attacker, int damagebase, boo
 			if(sound || !Armor_Charge[victim])
 				ClientCommand(victim, "playgamesound buttons/combine_button1.wav ; playgamesound buttons/combine_button1.wav");
 		}
+	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		//removes repair of buildings.
+		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
+		Repair -= damage;
+		if(Repair <= 0)
+			Repair = 0;
+		SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
 	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
@@ -1056,33 +1114,25 @@ void Elemental_AddCorruptionDamage(int victim, int attacker, int damagebase, boo
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Corruption;
 			ElementDamage[victim][Element_Corruption] += damage;
-			if(ElementDamage[victim][Element_Corruption] > trigger)
+			if(Elemental_GetDamage(victim, Element_Corruption) > trigger)
 			{
 				ElementDamage[victim][Element_Corruption] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Corruption] = GetGameTime() + 5.0;
-				EmitSoundToAll("ambient/energy/weld1.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
-				int count = RoundToCeil(3.0 * MultiGlobalEnemy);
-				Matrix_Spawning(attacker, count);
+				EmitSoundToAll("misc/freeze_cam.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
+				Matrix_Spawning(attacker, victim);
 			}
 			
 			if(attacker && attacker <= MaxClients)
 				ApplyElementalEvent(victim, attacker, damage);
 		}
 	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		//removes repair of buildings.
-		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
-		Repair -= damage;
-		if(Repair <= 0)
-			Repair = 0;
-		SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
-	}
 }
 
 static const char g_Agent_Summons[][] =
 {
 	//wave 1-19 | 0-6
+	"npc_antiviral_programm",
+	/*
 	"npc_agent_john",
 	"npc_agent_james",
 	"npc_agent_chase",
@@ -1126,57 +1176,43 @@ static const char g_Agent_Summons[][] =
 	"npc_agent_ross",
 	"npc_agent_spencer",
 	"npc_agent_todd",
+	*/
 };
 
-static void Matrix_Spawning(int entity, int count)
+static void Matrix_Spawning(int attacker, int victim)
 {
-	int summon = GetRandomInt(0, 6);
-	int wave = (Waves_GetRoundScale() + 1);
-	if(wave >= 20)
+	float pos[3];
+	GetEntPropVector(attacker, Prop_Data, "m_vecAbsOrigin", pos);
+	int Spawner_entity = GetRandomActiveSpawner();
+	if(IsValidEntity(Spawner_entity))
 	{
-		summon = GetRandomInt(7, 11);
+		float ang[3];
+		GetEntPropVector(Spawner_entity, Prop_Data, "m_vecOrigin", pos);
+		GetEntPropVector(Spawner_entity, Prop_Data, "m_angRotation", ang);
 	}
-	if(wave >= 30)
+	int summon = NPC_CreateByName("npc_antiviral_programm", -1, pos, {0.0,0.0,0.0}, GetTeam(attacker), "final");
+	if(IsValidEntity(summon))
 	{
-		summon = GetRandomInt(12, 16);
-	}
+		CClotBody npcsummon = view_as<CClotBody>(summon);
+		if(GetTeam(attacker) != TFTeam_Red)
+			Zombies_Currently_Still_Ongoing++;
 
-	char name[255];
-	FormatEx(name, sizeof(name), "%s", g_Agent_Summons[summon]);
-	int health = ReturnEntityMaxHealth(entity);
-	if(b_thisNpcIsABoss[entity])
-	{
-		health = (ReturnEntityMaxHealth(entity)/10);
+		npcsummon.m_iTarget = victim;
+
+		int Decicion = TeleportDiversioToRandLocation(summon, true, 1500.0, 1000.0);
+		switch(Decicion)
+		{
+			case 2:
+			{
+				Decicion = TeleportDiversioToRandLocation(summon, true, 1000.0, 500.0);
+				if(Decicion == 2)
+				{
+					Decicion = TeleportDiversioToRandLocation(summon, true, 500.0, 250.0);
+				}
+			}
+		}
+		npcsummon.m_iWearable5 = ConnectWithBeam(summon, victim, 65, 125, 65, 2.0, 2.0, 0.0, "sprites/laserbeam.vmt");
 	}
-	if(b_thisNpcIsARaid[entity])
-	{
-		health = (ReturnEntityMaxHealth(entity)/100);
-	}
-	if(!b_thisNpcIsARaid[entity] && !b_thisNpcIsABoss[entity] && MultiGlobalHealth != 1.0)
-	{
-		//account for max hp sacling, or else we just keep multiplying forever...
-		//because it does the scaling on spawn, but doesnt revert it here when it adds a new npc....
-		//it was the same bug alaxios had, in this case, it has to be reversed.
-		health = RoundToNearest(float(health) / MultiGlobalHealth);
-	}
-	
-	Enemy enemy;
-	enemy.Index = NPC_GetByPlugin(name);
-	enemy.Health = health;
-	enemy.Is_Outlined = false;
-	enemy.Is_Immune_To_Nuke = true;
-	//do not bother outlining.
-	enemy.ExtraMeleeRes = 1.0;
-	enemy.ExtraRangedRes = 1.0;
-	enemy.ExtraSpeed = 1.0;
-	enemy.ExtraDamage = 1.0;
-	enemy.ExtraSize = 1.0;		
-	enemy.Team = GetTeam(entity);
-	for(int i; i<count; i++)
-	{
-		Waves_AddNextEnemy(enemy);
-	}
-	Zombies_Currently_Still_Ongoing += count;
 }
 
 void Matrix_Shared_CorruptionPrecache()
@@ -1217,7 +1253,7 @@ void Elemental_AddBurgerDamage(int victim, int attacker, int damagebase)
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Burger;
 			ElementDamage[victim][Element_Burger] += damage;
-			if(ElementDamage[victim][Element_Burger] > trigger)
+			if(Elemental_GetDamage(victim, Element_Burger) > trigger)
 			{
 				ElementDamage[victim][Element_Burger] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_Burger] = GetGameTime() + 100.0;
@@ -1265,7 +1301,7 @@ void Elemental_AddPlasmicDamage(int victim, int attacker, int damagebase, int we
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1320,6 +1356,44 @@ void Elemental_AddPlasmicDamage(int victim, int attacker, int damagebase, int we
 			}
 		}
 	}
+	else if(i_IsABuilding[victim]) // In the rare occasion you inflict plasmic elemental damage to buildings (4/5/2024 mini incident)
+	{
+		//removes repair of buildings.
+		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
+		if(Repair > 0)
+		{
+			Repair -= damage;
+			if(Repair <= 0)
+			{
+				float position[3];
+				GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", position);
+				float healing = 20.0; // bleh
+				if(!b_NpcHasDied[attacker])
+				{
+					healing = float(ReturnEntityMaxHealth(attacker)) * 0.005;
+				}
+				else if(IsValidClient(attacker))
+				{
+					if(IsValidEntity(weapon))
+					{
+						healing *= Attributes_GetOnPlayer(attacker, 8, true);
+					}
+				}
+				PlasmicElemental_HealNearby(attacker, healing, position, 200.0, 1.0, 2, GetTeam(attacker));
+					
+				Repair = 0;
+				position[2] += 10.0;
+				for(int i = 0; i < 2; i++)
+				{
+					Cheese_BeamEffect(position, 10.0, 250.0, 0.2, 3.0);
+					position[2] += 20.5;
+				}
+				Cheese_PlaySplat(victim);
+			}
+				
+			SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
+		}
+	}
 	else if(!b_NpcHasDied[victim])	// VS NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Plasma));
@@ -1339,7 +1413,7 @@ void Elemental_AddPlasmicDamage(int victim, int attacker, int damagebase, int we
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_Plasma;
 			ElementDamage[victim][Element_Plasma] += damage;
-			if(ElementDamage[victim][Element_Plasma] > trigger)
+			if(Elemental_GetDamage(victim, Element_Plasma) > trigger)
 			{
 				ElementDamage[victim][Element_Plasma] = 0;
 				float position[3];
@@ -1386,44 +1460,6 @@ void Elemental_AddPlasmicDamage(int victim, int attacker, int damagebase, int we
 				ApplyElementalEvent(victim, attacker, damage);
 		}
 	}
-	else if(i_IsABuilding[victim]) // In the rare occasion you inflict plasmic elemental damage to buildings (4/5/2024 mini incident)
-	{
-		//removes repair of buildings.
-		int Repair = GetEntProp(victim, Prop_Data, "m_iRepair");
-		if(Repair > 0)
-		{
-			Repair -= damage;
-			if(Repair <= 0)
-			{
-				float position[3];
-				GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", position);
-				float healing = 20.0; // bleh
-				if(!b_NpcHasDied[attacker])
-				{
-					healing = float(ReturnEntityMaxHealth(attacker)) * 0.005;
-				}
-				else if(IsValidClient(attacker))
-				{
-					if(IsValidEntity(weapon))
-					{
-						healing *= Attributes_GetOnPlayer(attacker, 8, true);
-					}
-				}
-				PlasmicElemental_HealNearby(attacker, healing, position, 200.0, 1.0, 2, GetTeam(attacker));
-					
-				Repair = 0;
-				position[2] += 10.0;
-				for(int i = 0; i < 2; i++)
-				{
-					Cheese_BeamEffect(position, 10.0, 250.0, 0.2, 3.0);
-					position[2] += 20.5;
-				}
-				Cheese_PlaySplat(victim);
-			}
-				
-			SetEntProp(victim, Prop_Data, "m_iRepair", Repair);
-		}
-	}
 }
 
 void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool sound = true, bool ignoreArmor = false, bool trueDmg = false)
@@ -1454,7 +1490,7 @@ void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool so
 		{
 			if(i_HealthBeforeSuit[victim] > 0)
 			{
-				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 4.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE);
+				SDKHooks_TakeDamage(victim, attacker, attacker, damagebase * 3.0, DMG_TRUEDAMAGE|DMG_PREVENT_PHYSICS_FORCE, .Zr_damage_custom = ZR_ELEMENTAL_QUANTUM);
 			}
 			else
 			{
@@ -1498,6 +1534,32 @@ void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool so
 			}
 		}
 	}
+	else if(i_IsABuilding[victim])	// Buildings
+	{
+		int repair = GetEntProp(victim, Prop_Data, "m_iRepair") - (damage / 2);
+		if(repair < 0)
+			repair = 0;
+
+		SetEntProp(victim, Prop_Data, "m_iRepair", repair);
+
+		repair = GetEntProp(victim, Prop_Data, "m_iRepairMax") - (damage / 2);
+		if(repair < 1)
+			repair = 1;
+
+		SetEntProp(victim, Prop_Data, "m_iRepairMax", repair);
+
+		repair = GetEntProp(victim, Prop_Data, "m_iHealth") - (damage / 2);
+		if(repair < 1)
+			repair = 1;
+
+		SetEntProp(victim, Prop_Data, "m_iHealth", repair);
+
+		repair = GetEntProp(victim, Prop_Data, "m_iMaxHealth") - (damage / 2);
+		if(repair < 1)
+			repair = 1;
+
+		SetEntProp(victim, Prop_Data, "m_iMaxHealth", repair);
+	}
 	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Chaos));
@@ -1516,7 +1578,7 @@ void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool so
 		ElementDamage[victim][Element_Chaos] = 0;
 		ElementDamage[victim][Element_Void] = 0;
 
-		if(ElementDamage[victim][Element_Warped] > trigger)
+		if(Elemental_GetDamage(victim, Element_Warped) > trigger)
 		{
 			ElementDamage[victim][Element_Warped] = 0;
 
@@ -1571,32 +1633,6 @@ void Elemental_AddWarpedDamage(int victim, int attacker, int damagebase, bool so
 		if(attacker && attacker <= MaxClients)
 			ApplyElementalEvent(victim, attacker, damage);
 	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		int repair = GetEntProp(victim, Prop_Data, "m_iRepair") - (damage / 2);
-		if(repair < 0)
-			repair = 0;
-
-		SetEntProp(victim, Prop_Data, "m_iRepair", repair);
-
-		repair = GetEntProp(victim, Prop_Data, "m_iRepairMax") - (damage / 2);
-		if(repair < 1)
-			repair = 1;
-
-		SetEntProp(victim, Prop_Data, "m_iRepairMax", repair);
-
-		repair = GetEntProp(victim, Prop_Data, "m_iHealth") - (damage / 2);
-		if(repair < 1)
-			repair = 1;
-
-		SetEntProp(victim, Prop_Data, "m_iHealth", repair);
-
-		repair = GetEntProp(victim, Prop_Data, "m_iMaxHealth") - (damage / 2);
-		if(repair < 1)
-			repair = 1;
-
-		SetEntProp(victim, Prop_Data, "m_iMaxHealth", repair);
-	}
 }
 
 
@@ -1641,7 +1677,12 @@ bool Elemental_AddManaOverflowDamage(int victim, int attacker, int damagebase, i
 	{
 		damage = RoundToNearest(float(damage) * 1.3);
 	}
-	if(!b_NpcHasDied[victim])	// NPCs
+	
+	if(i_IsABuilding[victim])	// Buildings
+	{
+		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
+	}
+	else if(!b_NpcHasDied[victim])	// NPCs
 	{
 		//players got their own Overmana Overload, so this is mainly targeted at npcs
 		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_ManaOverflow));
@@ -1670,7 +1711,7 @@ bool Elemental_AddManaOverflowDamage(int victim, int attacker, int damagebase, i
 			LastTime[victim] = GetGameTime();
 			LastElement[victim] = Element_ManaOverflow;
 			ElementDamage[victim][Element_ManaOverflow] += damage;
-			if(ElementDamage[victim][Element_ManaOverflow] > trigger)
+			if(Elemental_GetDamage(victim, Element_ManaOverflow) > trigger)
 			{
 				ElementDamage[victim][Element_ManaOverflow] = 0;
 				f_ArmorCurrosionImmunity[victim][Element_ManaOverflow] = GetGameTime() + (9.5 + (type * 0.5));
@@ -1699,9 +1740,71 @@ bool Elemental_AddManaOverflowDamage(int victim, int attacker, int damagebase, i
 				f_ArmorCurrosionImmunity[victim][Element_ManaOverflow] -= speedUp;
 		}
 	}
-	else if(i_IsABuilding[victim])	// Buildings
-	{
-		IncreaseEntityDamageTakenBy(victim, (damage * 0.001), 5.0, true);
-	}
 	return triggered;
 }
+
+void Elemental_AddStaggerDamage(int victim, int attacker, int damagebase)
+{
+	if(i_IsVehicle[victim])
+	{
+		victim = Vehicle_Driver(victim);
+		if(victim == -1)
+			return;
+	}
+	
+	int damage = RoundFloat(damagebase * fl_Extra_Damage[attacker]);
+	if(NpcStats_ElementalAmp(victim))
+	{
+		damage = RoundToNearest(float(damage) * 1.3);
+	}
+	
+	if(!b_NpcHasDied[victim])	// NPCs
+	{
+		damage -= RoundFloat(damage * GetEntPropFloat(victim, Prop_Data, "m_flElementRes", Element_Stagger));
+		if(damage < 1)
+			return;
+		
+		bool triggered;
+		int trigger = Elemental_TriggerDamage(victim, Element_Stagger);
+
+		LastTime[victim] = GetGameTime();
+		LastElement[victim] = Element_Stagger;
+		ElementDamage[victim][Element_Stagger] += damage;
+		while(Elemental_GetDamage(victim, Element_Stagger) > trigger)
+		{
+			triggered = true;
+			ElementDamage[victim][Element_Stagger] -= trigger;
+
+			if(HasSpecificBuff(victim, "Stagger+") || HasSpecificBuff(victim, "Stagger++"))
+			{
+				ApplyStatusEffect(attacker, victim, "Stagger++", 5.0);
+				break;
+			}
+			else if(HasSpecificBuff(victim, "Stagger"))
+			{
+				ApplyStatusEffect(attacker, victim, "Stagger+", 5.0);
+			}
+			else
+			{
+				ApplyStatusEffect(attacker, victim, "Stagger", 5.0);
+			}
+		}
+
+		if(triggered)
+		{
+			FreezeNpcInTime(victim, 3.0);
+			EmitSoundToAll("playgamesound physics/glass/glass_sheet_break3.wav", victim, SNDCHAN_STATIC, RAIDBOSS_ZOMBIE_SOUNDLEVEL, _, BOSS_ZOMBIE_VOLUME);
+		}
+		else
+		{
+			if(attacker && attacker <= MaxClients)
+				ClientCommand(attacker, triggered ? "playgamesound physics/glass/glass_sheet_break3.wav" : ((GetURandomInt() % 2) ? "playgamesound weapons/physcannon/energy_sing_flyby1.wav" : "playgamesound weapons/physcannon/energy_sing_flyby2.wav"));		
+		}
+		
+		if(attacker && attacker <= MaxClients)
+		{
+			ApplyElementalEvent(victim, attacker, damage);
+		}
+	}
+}
+
