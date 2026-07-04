@@ -327,7 +327,7 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 					}
 				}
 			}
-			case 3:
+			/*case 3:
 			{
 				switch(GetRandomInt(1, 2))
 				{
@@ -417,6 +417,12 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.1);
 				enemy.Data = "nobackup";
+			}
+			{
+				enemy.Index = NPC_GetByPlugin("npc_bladedance");
+				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+				enemy.ExtraSpeed = 1.75;
+				enemy.Data = "bossrush_duo";
 			}
 			case 7:	
 			{
@@ -607,19 +613,13 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.ExtraSpeed = 1.75;
 				enemy.Data = "bossrush_duo";
-			}
+			}*/
 			default:
 			{
 				enemy.Index = NPC_GetByPlugin("npc_bob_the_first_last_savior");
 				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 				enemy.ExtraDamage = (f_FreeplayDamageExtra * 0.1);
 				enemy.Data = "nobackup";
-			}
-			{
-				enemy.Index = NPC_GetByPlugin("npc_bladedance");
-				enemy.Health = RoundToFloor((4000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.ExtraSpeed = 1.75;
-				enemy.Data = "bossrush_duo";
 			}
 		}
 
@@ -954,7 +954,7 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				}
 			}
 		}
-		case 3:
+		/*case 3:
 		{
 			switch(GetRandomInt(1, 2))
 			{
@@ -1002,11 +1002,11 @@ static Action Freeplay_RouletteMessage(Handle timer)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{aqua}bob");
+					CPrintToChatAll("{aqua}bob and blade");
 				}
 				default:
 				{
-					CPrintToChatAll("{crimson}bob");
+					CPrintToChatAll("{crimson}bob and blade");
 				}
 			}
 		}
@@ -1087,18 +1087,18 @@ static Action Freeplay_RouletteMessage(Handle timer)
 		case 13:
 		{
 			CPrintToChatAll("{crimson}blade and overlord");
-		}
+		}*/
 		default:
 		{
 			switch(GetRandomInt(1, 2))
 			{
 				case 1:
 				{
-					CPrintToChatAll("{yellow}bob and blade");
+					CPrintToChatAll("{yellow}bob");
 				}
 				default:
 				{
-					CPrintToChatAll("{yellow}bob and blade!");
+					CPrintToChatAll("{yellow}bob!");
 				}
 			}
 		}
