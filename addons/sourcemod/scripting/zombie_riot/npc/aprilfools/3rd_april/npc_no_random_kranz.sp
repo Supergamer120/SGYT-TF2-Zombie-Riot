@@ -78,6 +78,12 @@ static void ClotPrecache()
 
 
 }
+
+int NoRandomKranzV3_ID()
+{
+	return NPCID;
+}
+
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team, const char[] data)
 {
 	return NoRandomKranz(vecPos, vecAng, team, data);
@@ -342,8 +348,8 @@ methodmap NoRandomKranz < CClotBody
 			strcopy(music.Artist, sizeof(music.Artist), "Dragon Ball Z Dokkan Battle");
 			Music_SetRaidMusic(music);
 			
-			CPrintToChatAll("{darkblue}No Random Kranz V3{default}: I am not NRCV3 nor Kranz, its over mercs, i have come for you!");
-			CPrintToChatAll("{darkblue}No Random Kranz V3{default}: Us bosses HAVE NO LIMITS!");
+			NPCTalkMessage(npc.index, "I am not NRCV3 nor Kranz, it's over mercs, I have come for you!");
+			NPCTalkMessage(npc.index, "Us bosses HAVE NO LIMITS!");
 			
 			npc.m_iWearable1 = npc.EquipItem("head", "models/weapons/c_models/c_directhit/c_directhit.mdl");
 		}
@@ -386,6 +392,11 @@ methodmap NoRandomKranz < CClotBody
 		
 		return npc;
 	}
+}
+
+static void NPCTalkMessage(int entity, const char[] message)
+{
+	PrintNPCMessageWithPrefixes(entity, "darkblue", message);
 }
 
 public void NoRandomKranz_ClotThink(int iNPC)
@@ -463,7 +474,7 @@ public void NoRandomKranz_ClotThink(int iNPC)
 		RaidModeScaling *= 1.5;
 		b_NpcUnableToDie[npc.index] = false;
 		
-		CPrintToChatAll("{darkblue}No Random Kranz V3{default}: My shitty ass transformation conditions are finally met, DIE!!!");
+		NPCTalkMessage(npc.index, "My shitty ass transformation conditions are finally met, DIE!!!");
 	}
 	if(npc.i_GunMode != 2 && npc.m_CreateClones < GetGameTime(npc.index))
 	{
@@ -619,7 +630,7 @@ public Action NoRandomKranz_OnTakeDamage(int victim, int &attacker, int &inflict
 	int Health = GetEntProp(victim, Prop_Data, "m_iHealth");
 	if(RoundToCeil(damage) > Health && npc.m_iHealthBar <= 0)
 	{	
-		CPrintToChatAll("{darkblue}No Random Kranz V3{default}: OH COME ON FULL DODGE BUILD AND THEN THIS???");
+		NPCTalkMessage(npc.index, "OH COME ON FULL DODGE BUILD AND THEN THIS???");
 		
 		npc.StopPathing();
 		ApplyStatusEffect(victim, victim, "Infinite Will", 1.0);
@@ -675,7 +686,7 @@ public void NoRandomKranz_NPCDeath(int entity)
 			Music_Stop_All(client1);
 		}
 	}
-	CPrintToChatAll("{darkblue}No Random Kranz V3{default}: K  O   !");
+	NPCTalkMessage(npc.index, "K  O   !");
 		
 	static float flMyPos[3];
 	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", flMyPos);
@@ -690,7 +701,21 @@ public void NoRandomKranz_NPCDeath(int entity)
 	EmitAmbientSound(g_DeathSounds[sound], flMyPos, _, 120, _,1.0);
 	EmitAmbientSound(g_DeathSounds[sound], flMyPos, _, 120, _,1.0);
 	
-
+	int a, entity1;
+	//slay clones
+	while((entity1 = FindEntityByNPC(a)) != -1)
+	{
+		if(IsValidEntity(entity1) && i_NpcInternalId[entity1] == NoRandomKranzV3_ID())
+		{
+			NoRandomKranz npcClone = view_as<NoRandomKranz>(entity1);
+			if (npcClone.m_TimeUntillsuicide)
+			{
+				b_DissapearOnDeath[entity1] = true;
+				b_DoGibThisNpc[entity1] = true;
+				SmiteNpcToDeath(entity1);
+			}
+		}
+	}
 }
 /*
 
@@ -788,10 +813,7 @@ int NoRandomKranzSelfDefense(NoRandomKranz npc, float gameTime, int target, floa
 						npc.PlayMeleeHitSound();
 						npc.DispatchParticleEffect(npc.index, "hightower_explosion", NULL_VECTOR, NULL_VECTOR, NULL_VECTOR, npc.FindAttachment("effect_hand_l"), PATTACH_POINT_FOLLOW, true);
 						
-						BlackHoleRocketDoPos(npc.index, vecHit);
-						BlackHoleRocketDoPos(npc.index, vecHit);
-						BlackHoleRocketDoPos(npc.index, vecHit);
-						BlackHoleRocketDoPos(npc.index, vecHit);
+						BlackHoleRocketDoPos(npc.index, vecHit, 4.0);
 
 						bool Knocked = false;
 									
@@ -1133,13 +1155,13 @@ static bool NpcClot_LifeLost(int iNPC, int LifeAfter)
 }
 
 
-public void BlackHoleRocketDo(int entity)
+static void BlackHoleRocketDo(int entity, float dmgMult = 1.0)
 {
 	static float flMyPos[3];
 	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", flMyPos);
-	BlackHoleRocketDoPos(entity, flMyPos);
+	BlackHoleRocketDoPos(entity, flMyPos, dmgMult);
 }
-public void BlackHoleRocketDoPos(int entity, float Pos[3])
+static void BlackHoleRocketDoPos(int entity, float Pos[3], float dmgMult = 1.0)
 {
 	int Particle = ParticleEffectAt(Pos, "eyeboss_tp_vortex", 5.0);	
 	SetTeam(Particle, GetTeam(entity));
@@ -1147,8 +1169,9 @@ public void BlackHoleRocketDoPos(int entity, float Pos[3])
 	DataPack pack;
 	CreateDataTimer(0.25, BlackHoleRocketDo_DmgDo, pack, TIMER_REPEAT|TIMER_FLAG_NO_MAPCHANGE);
 
-	pack.WriteCell(EntIndexToEntRef(Particle)); 
-	pack.WriteFloat(4.0 * RaidModeScaling); 
+	pack.WriteCell(EntIndexToEntRef(Particle));
+	pack.WriteCell(EntIndexToEntRef(entity));
+	pack.WriteFloat(4.0 * RaidModeScaling * dmgMult); 
 }
 public Action BlackHoleRocketDo_DmgDo(Handle timer, DataPack pack)
 {
@@ -1156,6 +1179,14 @@ public Action BlackHoleRocketDo_DmgDo(Handle timer, DataPack pack)
 	int Particle = EntRefToEntIndex(pack.ReadCell());
 	if(!IsValidEntity(Particle))
 		return Plugin_Stop;
+	
+	int owner = EntRefToEntIndex(pack.ReadCell());
+	if (!IsValidEntity(owner) || b_NpcHasDied[owner])
+	{
+		RemoveEntity(Particle);
+		return Plugin_Stop;
+	}
+	
 	float DamageDeal = pack.ReadFloat();
 	float SpawnPos[3];
 	GetEntPropVector(Particle, Prop_Data, "m_vecAbsOrigin", SpawnPos);
