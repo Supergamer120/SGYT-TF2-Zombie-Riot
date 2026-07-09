@@ -706,8 +706,15 @@ public void CaptinoBaguettus_ClotThink(int iNPC)
 	{
 		case -1:
 		{
-			npc.m_flNextTMITalk = GameTime + 1.0;
-			npc.m_iNextTMITalk=0;
+			if(!StrContains(data, "voidsurv"))
+			{
+				NPCPritToChat(npc.index, "{paleturquoise}", "CaptinoMenius_Talk-1-1", false, false);	
+			}
+			else
+			{
+				npc.m_flNextTMITalk = GameTime + 1.0;
+				npc.m_iNextTMITalk=0;
+			}
 		}
 		case 0:
 		{
