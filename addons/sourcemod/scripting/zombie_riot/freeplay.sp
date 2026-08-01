@@ -62,6 +62,8 @@ static bool thespewer;
 static bool sigmaller;
 static bool portalgalore;
 static bool refragportal;
+static int InvulnAlly;
+static bool InvulnAllyUsed[13];
 
 static int FreeplayModifActive = 0;
 static float FM_Health;
@@ -204,9 +206,20 @@ void Freeplay_ResetAll()
 	sigmaller = false;
 	portalgalore = false;
 	refragportal = false;
+	Freeplay_ResetInvulnAllies();
 	squeezerplus = false;
 	FM_Health = 0.25;
 	FM_Damage = 0.5;
+}
+
+void Freeplay_ResetInvulnAllies()
+{
+    InvulnAlly = -1;
+
+    for(int i = 0; i < sizeof(InvulnAllyUsed); i++)
+    {
+        InvulnAllyUsed[i] = false;
+    }
 }
 
 int Freeplay_EnemyCount()
@@ -242,6 +255,9 @@ int Freeplay_EnemyCount()
 			amount++;
 
 		if(refragportal)
+			amount++;
+
+		if(invulnally)
 			amount++;
 	}
 
@@ -294,7 +310,7 @@ int Freeplay_GetDangerLevelCurrent(int postWaves)
 void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = false)
 {
 	bool shouldscale = true;
-	if(RaidFight || friendunit || zombiecombine || moremen || immutable || Schizophrenia || DarknessComing || thespewer || sigmaller || portalgalore || refragportal)
+	if(RaidFight || friendunit || zombiecombine || moremen || immutable || Schizophrenia || DarknessComing || thespewer || sigmaller || portalgalore || refragportal || invulnally)
 	{
 		enemy.Is_Boss = 0;
 		enemy.WaitingTimeGive = 0.0;
@@ -836,6 +852,11 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 
 		count = 2;
 		refragportal = false;
+	}
+	else if(invulnally)
+	{
+		
+		invulnally = false;
 	}
 	else
 	{
@@ -3835,13 +3856,13 @@ void Freeplay_SetupStart(bool extra = false)
 			}
 			case 92:
 			{
-				if(refragportal)
+				if(portalgalore)
 				{
 					Freeplay_SetupStart();
 					return;
 				}
-				strcopy(message, sizeof(message), "{red}Here's a gift from {darkblue}C.H.I.M.E.R.A.{red}. {darkblue}Five Hundred Portal Gate!");
-				refragportal = true;
+				strcopy(message, sizeof(message), "{red}Here's a gift from {purple}Unspeakable{red}. {purple}Five Hundred Void Portals!!");
+				portalgalore = true;
 			}
 			default:
 			{
