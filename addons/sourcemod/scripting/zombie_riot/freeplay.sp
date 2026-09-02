@@ -58,6 +58,7 @@ static bool refragportal;
 static bool XenoLabBuff;
 static bool SeaLabBuff;
 static int SpecialistDebuff;
+static bool SensalTrio;
 
 static int FreeplayModifActive = 0;
 static float FM_Health;
@@ -196,6 +197,7 @@ void Freeplay_ResetAll()
 	XenoLabBuff = false;
 	SeaLabBuff = false;
 	SpecialistDebuff = 0;
+	SensalTrio = false;
 	squeezerplus = false;
 	FM_Health = 0.4;
 	FM_Damage = 0.65;
@@ -234,6 +236,9 @@ int Freeplay_EnemyCount()
 			amount++;
 
 		if(refragportal)
+			amount++;
+
+		if(SensalTrio)
 			amount++;
 	}
 
@@ -286,7 +291,7 @@ int Freeplay_GetDangerLevelCurrent(int postWaves)
 void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = false)
 {
 	bool shouldscale = true;
-	if(RaidFight || friendunit || zombiecombine || moremen || immutable || Schizophrenia || DarknessComing || thespewer || sigmaller || portalgalore || refragportal)
+	if(RaidFight || friendunit || zombiecombine || moremen || immutable || Schizophrenia || DarknessComing || thespewer || sigmaller || portalgalore || refragportal || SensalTrio)
 	{
 		enemy.Is_Boss = 0;
 		enemy.WaitingTimeGive = 0.0;
@@ -348,7 +353,8 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_xeno_raidboss_silvester");
 				enemy.Health = RoundToFloor((2500000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.Data = "wave_40";
+				enemy.Data = "wave_40;triple_enemies";
+				SensalTrio = true;
 			}
 			case 4:
 			{
@@ -391,6 +397,23 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_stella");
 				enemy.Health = RoundToFloor((3000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+				enemy.Data = "wave_40;triple_enemies";
+
+				switch(GetRandomInt(1, 4))
+				{
+					case 1: 
+					{
+						enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
+						enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+					default: 
+					{
+						enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
+						enemy.Health = RoundToFloor((5000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+						enemy.Data = "wave_40;triple_enemies";
+					}
+				}
 			}
 			case 7:	
 			{
@@ -490,6 +513,16 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 			{
 				enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
 				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+				enemy.Data = "wave_40;triple_enemies";
+
+				if(GetRandomInt(1, 3) == 1)
+					enemy.Index = NPC_GetByPlugin("npc_stella");
+					enemy.Health = RoundToFloor((3000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+					enemy.Data = "wave_40;triple_enemies";
+				else
+					enemy.Index = NPC_GetByPlugin("npc_stella");
+					enemy.Health = RoundToFloor((3000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+					enemy.Data = "wave_40;triple_enemies";
 			}
 			case 19:
 			{
@@ -810,6 +843,31 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 
 		count = 5;
 		refragportal = false;
+	}
+	else if(SensalTrio)
+	{
+		enemy.Is_Immune_To_Nuke = true;
+		enemy.Is_Boss = 1;
+		enemy.Index = NPC_GetByPlugin("npc_sensal");
+		enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
+		enemy.Data = "wave_40;triple_enemies";
+
+		// Raid health is lower before w101.
+		if(Waves_GetRoundScale() < 101)
+			enemy.Health = RoundToCeil(float(enemy.Health) * 0.75);
+
+		enemy.Health = RoundToCeil(float(enemy.Health) * HealthMulti);
+		
+		//Global HP increaser
+		enemy.Health = RoundToCeil(float(enemy.Health) * 0.85);
+
+		// moni
+		enemy.Does_Not_Scale = 1;
+		count = 1;
+		RaidFight = 0;
+		shouldscale = false;
+
+		SensalTrio = false;
 	}
 	else
 	{
