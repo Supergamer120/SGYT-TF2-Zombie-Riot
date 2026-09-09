@@ -348,21 +348,6 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 					}
 				}
 			}
-			case 4:
-			{
-				enemy.Index = NPC_GetByPlugin("npc_ruina_twirl");
-				enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-				enemy.Data = "wave_40;triple_enemies";
-
-				if(GetRandomInt(1, 3) == 1)
-					enemy.Index = NPC_GetByPlugin("npc_stella");
-					enemy.Health = RoundToFloor((3000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-					enemy.Data = "wave_40;triple_enemies";
-				else
-					enemy.Index = NPC_GetByPlugin("npc_stella");
-					enemy.Health = RoundToFloor((3000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
-					enemy.Data = "wave_40;triple_enemies";
-			}
 			default:
 			{
 				enemy.Index = NPC_GetByPlugin("npc_true_fusion_warrior");
@@ -824,7 +809,7 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 
 static Action Freeplay_RouletteMessage(Handle timer)
 {
-	RaidFight = GetRandomInt(1, 4);
+	RaidFight = GetRandomInt(1, 3);
 	EmitSoundToAll("misc/halloween/spelltick_set.wav", _, _, _, _, _, GetRandomInt(70, 135));
 	switch(RaidFight)
 	{
@@ -881,24 +866,6 @@ static Action Freeplay_RouletteMessage(Handle timer)
 				default:
 				{
 					CPrintToChatAll("{crimson}KARLAS {white}& {aqua}STELLA! {gold}- {red}Hope you like dealing with all of karlas's swords!");
-				}
-			}
-		}
-		case 4:
-		{
-			switch(GetRandomInt(1, 2))
-			{
-				case 1:
-				{
-					CPrintToChatAll("{purple}TWIRL! {gold}- {red}Oh so you're strong? Fight her!");
-				}
-				/*case 2:
-				{
-					CPrintToChatAll("{purple}TWIRL! {gold}- {red}What if I add the other elf you guys fought. And her "pet cat." ");
-				}*/
-				default:
-				{
-					CPrintToChatAll("{purple}TWIRL! {gold}- {red}The ruler of ruina descends!");
 				}
 			}
 		}
