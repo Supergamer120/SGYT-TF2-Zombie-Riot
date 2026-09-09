@@ -513,25 +513,10 @@ void Freeplay_AddEnemy(int postWaves, Enemy enemy, int &count, bool alaxios = fa
 	{
 		enemy.Is_Immune_To_Nuke = true;
 		enemy.Is_Boss = 1;
+		count = 0;
 		enemy.Index = NPC_GetByPlugin("npc_sensal");
 		enemy.Health = RoundToFloor((6000000.0 + HealthBonus) / 70.0 * float(Waves_GetRound() * 2) * MultiGlobalHighHealthBoss);
 		enemy.Data = "wave_40;triple_enemies";
-
-		// Raid health is lower before w101.
-		if(Waves_GetRoundScale() < 101)
-			enemy.Health = RoundToCeil(float(enemy.Health) * 0.75);
-
-		enemy.Health = RoundToCeil(float(enemy.Health) * HealthMulti);
-		
-		//Global HP increaser
-		enemy.Health = RoundToCeil(float(enemy.Health) * 0.85);
-
-		// moni
-		enemy.Does_Not_Scale = 1;
-		count = 1;
-		RaidFight = 0;
-		shouldscale = false;
-
 		SensalTrio = false;
 	}
 	else
