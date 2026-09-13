@@ -34,7 +34,7 @@ static const char g_MeleeHitSounds[][] = {
 	"weapons/airboat/airboat_gun_energy2.wav",
 };
 
-void AlminaRanka_S_OnMapStart_NPC()
+void AlminaRana_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -43,11 +43,11 @@ void AlminaRanka_S_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	PrecacheModel("models/player/medic.mdl");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Ranka S");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_ranka_s");
+	strcopy(data.Name, sizeof(data.Name), "Rana");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_rana");
 	strcopy(data.Icon, sizeof(data.Icon), "seargent_ideal");
 	data.IconCustom = true;
-	data.Flags = MVM_CLASS_FLAG_MINIBOSS;
+	data.Flags = 0;
 	data.Category = Type_AlminaExpiAlliance;
 	data.Func = ClotSummon;
 	NPC_Add(data);
@@ -55,10 +55,10 @@ void AlminaRanka_S_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return AlminaRanka_S(vecPos, vecAng, team);
+	return AlminaRana(vecPos, vecAng, team);
 }
 
-methodmap AlminaRanka_S < CClotBody
+methodmap AlminaRana < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -100,9 +100,9 @@ methodmap AlminaRanka_S < CClotBody
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][0] = TempValueForProperty; }
 	}
 	
-	public AlminaRanka_S(float vecPos[3], float vecAng[3], int ally)
+	public AlminaRana(float vecPos[3], float vecAng[3], int ally)
 	{
-		AlminaRanka_S npc = view_as<AlminaRanka_S>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.35", "15000", ally, false, true));
+		AlminaRana npc = view_as<AlminaRana>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.35", "15000", ally, false, true));
 		
 		i_NpcWeight[npc.index] = 3;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -119,10 +119,10 @@ methodmap AlminaRanka_S < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_GIANT;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(AlminaRanka_S_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(AlminaRanka_S_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(AlminaRanka_S_ClotThink);
-		Ranka_S_ArmorStick_Effect(npc.index);
+		func_NPCDeath[npc.index] = view_as<Function>(AlminaRana_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(AlminaRana_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(AlminaRana_ClotThink);
+		Rana_ArmorStick_Effect(npc.index);
 		
 		
 		npc.StartPathing();
@@ -145,9 +145,9 @@ methodmap AlminaRanka_S < CClotBody
 	}
 }
 
-public void AlminaRanka_S_ClotThink(int iNPC)
+public void AlminaRana_ClotThink(int iNPC)
 {
-	AlminaRanka_S npc = view_as<AlminaRanka_S>(iNPC);
+	AlminaRana npc = view_as<AlminaRana>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -190,7 +190,7 @@ public void AlminaRanka_S_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		AlminaRanka_SSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		AlminaRanaSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -200,9 +200,9 @@ public void AlminaRanka_S_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action AlminaRanka_S_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action AlminaRana_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	AlminaRanka_S npc = view_as<AlminaRanka_S>(victim);
+	AlminaRana npc = view_as<AlminaRana>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -217,9 +217,9 @@ public Action AlminaRanka_S_OnTakeDamage(int victim, int &attacker, int &inflict
 }
 
 
-public void AlminaRanka_S_NPCDeath(int entity)
+public void AlminaRana_NPCDeath(int entity)
 {
-	AlminaRanka_S npc = view_as<AlminaRanka_S>(entity);
+	AlminaRana npc = view_as<AlminaRana>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -243,7 +243,7 @@ public void AlminaRanka_S_NPCDeath(int entity)
 
 }
 
-void AlminaRanka_SSelfDefense(AlminaRanka_S npc, float gameTime, int target, float distance)
+void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float distance)
 {
 	if(npc.m_flAttackHappens)
 	{
@@ -322,7 +322,7 @@ void AlminaRanka_SSelfDefense(AlminaRanka_S npc, float gameTime, int target, flo
 
 
 
-void Ranka_S_ArmorStick_Effect(int iNpc)
+void Rana_ArmorStick_Effect(int iNpc)
 {
 	if(AtEdictLimit(EDICT_NPC))
 		return;
