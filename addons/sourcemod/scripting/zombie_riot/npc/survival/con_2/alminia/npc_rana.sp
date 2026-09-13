@@ -102,7 +102,7 @@ methodmap AlminaRana < CClotBody
 	
 	public AlminaRana(float vecPos[3], float vecAng[3], int ally)
 	{
-		AlminaRana npc = view_as<AlminaRana>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.35", "15000", ally, false, true));
+		AlminaRana npc = view_as<AlminaRana>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "5000", ally, false, true));
 		
 		i_NpcWeight[npc.index] = 3;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -264,7 +264,7 @@ void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float dis
 				
 				if(IsValidEnemy(npc.index, target))
 				{
-					float damageDealt = 125.0;
+					float damageDealt = 55.0;
 					if(ShouldNpcDealBonusDamage(target))
 						damageDealt *= 4.0;
 
