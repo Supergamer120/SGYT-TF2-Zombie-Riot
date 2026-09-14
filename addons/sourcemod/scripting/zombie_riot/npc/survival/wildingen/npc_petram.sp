@@ -48,7 +48,7 @@ void PetramOnMapStart()
 	strcopy(data.Name, sizeof(data.Name), "Petram");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_petram");
 	strcopy(data.Icon, sizeof(data.Icon), "seargent_ideal");
-	data.IconCustom = false;
+	data.IconCustom = true;
 	data.Flags = 0;
 	data.Category = Type_Interitus;
 	data.Func = ClotSummon;
@@ -89,7 +89,7 @@ methodmap Petram < CClotBody
 	
 	public Petram(float vecPos[3], float vecAng[3], int ally)
 	{
-		Petram npc = view_as<Petram>(CClotBody(vecPos, vecAng, "models/player/engineer.mdl", "1.0", "10000", ally));
+		Petram npc = view_as<Petram>(CClotBody(vecPos, vecAng, "models/player/engineer.mdl", "1.0", "5000", ally));
 		
 		i_NpcWeight[npc.index] = 5;
 		npc.SetActivity("ACT_MP_RUN_MELEE");
@@ -112,7 +112,10 @@ methodmap Petram < CClotBody
 		npc.m_flNextMeleeAttack = 0.0;
 		npc.m_flAttackHappens = 0.0;
 		
-		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/weapons/c_models/c_bear_claw/c_bear_claw.mdl");
+		npc.m_flMeleeArmor = 0.10;
+		npc.m_flRangedArmor = 0.10;
+		
+		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/weapons/c_models/c_boston_basher/c_boston_basher.mdl");
 		npc.m_iWearable2 = npc.EquipItem("head", "models/player/items/engineer/engineer_cowboy_hat.mdl");
 		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/engineer/hwn2018_dell_in_the_shell/hwn2018_dell_in_the_shell.mdl");
 
@@ -195,7 +198,7 @@ static void ClotThink(int iNPC)
 							damage *= Rogue_Paradox_RedMoon() ? 30.0 : 1.5;
 
 						npc.PlayMeleeHitSound();
-						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB);
+						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_TRUEDAMAGE);
 					}
 				}
 
