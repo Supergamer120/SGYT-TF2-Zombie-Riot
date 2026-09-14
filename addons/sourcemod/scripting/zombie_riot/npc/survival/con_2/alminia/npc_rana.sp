@@ -132,14 +132,13 @@ methodmap AlminaRana < CClotBody
 		int skin = 1;
 		SetEntProp(npc.index, Prop_Send, "m_nSkin", skin);
 		
-
-		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/player/items/all_class/sbox2014_knight_helmet/sbox2014_knight_helmet_soldier.mdl");
-		npc.m_iWearable2 = npc.EquipItem("head", "models/workshop/player/items/all_class/bak_teufort_knight/bak_teufort_knight_soldier.mdl");
-		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/soldier/dec23_trench_warefarer/dec23_trench_warefarer.mdl");
+		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/player/items/all_class/bak_teufort_knight/bak_teufort_knight_soldier.mdl");
+		npc.m_iWearable2 = npc.EquipItem("head", "model/workshop/player/items/soldier/inglorious_patriot_new/inglorious_patriot_new.mdl");
 		
 		SetEntProp(npc.m_iWearable1, Prop_Send, "m_nSkin", skin);
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", skin);
-		SetEntProp(npc.m_iWearable3, Prop_Send, "m_nSkin", skin);
+
+		SetEntityRenderColor(npc.m_iWearable2, 40, 57, 77, 255);
 
 		return npc;
 	}
@@ -276,16 +275,16 @@ void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float dis
 					{
 						if (IsInvuln(target))
 						{
-							npc.m_flArmorToGive = 1000.0;
+							npc.m_flArmorToGive = 400.0;
 						}
 						else
 						{
-							npc.m_flArmorToGive = 1500.0;
+							npc.m_flArmorToGive = 700.0;
 						}
 					}
 					else
 					{
-						npc.m_flArmorToGive = 1000.0;
+						npc.m_flArmorToGive = 400.0;
 					}
 					if(NpcStats_AlminaIsEnemyMarked(target))
 						npc.m_flArmorToGive *= 1.5;
@@ -314,7 +313,7 @@ void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float dis
 						
 				npc.m_flAttackHappens = gameTime + 0.25;
 				npc.m_flDoingAnimation = gameTime + 0.25;
-				npc.m_flNextMeleeAttack = gameTime + 1.0;
+				npc.m_flNextMeleeAttack = gameTime + 0.9;
 			}
 		}
 	}
