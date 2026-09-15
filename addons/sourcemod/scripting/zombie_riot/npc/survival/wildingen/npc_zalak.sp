@@ -192,16 +192,22 @@ static void ClotThink(int iNPC)
 					{
 						float damage = 20.0;
 						if(ShouldNpcDealBonusDamage(target))
-							damage *= Rogue_Paradox_RedMoon() ? 30.0 : 1.5;
+							damage *= 1.5;
 
-          if(!NpcStats_IsEnemySilenced(npc.index))
-					{
-						StartBleedingTimer(target, npc.index,2.0, 10, -1, DMG_TRUEDAMAGE, 0);
-					}
+      			  		if(!NpcStats_IsEnemySilenced(npc.index))
+						{
+							if(Rogue_Paradox_RedMoon())
+							{
+								StartBleedingTimer(target, npc.index,2.0, 10, -1, DMG_TRUEDAMAGE, 0);
+							}
+							else
+							{
+								StartBleedingTimer(target, npc.index,3.0, 20, -1, DMG_TRUEDAMAGE, 0);
+							}
+						}
 
 						npc.PlayMeleeHitSound();
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB);
-						Elemental_AddChaosDamage(target, npc.index, Rogue_Paradox_RedMoon() ? 450 : 300);
 					}
 				}
 
