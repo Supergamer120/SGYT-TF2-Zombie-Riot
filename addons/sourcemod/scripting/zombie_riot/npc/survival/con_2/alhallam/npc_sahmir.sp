@@ -95,7 +95,7 @@ methodmap Sahmir < CClotBody
 	
 	public Sahmir(float vecPos[3], float vecAng[3], int ally)
 	{
-		Sahmir npc = view_as<Sahmir>(CClotBody(vecPos, vecAng, "models/player/sniper.mdl", "1.0", "7000", ally));
+		Sahmir npc = view_as<Sahmir>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.0", "10000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -121,7 +121,7 @@ methodmap Sahmir < CClotBody
 		
 		
 		npc.StartPathing();
-		npc.m_flSpeed = 280.0;
+		npc.m_flSpeed = 25	0.0;
 		Is_a_Medic[npc.index] = true;
 		
 		
@@ -130,21 +130,20 @@ methodmap Sahmir < CClotBody
 		
 
 		npc.m_iWearable1 = npc.EquipItem("head", "models/weapons/c_models/c_knife/c_knife.mdl");
+		SetVariantString("1.2");
+		AcceptEntityInput(npc.m_iWearable1, "SetModelScale");
 		
-		npc.m_iWearable2 = npc.EquipItem("head", "models/workshop/player/items/sniper/hwn2022_hunting_cloak/hwn2022_hunting_cloak.mdl");
+		npc.m_iWearable2 = npc.EquipItem("head", "models/workshop/player/items/heavy/sbox2014_leftover_trap/sbox2014_leftover_trap.mdl");
 
-		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/sniper/sum20_jarmaments/sum20_jarmaments.mdl");
+		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/heavy/sbox2014_trash_man/sbox2014_trash_man.mdl");
 
-		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/sniper/hwn2022_headhunters_brim/hwn2022_headhunters_brim.mdl");
-
-		npc.m_iWearable5 = npc.EquipItem("head", "models/workshop/player/items/sniper/dec2014_hunter_beard/dec2014_hunter_beard.mdl");
+		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/heavy/hwn2025_poncho/hwn2025_poncho.mdl");
 	
 
 		SetEntProp(npc.m_iWearable1, Prop_Send, "m_nSkin", skin);
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", skin);
 		SetEntProp(npc.m_iWearable3, Prop_Send, "m_nSkin", skin);
 		SetEntProp(npc.m_iWearable4, Prop_Send, "m_nSkin", skin);
-		SetEntProp(npc.m_iWearable5, Prop_Send, "m_nSkin", skin);
 		return npc;
 	}
 }
