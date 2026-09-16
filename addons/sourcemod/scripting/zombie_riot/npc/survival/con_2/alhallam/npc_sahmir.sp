@@ -2,22 +2,22 @@
 #pragma newdecls required
 
 static const char g_DeathSounds[][] = {
-	"vo/sniper_paincrticialdeath01.mp3",
-	"vo/sniper_paincrticialdeath02.mp3",
-	"vo/sniper_paincrticialdeath03.mp3",
+	"vo/heavy_paincrticialdeath01.mp3",
+	"vo/heavy_paincrticialdeath02.mp3",
+	"vo/heavy_paincrticialdeath03.mp3",
 };
 
 static const char g_HurtSounds[][] = {
-	"vo/sniper_painsharp01.mp3",
-	"vo/sniper_painsharp02.mp3",
-	"vo/sniper_painsharp03.mp3",
-	"vo/sniper_painsharp04.mp3",
+	"vo/heavy_painsharp01.mp3",
+	"vo/heavy_painsharp02.mp3",
+	"vo/heavy_painsharp03.mp3",
+	"vo/heavy_painsharp04.mp3",
+	"vo/heavy_painsharp05.mp3",
 };
 static const char g_IdleAlertedSounds[][] = {
-	"vo/sniper_battlecry01.mp3",
-	"vo/sniper_battlecry02.mp3",
-	"vo/sniper_battlecry03.mp3",
-	"vo/sniper_battlecry04.mp3",
+	"vo/taunts/heavy_taunts16.mp3",
+	"vo/taunts/heavy_taunts18.mp3",
+	"vo/taunts/heavy_taunts19.mp3",
 };
 
 static const char g_MeleeAttackSounds[][] = {
@@ -29,7 +29,7 @@ static const char g_HealSound[][] = {
 
 
 
-void WinterSkinHunter_OnMapStart_NPC()
+void Sahmir_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -38,8 +38,8 @@ void WinterSkinHunter_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_HealSound)); i++) { PrecacheSound(g_HealSound[i]); }
 
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Skin Hunter");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_skin_hunter");
+	strcopy(data.Name, sizeof(data.Name), "Sahmir");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_sahmir");
 	strcopy(data.Icon, sizeof(data.Icon), "sniper_camper_1");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -52,9 +52,9 @@ void WinterSkinHunter_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return WinterSkinHunter(vecPos, vecAng, team);
+	return Sahmir(vecPos, vecAng, team);
 }
-methodmap WinterSkinHunter < CClotBody
+methodmap Sahmir < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -93,9 +93,9 @@ methodmap WinterSkinHunter < CClotBody
 	}
 	
 	
-	public WinterSkinHunter(float vecPos[3], float vecAng[3], int ally)
+	public Sahmir(float vecPos[3], float vecAng[3], int ally)
 	{
-		WinterSkinHunter npc = view_as<WinterSkinHunter>(CClotBody(vecPos, vecAng, "models/player/sniper.mdl", "1.0", "7000", ally));
+		Sahmir npc = view_as<Sahmir>(CClotBody(vecPos, vecAng, "models/player/sniper.mdl", "1.0", "7000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -107,9 +107,9 @@ methodmap WinterSkinHunter < CClotBody
 		AcceptEntityInput(npc.index, "SetBodyGroup");
 		
 
-		func_NPCDeath[npc.index] = view_as<Function>(WinterSkinHunter_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(WinterSkinHunter_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(WinterSkinHunter_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(Sahmir_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(Sahmir_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(Sahmir_ClotThink);
 		
 		
 		npc.m_flNextMeleeAttack = 0.0;
@@ -149,14 +149,9 @@ methodmap WinterSkinHunter < CClotBody
 	}
 }
 
-public void WinterSkinHunter_ClotThink(int iNPC)
+public void Sahmir_ClotThink(int iNPC)
 {
-	WinterSkinHunter npc = view_as<WinterSkinHunter>(iNPC);
-	if(npc.m_flNextRangedAttackHappening < GetGameTime())
-	{
-		npc.m_flNextRangedAttackHappening = GetGameTime() + 2.5;
-		DesertYadeamDoHealEffect(npc.index, 200.0);
-	}
+	Sahmir npc = view_as<Sahmir>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -214,15 +209,10 @@ public void WinterSkinHunter_ClotThink(int iNPC)
 		}
 		npc.m_flGetClosestTargetTime = GetGameTime(npc.index) + 1.0;
 	}
-	if(npc.m_flNextRangedAttack < GetGameTime(npc.index))
-	{
-		npc.m_flNextRangedAttack = GetGameTime(npc.index) + 0.25;
-		ExpidonsaGroupHeal(npc.index, 200.0, 99, 40.0, 1.0, false,Expidonsa_DontHealSameIndex);
-	}
-	WinterSkinHunterSelfDefense(npc,GetGameTime(npc.index)); 
+	SahmirSelfDefense(npc,GetGameTime(npc.index)); 
 }
 
-void WinterSkinHunterSelfDefense(WinterSkinHunter npc, float gameTime)
+void SahmirSelfDefense(Sahmir npc, float gameTime)
 {
 	int GetClosestEnemyToAttack;
 	//Ranged units will behave differently.
@@ -246,13 +236,14 @@ void WinterSkinHunterSelfDefense(WinterSkinHunter npc, float gameTime)
 				npc.PlayMeleeSound();
 				//after we fire, we will have a short delay beteween the actual laser, and when it happens
 				//This will predict as its relatively easy to dodge
-				float projectile_speed = 1200.0;
+				float projectile_speed = 2000.0;
 
 				WorldSpaceCenter(GetClosestEnemyToAttack, vecTarget);
 
 				npc.FaceTowards(vecTarget, 20000.0);
 				npc.m_flNextMeleeAttack = GetGameTime(npc.index) + 0.75;
 				npc.FireArrow(vecTarget, 35.0, projectile_speed);
+				ApplyStatusEffect(npc.index, target, "Molecular Collapse", 15.0);
 				npc.PlayIdleAlertSound();
 			}
 		}
@@ -260,9 +251,9 @@ void WinterSkinHunterSelfDefense(WinterSkinHunter npc, float gameTime)
 }
 
 
-public Action WinterSkinHunter_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action Sahmir_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	WinterSkinHunter npc = view_as<WinterSkinHunter>(victim);
+	Sahmir npc = view_as<Sahmir>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -276,9 +267,9 @@ public Action WinterSkinHunter_OnTakeDamage(int victim, int &attacker, int &infl
 	return Plugin_Changed;
 }
 
-public void WinterSkinHunter_NPCDeath(int entity)
+public void Sahmir_NPCDeath(int entity)
 {
-	WinterSkinHunter npc = view_as<WinterSkinHunter>(entity);
+	Sahmir npc = view_as<Sahmir>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
