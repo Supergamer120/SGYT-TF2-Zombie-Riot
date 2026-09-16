@@ -1,7 +1,7 @@
 #pragma semicolon 1
 #pragma newdecls required
 
-static bool g_bAtillaHasAdaptedArmor[MAXENTITIES];
+static bool g_bSerakHasAdaptedArmor[MAXENTITIES];
 
 static const char g_DeathSounds[][] = {
 	"vo/spy_paincrticialdeath01.mp3",
@@ -37,7 +37,7 @@ static const char g_MeleeHitSounds[][] = {
 	"weapons/cleaver_hit_07.wav",
 };
 
-void DesertAtilla_OnMapStart_NPC()
+void Serak_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -46,8 +46,8 @@ void DesertAtilla_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	PrecacheModel("models/player/medic.mdl");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Atilla");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_atilla");
+	strcopy(data.Name, sizeof(data.Name), "Serak");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_serak");
 	strcopy(data.Icon, sizeof(data.Icon), "militia");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -59,9 +59,9 @@ void DesertAtilla_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return DesertAtilla(vecPos, vecAng, team);
+	return Serak(vecPos, vecAng, team);
 }
-methodmap DesertAtilla < CClotBody
+methodmap Serak < CClotBody
 {
 	public bool m_bHasAdaptedArmor
 	{
@@ -111,11 +111,11 @@ methodmap DesertAtilla < CClotBody
 	}
 	
 	
-	public DesertAtilla(float vecPos[3], float vecAng[3], int ally)
+	public Serak(float vecPos[3], float vecAng[3], int ally)
 	{
-		DesertAtilla npc = view_as<DesertAtilla>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "700", ally));
+		Serak npc = view_as<Serak>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "700", ally));
 
-		g_bAtillaHasAdaptedArmor[npc.index] = false;
+		g_bSerakHasAdaptedArmor[npc.index] = false;
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -129,9 +129,9 @@ methodmap DesertAtilla < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(DesertAtilla_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(DesertAtilla_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(DesertAtilla_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(Serak_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(Serak_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(Serak_ClotThink);
 		
 		
 		
@@ -164,9 +164,9 @@ methodmap DesertAtilla < CClotBody
 	}
 }
 
-public void DesertAtilla_ClotThink(int iNPC)
+public void Serak_ClotThink(int iNPC)
 {
-	DesertAtilla npc = view_as<DesertAtilla>(iNPC);
+	Serak npc = view_as<Serak>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -209,7 +209,7 @@ public void DesertAtilla_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		DesertAtillaSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		SerakSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -219,11 +219,11 @@ public void DesertAtilla_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action DesertAtilla_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
 	if(attacker > 0)
 	{
-		DwellerHeavy npc = view_as<DwellerHeavy>(victim);
+		Serak npc = view_as<Serak>(victim);
 		if (npc.m_flHeadshotCooldown < GetGameTime(npc.index))
 		{
 			npc.m_flHeadshotCooldown = GetGameTime(npc.index) + DEFAULT_HURTDELAY;
@@ -241,21 +241,21 @@ public Action DesertAtilla_OnTakeDamage(int victim, int &attacker, int &inflicto
 			{
 				if(!NpcStats_IsEnemySilenced(npc.index))
 				{
-					npc.m_flMeleeArmor -= 0.5;
+					npc.m_flMeleeArmor -= 0.25;
 				}
 				
-				npc.m_flRangedArmor += 1.5;
-				g_bAtillaHasAdaptedArmor[npc.index] = true;
+				npc.m_flRangedArmor += 1.25;
+				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 			else if(!(damagetype & DMG_TRUEDAMAGE))
 			{
 				if(!NpcStats_IsEnemySilenced(npc.index))
 				{
-					npc.m_flRangedArmor -= 0.5;
+					npc.m_flRangedArmor -= 0.25;
 				}
 
-				npc.m_flMeleeArmor += 1.5;
-				g_bAtillaHasAdaptedArmor[npc.index] = true;
+				npc.m_flMeleeArmor += 1.25;
+				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 		}
 	}
@@ -263,9 +263,9 @@ public Action DesertAtilla_OnTakeDamage(int victim, int &attacker, int &inflicto
 	return Plugin_Changed;
 }
 
-public void DesertAtilla_NPCDeath(int entity)
+public void Serak_NPCDeath(int entity)
 {
-	DesertAtilla npc = view_as<DesertAtilla>(entity);
+	Serak npc = view_as<Serak>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -281,7 +281,7 @@ public void DesertAtilla_NPCDeath(int entity)
 
 }
 
-void DesertAtillaSelfDefense(DesertAtilla npc, float gameTime, int target, float distance)
+void SerakSelfDefense(Serak npc, float gameTime, int target, float distance)
 {
 	if(npc.m_flAttackHappens)
 	{
@@ -337,3 +337,4 @@ void DesertAtillaSelfDefense(DesertAtilla npc, float gameTime, int target, float
 		}
 	}
 }
+
