@@ -1,6 +1,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+static bool g_bAtillaHasAdaptedArmor[MAXENTITIES];
+
 static const char g_DeathSounds[][] = {
 	"vo/spy_paincrticialdeath01.mp3",
 	"vo/spy_paincrticialdeath02.mp3",
@@ -61,6 +63,17 @@ static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 }
 methodmap DesertAtilla < CClotBody
 {
+	public bool m_bHasAdaptedArmor
+	{
+		get
+		{
+			return view_as<bool>(GetEntProp(this.index, Prop_Data, "m_bHasAdaptedArmor"));
+		}
+		set
+		{
+			SetEntProp(this.index, Prop_Data, "m_bHasAdaptedArmor", value ? 1 : 0);
+		}
+	}
 	public void PlayIdleAlertSound() 
 	{
 		if(this.m_flNextIdleSound > GetGameTime(this.index))
@@ -101,6 +114,8 @@ methodmap DesertAtilla < CClotBody
 	public DesertAtilla(float vecPos[3], float vecAng[3], int ally)
 	{
 		DesertAtilla npc = view_as<DesertAtilla>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "700", ally));
+
+		g_bAtillaHasAdaptedArmor[npc.index] = false;
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -226,27 +241,21 @@ public Action DesertAtilla_OnTakeDamage(int victim, int &attacker, int &inflicto
 			{
 				if(!NpcStats_IsEnemySilenced(npc.index))
 				{
-					npc.m_flMeleeArmor -= 0.05;
-					if(npc.m_flMeleeArmor < 0.05)
-						npc.m_flMeleeArmor = 0.05;
+					npc.m_flMeleeArmor -= 0.5;
 				}
 				
-				npc.m_flRangedArmor += 0.05;
-				if(npc.m_flRangedArmor > 1.5)
-					npc.m_flRangedArmor = 1.5;
+				npc.m_flRangedArmor += 1.5;
+				g_bAtillaHasAdaptedArmor[npc.index] = true;
 			}
 			else if(!(damagetype & DMG_TRUEDAMAGE))
 			{
-				npc.m_flRangedArmor -= 0.05;
-				if(npc.m_flRangedArmor < 0.05)
+				if(!NpcStats_IsEnemySilenced(npc.index))
 				{
-					npc.m_flRangedArmor = 0.05;
+					npc.m_flRangedArmor -= 0.5;
 				}
-				npc.m_flMeleeArmor += 0.05;
-				if(npc.m_flMeleeArmor > 1.5)
-				{
-					npc.m_flMeleeArmor = 1.5;
-				}
+
+				npc.m_flMeleeArmor += 1.5;
+				g_bAtillaHasAdaptedArmor[npc.index] = true;
 			}
 		}
 	}
