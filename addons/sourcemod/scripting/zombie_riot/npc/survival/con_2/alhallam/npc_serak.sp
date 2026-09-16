@@ -258,7 +258,7 @@ public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, floa
 
 				npc.m_flMeleeArmor += 1.25;
 				TE_Particle("asplode_hoodoo", flMyPos, NULL_VECTOR, NULL_VECTOR, _, _, _, _, _, _, _, _, _, _, 0.0);
-				EmitSoundToAll(SOUND_WAND_LIGHTNING_ABILITY_PAP_SMITE, 0, SNDCHAN_AUTO, 100, SND_NOFLAGS, SNDVOL_NORMAL, SNDPITCH_NORMAL, -1, flMyPos);
+				EmitSoundToAll(weapons/flame_thrower_bb_end.wav, 0, SNDCHAN_AUTO, 100, SND_NOFLAGS, SNDVOL_NORMAL, SNDPITCH_NORMAL, -1, flMyPos); //SOUND_WAND_CRYO_M1
 				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 		}
