@@ -4,23 +4,23 @@
 static bool g_bSerakHasAdaptedArmor[MAXENTITIES];
 
 static const char g_DeathSounds[][] = {
-	"vo/spy_paincrticialdeath01.mp3",
-	"vo/spy_paincrticialdeath02.mp3",
-	"vo/spy_paincrticialdeath03.mp3",
+	"vo/sniper_paincrticialdeath01.mp3",
+	"vo/sniper_paincrticialdeath02.mp3",
+	"vo/sniper_paincrticialdeath03.mp3",
 };
 
 static const char g_HurtSounds[][] = {
-	"vo/spy_painsharp01.mp3",
-	"vo/spy_painsharp02.mp3",
-	"vo/spy_painsharp03.mp3",
-	"vo/spy_painsharp04.mp3",
+	"vo/sniper_painsharp01.mp3",
+	"vo/sniper_painsharp02.mp3",
+	"vo/sniper_painsharp03.mp3",
+	"vo/sniper_painsharp04.mp3",
 };
 
 static const char g_IdleAlertedSounds[][] = {
-	"vo/spy_battlecry01.mp3",
-	"vo/spy_battlecry02.mp3",
-	"vo/spy_battlecry03.mp3",
-	"vo/spy_battlecry04.mp3",
+	"vo/sniper_battlecry01.mp3",
+	"vo/sniper_battlecry02.mp3",
+	"vo/sniper_battlecry03.mp3",
+	"vo/sniper_battlecry04.mp3",
 };
 
 static const char g_MeleeAttackSounds[][] = {
@@ -113,7 +113,7 @@ methodmap Serak < CClotBody
 	
 	public Serak(float vecPos[3], float vecAng[3], int ally)
 	{
-		Serak npc = view_as<Serak>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "700", ally));
+		Serak npc = view_as<Serak>(CClotBody(vecPos, vecAng, "models/player/sniper.mdl", "1.0", "700", ally));
 
 		g_bSerakHasAdaptedArmor[npc.index] = false;
 		
@@ -245,6 +245,8 @@ public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, floa
 				}
 				
 				npc.m_flRangedArmor += 1.25;
+				TE_Particle("asplode_hoodoo", flMyPos, NULL_VECTOR, NULL_VECTOR, _, _, _, _, _, _, _, _, _, _, 0.0);
+				EmitSoundToAll(weapons/flame_thrower_bb_end.wav, 0, SNDCHAN_AUTO, 100, SND_NOFLAGS, SNDVOL_NORMAL, SNDPITCH_NORMAL, -1, flMyPos); //SOUND_WAND_CRYO_M1
 				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 			else if(!(damagetype & DMG_TRUEDAMAGE))
@@ -255,6 +257,8 @@ public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, floa
 				}
 
 				npc.m_flMeleeArmor += 1.25;
+				TE_Particle("asplode_hoodoo", flMyPos, NULL_VECTOR, NULL_VECTOR, _, _, _, _, _, _, _, _, _, _, 0.0);
+				EmitSoundToAll(SOUND_WAND_LIGHTNING_ABILITY_PAP_SMITE, 0, SNDCHAN_AUTO, 100, SND_NOFLAGS, SNDVOL_NORMAL, SNDPITCH_NORMAL, -1, flMyPos);
 				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 		}
