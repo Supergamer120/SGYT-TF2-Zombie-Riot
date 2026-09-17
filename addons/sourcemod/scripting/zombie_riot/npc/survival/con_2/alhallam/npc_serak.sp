@@ -274,7 +274,7 @@ public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, floa
 				}
 				else
 				{
-						chargerPos[2] += 82.0;
+					chargerPos[2] += 82.0;
 				}
 				TE_ParticleInt(g_particleMissText, chargerPos);
 				TE_SendToClient(attacker);
