@@ -262,6 +262,31 @@ public Action Serak_OnTakeDamage(int victim, int &attacker, int &inflictor, floa
 				g_bSerakHasAdaptedArmor[npc.index] = true;
 			}
 		}
+		if(npc.Anger)
+		{
+			if(attacker <= MaxClients && attacker > 0)
+			{
+				float chargerPos[3];
+				GetEntPropVector(victim, Prop_Data, "m_vecAbsOrigin", chargerPos);
+				if(b_BoundingBoxVariant[victim] == BBV_Giant)
+				{
+					chargerPos[2] += 120.0;
+				}
+				else
+				{
+						chargerPos[2] += 82.0;
+				}
+				TE_ParticleInt(g_particleMissText, chargerPos);
+				TE_SendToClient(attacker);
+			}
+		
+			damage = 0.0;
+			npc.Anger = false;
+		}
+		else
+		{
+			npc.Anger = true;
+		}
 	}
 	
 	return Plugin_Changed;
