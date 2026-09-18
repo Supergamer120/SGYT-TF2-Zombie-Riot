@@ -3149,13 +3149,13 @@ void Freeplay_SetupStart(bool extra = false)
 				{
 					strcopy(message, sizeof(message), "{green}All enemies have lost the Xeno's Territory buff.");
 					XenoLabBuff = false;
-					SpeedMult += 0.15;
+					//SpeedMult += 0.15;
 				}
 				else
 				{
 					strcopy(message, sizeof(message), "{red}All enemies now gain the Xeno's Territory buff!");
 					XenoLabBuff = true;
-					SpeedMult -= 0.15;
+					//SpeedMult -= 0.15;
 				}
 			}
 			case 71:
