@@ -88,7 +88,7 @@ methodmap Ursus < CClotBody
 	{
 		Ursus npc = view_as<Ursus>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.5", "80000", ally));
 		
-		i_NpcWeight[npc.index] = 4;
+		i_NpcWeight[npc.index] = 999;
 		npc.SetActivity("ACT_MP_RUN_MELEE");
 		KillFeed_SetKillIcon(npc.index, "warrior_spirit");
 		
