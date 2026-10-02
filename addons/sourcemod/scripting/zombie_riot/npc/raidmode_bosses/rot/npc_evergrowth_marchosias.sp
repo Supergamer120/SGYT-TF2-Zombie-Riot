@@ -110,44 +110,49 @@ methodmap Ursus < CClotBody
 		npc.m_flAttackHappens = 0.0;
 		
 		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/weapons/c_models/c_bear_claw/c_bear_claw.mdl");
+		SetEntityRenderColor(npc.m_iWearable1, 195, 42, 46, 255);
 
 		npc.m_iWearable2 = npc.EquipItem("head", "models/player/items/heavy/yeti_arms.mdl");
-		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop_partner/player/items/all_class/tr_jungle_booty/tr_jungle_booty_heavy.mdl");
-		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/heavy/sf14_halloween_bull_locks/sf14_halloween_bull_locks.mdl");
-		SetVariantString("1.5");
-		npc.m_iWearable5 = npc.EquipItem("head", "models/player/items/medic/hwn_medic_misc2.mdl");
-		npc.m_iWearable6 = npc.EquipItem("head", "models/workshop/player/items/medic/sf14_purity_wings/sf14_purity_wings.mdl");
-		SetVariantString("2.0");
-		npc.m_iWearable7 = npc.EquipItem("head", "models/workshop/player/items/medic/sf14_medic_hundkopf/sf14_medic_hundkopf.mdl");
-		SetVariantString("1.5");
-		npc.m_iWearable8 = npc.EquipItem("head", "models/player/items/pyro/hwn_pyro_hat.mdl");
-		SetVariantString("1.5");
-		npc.m_iWearable9 = npc.EquipItem("head", "models/workshop_partner/player/items/scout/ai_body/ai_body.mdl");
-		SetVariantString("1.25");
-		npc.m_iWearable10 = npc.EquipItem("head", "models/workshop/player/items/all_class/sum20_loaf_loafers_style2/sum20_loaf_loafers_style2_heavy.mdl");
-		SetVariantString("1.1");
-
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable2, 195, 42, 46, 255);
+
+		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/heavy/sf14_halloween_bull_locks/sf14_halloween_bull_locks.mdl");
+		SetVariantString("1.5");
+		AcceptEntityInput(npc.m_iWearable3, "SetModelScale");
 		SetEntProp(npc.m_iWearable3, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable3, 195, 42, 46, 255);
+
+		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/medic/sf14_purity_wings/sf14_purity_wings.mdl");
+		SetVariantString("2.0");
+		AcceptEntityInput(npc.m_iWearable4, "SetModelScale");
 		SetEntProp(npc.m_iWearable4, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable4, 195, 42, 46, 255);
+
+		npc.m_iWearable5 = npc.EquipItem("head", "models/workshop/player/items/medic/sf14_medic_hundkopf/sf14_medic_hundkopf.mdl");
+		SetVariantString("1.5");
+		AcceptEntityInput(npc.m_iWearable5, "SetModelScale");
 		SetEntProp(npc.m_iWearable5, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable5, 195, 42, 46, 255);
+
+		npc.m_iWearable6 = npc.EquipItem("head", "models/player/items/pyro/hwn_pyro_hat.mdl");
+		SetVariantString("1.5");
+		AcceptEntityInput(npc.m_iWearable6, "SetModelScale");
 		SetEntProp(npc.m_iWearable6, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable6, 195, 42, 46, 255);
+
+		npc.m_iWearable7 = npc.EquipItem("head", "models/workshop_partner/player/items/scout/ai_body/ai_body.mdl");
+		SetVariantString("1.25");
+		AcceptEntityInput(npc.m_iWearable7, "SetModelScale");
 		SetEntProp(npc.m_iWearable7, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable7, 195, 42, 46, 255);
+
+		npc.m_iWearable8 = npc.EquipItem("head", "models/workshop/player/items/all_class/sum20_loaf_loafers_style2/sum20_loaf_loafers_style2_heavy.mdl");
+		SetVariantString("1.1");
+		AcceptEntityInput(npc.m_iWearable8, "SetModelScale");
 		SetEntProp(npc.m_iWearable8, Prop_Send, "m_nSkin", 1);
-		SetEntProp(npc.m_iWearable9, Prop_Send, "m_nSkin", 1);
-		SetEntProp(npc.m_iWearable10, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable8, 195, 42, 46, 255);
 		
 		SetEntityRenderColor(npc.index, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable1, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable2, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable3, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable4, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable5, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable6, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable7, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable8, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable9, 195, 42, 46, 255);
-		SetEntityRenderColor(npc.m_iWearable10, 195, 42, 46, 255);
 
 		return npc;
 	}
