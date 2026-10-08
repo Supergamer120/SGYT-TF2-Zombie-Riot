@@ -1,4 +1,4 @@
-#pragma semicolon 1
+#pragma semicolon 1 //always does void damage. rage last longer but he has no movespeed buff or even less speed during it. he gets heavy res on rage, heavy damage but less attackspeed. pulse is 1 big one that hurts and does void. but after doing it he takes a bit to go bck to norm fighting phase.
 #pragma newdecls required
 
 
