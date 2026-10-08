@@ -1,4 +1,4 @@
-#pragma semicolon 1
+#pragma semicolon 1 // has perma passive res, but little res on rage phase. and is fast as fuck during speed phase. During rage he does armor corrosion. in not rage does non. pulse is quick, does alot of corrosion, but little damage.
 #pragma newdecls required
 
 
