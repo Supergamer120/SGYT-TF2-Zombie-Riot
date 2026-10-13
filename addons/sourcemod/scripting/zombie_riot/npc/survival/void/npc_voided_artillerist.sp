@@ -1,4 +1,4 @@
-#pragma semicolon 1
+#pragma semicolon 1 // where it shoots rocket, when done and explodes, spawns void creep there
 #pragma newdecls required
 
 static const char g_IdleAlertedSounds[][] = {
