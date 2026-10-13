@@ -1,4 +1,4 @@
-#pragma semicolon 1
+#pragma semicolon 1 //passivly gains expi shield. attacks give void affliction
 #pragma newdecls required
 
 static const char g_DeathSounds[][] = {
