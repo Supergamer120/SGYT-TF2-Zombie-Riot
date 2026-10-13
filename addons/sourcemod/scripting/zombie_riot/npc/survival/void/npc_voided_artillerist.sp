@@ -1,4 +1,4 @@
-#pragma semicolon 1 // where it shoots rocket, when done and explodes, spawns void creep there
+#pragma semicolon 1 // where it shoots rocket, when done and explodes, spawns void creep there. both attacks do void affliction. nuke does little and close range one does alot
 #pragma newdecls required
 
 static const char g_IdleAlertedSounds[][] = {
