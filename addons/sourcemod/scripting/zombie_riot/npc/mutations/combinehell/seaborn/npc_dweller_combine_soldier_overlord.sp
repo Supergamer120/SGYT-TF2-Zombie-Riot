@@ -195,7 +195,7 @@ methodmap CombineOverlord < CClotBody
 	//	npc.m_bDissapearOnDeath = true;
 		npc.m_bThisNpcIsABoss = true;
 		npc.m_iState = 0;
-		npc.m_flSpeed = 250.0;
+		npc.m_flSpeed = 200.0;
 		npc.m_flNextRangedAttack = 0.0;
 		npc.m_flNextRangedSpecialAttack = 0.0;
 		npc.m_flAttackHappenswillhappen = false;
@@ -213,6 +213,11 @@ methodmap CombineOverlord < CClotBody
 		npc.m_iWearable1 = npc.EquipItem("partyhat", "models/player/items/demo/crown.mdl");
 		SetVariantString("1.25");
 		AcceptEntityInput(npc.m_iWearable1, "SetModelScale");
+		
+		
+		SetEntityRenderColor(npc.index, 100, 100, 255, 255);
+		SetEntityRenderColor(npc.m_iWearable1, 100, 100, 255, 255);
+		SetEntityRenderColor(npc.m_iWearable2, 100, 100, 255, 255);
 		
 		return npc;
 	}
@@ -283,7 +288,7 @@ public void CombineOverlord_ClotThink(int iNPC)
 						npc.SetActivity("ACT_WF_OVERLORD_RUN");
 					}
 					npc.m_flmovedelay = GetGameTime(npc.index) + 1.0;
-					npc.m_flSpeed = 330.0;
+					npc.m_flSpeed = 400.0;
 				}
 				if (npc.m_flmovedelay < GetGameTime(npc.index) && npc.m_flAngerDelay > GetGameTime(npc.index))
 				{
@@ -293,7 +298,7 @@ public void CombineOverlord_ClotThink(int iNPC)
 						npc.SetActivity("ACT_WF_OVERLORD_RUN_RAGE");
 					}
 					npc.m_flmovedelay = GetGameTime(npc.index) + 1.0;
-					npc.m_flSpeed = 380.0;
+					npc.m_flSpeed = 400.0;
 				}
 			//	npc.FaceTowards(vecTarget);
 			}
