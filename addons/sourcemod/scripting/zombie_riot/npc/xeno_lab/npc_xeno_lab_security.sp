@@ -4,7 +4,8 @@
 // made my first super boss, i lowkey tweaked but i pulled it off, feel free to give critiques
 // ive been coding with lua for the past 6+ years so this was fun to transition to.
 
-#define SECURITY_MODEL "models/bots/heavy/bot_heavy.mdl"
+#define SECURITY_MODEL "models/player/heavy.mdl"
+#define SECURITY_FAKE_MODEL "models/bots/heavy/bot_heavy.mdl"
 #define SECURITY_INFECTION_RANGE 300.0
 #define SECURITY_ENRAGE_THRESHOLD 0.5 
 
@@ -75,6 +76,7 @@ static void ClotPrecache()
 	for (int i = 0; i < (sizeof(g_SecurityAlertSounds)); i++) { PrecacheSound(g_SecurityAlertSounds[i]); }
 	
 	PrecacheModel(SECURITY_MODEL);
+	PrecacheModel(SECURITY_FAKE_MODEL);
 	PrecacheModel("models/workshop/player/items/heavy/robo_heavy_chief/robo_heavy_chief.mdl");
 	PrecacheModel("models/workshop/player/items/heavy/spr18_tsar_platinum/spr18_tsar_platinum.mdl");
 	PrecacheModel("models/workshop/player/items/heavy/spr18_starboard_crusader/spr18_starboard_crusader.mdl");
@@ -136,7 +138,7 @@ methodmap XenoLabSecurity < CClotBody
 	
 	public XenoLabSecurity(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		XenoLabSecurity npc = view_as<XenoLabSecurity>(CClotBody(vecPos, vecAng, SECURITY_MODEL, "1.75", "125000", ally, false));
+		XenoLabSecurity npc = view_as<XenoLabSecurity>(CClotBody(vecPos, vecAng, SECURITY_MODEL, "1.70", "125000", ally, false, true));
 		// 125000 HP - Super boss tier
 		
 		i_NpcWeight[npc.index] = 6; 
@@ -154,7 +156,7 @@ methodmap XenoLabSecurity < CClotBody
 		func_NPCOnTakeDamage[npc.index] = XenoLabSecurity_OnTakeDamage;
 		func_NPCThink[npc.index] = XenoLabSecurity_ClotThink;
 		
-		npc.m_flSpeed = 220.0;
+		npc.m_flSpeed = 225.0;
 		npc.m_flGetClosestTargetTime = 0.0;
 		npc.m_flNextMeleeAttack = 0.0;
 		npc.m_flAttackHappens = 0.0;
@@ -183,12 +185,14 @@ methodmap XenoLabSecurity < CClotBody
 		npc.m_iWearable2 = npc.EquipItem("head", "models/workshop/player/items/heavy/spr18_tsar_platinum/spr18_tsar_platinum.mdl");
 		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/heavy/spr18_starboard_crusader/spr18_starboard_crusader.mdl");
 		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/heavy/sum23_hog_heels/sum23_hog_heels.mdl");
+		npc.m_iWearable5 = npc.EquipItem("head", SECURITY_FAKE_MODEL);
 		
-		SetEntityRenderColor(npc.index, 50, 200, 50, 255);
+		SetEntityRenderMode(npc.index, RENDER_NONE);
 		SetEntityRenderColor(npc.m_iWearable1, 50, 200, 50, 255);
 		SetEntityRenderColor(npc.m_iWearable2, 50, 200, 50, 255);
 		SetEntityRenderColor(npc.m_iWearable3, 50, 200, 50, 255);
 		SetEntityRenderColor(npc.m_iWearable4, 50, 200, 50, 255);
+		SetEntityRenderColor(npc.m_iWearable5, 50, 200, 50, 255);
 		
 		npc.m_bThisNpcIsABoss = true;
 		npc.StartPathing();
@@ -382,7 +386,7 @@ public Action Timer_SecurityInfectionBlast(Handle timer, DataPack pack)
 	
 	XenoLabSecurity npc = view_as<XenoLabSecurity>(entity);
 	
-	npc.m_flSpeed = (npc.m_bIsLabVersion && npc.Anger) ? 280.0 : 220.0;
+	npc.m_flSpeed = (npc.m_bIsLabVersion && npc.Anger) ? 300.0 : 225.0;
 	npc.m_bisWalking = true;
 	int iActivity = npc.LookupActivity("ACT_MP_RUN_MELEE");
 	if(iActivity > 0) npc.StartActivity(iActivity);
@@ -392,7 +396,7 @@ public Action Timer_SecurityInfectionBlast(Handle timer, DataPack pack)
 	GetEntPropVector(entity, Prop_Data, "m_vecAbsOrigin", pos);
 	pos[2] += 10.0;
 	
-	float damage = (npc.m_bIsLabVersion && npc.Anger) ? 500.0 : 350.0;
+	float damage = (npc.m_bIsLabVersion && npc.Anger) ? 750.0 : 500.0;
 	Explode_Logic_Custom(damage, entity, entity, -1, pos, range, _, _, true, _, _, 1.0, Security_InfectionHit);
 	
 	int particle = ParticleEffectAt(pos, "green_wof_sparks", 2.0);
@@ -451,7 +455,7 @@ void Security_InfectionHit(int entity, int victim, float damage, int weapon)
 		
 		// stronger infection in enraged mode aka lab version only
 		int tickCount = (npc.m_bIsLabVersion && npc.Anger) ? 15 : 10;
-		float tickDamage = (npc.m_bIsLabVersion && npc.Anger) ? 80.0 : 60.0;
+		float tickDamage = (npc.m_bIsLabVersion && npc.Anger) ? 120.0 : 100.0;
 		
 		StartBleedingTimer(victim, entity, tickDamage, tickCount, -1, DMG_SLASH, 0, 1);
 		
@@ -605,6 +609,8 @@ public void XenoLabSecurity_NPCDeath(int entity)
 		RemoveEntity(npc.m_iWearable3);
 	if(IsValidEntity(npc.m_iWearable4))
 		RemoveEntity(npc.m_iWearable4);
+	if(IsValidEntity(npc.m_iWearable5))
+		RemoveEntity(npc.m_iWearable5);
 	
 	if(npc.m_bIsLabVersion)
 	{
