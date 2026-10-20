@@ -170,7 +170,7 @@ methodmap XenoLabSecurity < CClotBody
 		npc.m_iOverlordComboAttack = 0;
 		
 		// Infection ability timer
-		npc.m_flNextRangedSpecialAttack = GetGameTime(npc.index) + 12.0;
+		npc.m_flNextRangedSpecialAttack = GetGameTime(npc.index) + 10.0;
 		
 		if(!IsValidEntity(RaidBossActive))
 		{
