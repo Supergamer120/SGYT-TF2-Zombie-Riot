@@ -136,6 +136,7 @@ methodmap DwellerVanguard < CClotBody
 		}
 		else if(!StrContains(data, "voided"))
 		{
+			npc.m_flSpeed = 99.75;
 			SetEntityRenderColor(npc.index, 125, 0, 125, 255);
 			SetEntityRenderColor(npc.m_iWearable2, 125, 0, 125, 255);
 			SetEntityRenderColor(npc.m_iWearable3, 125, 0, 125, 255);
