@@ -1,4 +1,4 @@
-#pragma semicolon 1 //make hit a voided vanguard from vhxis
+#pragma semicolon 1 //make hit a voided vanguard from vhxis. do what lab security does with anger to make this boy voided
 #pragma newdecls required
  
 static const char g_DeathSounds[][] =
