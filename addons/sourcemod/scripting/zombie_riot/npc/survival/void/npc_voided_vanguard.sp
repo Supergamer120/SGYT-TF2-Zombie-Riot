@@ -134,6 +134,13 @@ methodmap DwellerVanguard < CClotBody
 			npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 			FormatEx(c_NpcName[npc.index], sizeof(c_NpcName[]), "Vanguard");
 		}
+		else if(!StrContains(data, "voided"))
+		{
+			SetEntityRenderColor(npc.index, 125, 0, 125, 255);
+			SetEntityRenderColor(npc.m_iWearable2, 125, 0, 125, 255);
+			SetEntityRenderColor(npc.m_iWearable3, 125, 0, 125, 255);
+			FormatEx(c_NpcName[npc.index], sizeof(c_NpcName[]), "Voided Vanguard");
+		}
 		else
 		{
 			SetEntityRenderColor(npc.index, 155, 155, 255, 255);
