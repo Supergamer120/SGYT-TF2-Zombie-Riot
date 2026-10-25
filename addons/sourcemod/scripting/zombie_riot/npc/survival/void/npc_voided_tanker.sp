@@ -81,6 +81,11 @@ methodmap VestanTanker < CClotBody
 		public get()							{ return fl_AbilityOrAttack[this.index][0]; }
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][0] = TempValueForProperty; }
 	}
+	property float m_flShieldRegenCD
+	{
+		public get()							{ return fl_AbilityOrAttack[this.index][1]; }
+		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][1] = TempValueForProperty; }
+	}
 	
 	public VestanTanker(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
@@ -108,7 +113,7 @@ methodmap VestanTanker < CClotBody
 		npc.m_iState = 0;
 		npc.m_flGetClosestTargetTime = 0.0;
 		npc.m_flNextMeleeAttack = 0.0;
-		npc.m_flSpeed = 230.0;
+		npc.m_flSpeed = 227.5;
 		npc.m_flTrueArmor = 0.5;
 		
 		npc.m_flMeleeArmor = 0.9;
@@ -126,23 +131,29 @@ methodmap VestanTanker < CClotBody
 		
 		int skin = 1;
 		SetEntProp(npc.index, Prop_Send, "m_nSkin", skin);
+		SetEntityRenderColor(npc.index, 200, 0, 200, 255);
 
 		npc.m_iWearable1 = npc.EquipItem("head", "models/weapons/c_models/c_reserve_shooter/c_reserve_shooter.mdl");
 		SetVariantString("1.75");
 		AcceptEntityInput(npc.m_iWearable1, "SetModelScale");
+		SetEntityRenderColor(npc.m_iWearable1, 200, 0, 200, 255);
 		npc.m_iWearable2 = npc.EquipItem("head", "models/player/items/pyro/bio_fireman.mdl");
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable2, 200, 0, 200, 255);
 		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/heavy/sum23_hog_heels/sum23_hog_heels.mdl");
 		SetEntProp(npc.m_iWearable3, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable3, 200, 0, 200, 255);
 		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/heavy/Robo_Heavy_Chief/Robo_Heavy_Chief.mdl");
 		SetEntProp(npc.m_iWearable4, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable4, 200, 0, 200, 255);
 		npc.m_iWearable5 = npc.EquipItem("head", "models/workshop/player/items/heavy/fall17_siberian_tigerstripe/fall17_siberian_tigerstripe.mdl");
 		SetEntProp(npc.m_iWearable5, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable5, 200, 0, 200, 255);
 		
 		npc.m_iWearable6 = npc.EquipItemSeperate("models/buildables/sentry_shield.mdl",_,1,1.1);
 		SetEntProp(npc.m_iWearable6, Prop_Send, "m_nSkin", 1);
 		SetEntityRenderMode(npc.m_iWearable6, RENDER_TRANSCOLOR);
-		SetEntityRenderColor(npc.m_iWearable6, 255, 255, 255, 100);
+		SetEntityRenderColor(npc.m_iWearable6, 200, 0, 200, 100);
 
 		return npc;
 	}
@@ -151,6 +162,114 @@ methodmap VestanTanker < CClotBody
 static void VestanTanker_ClotThink(int iNPC)
 {
 	VestanTanker npc = view_as<VestanTanker>(iNPC);
+	if(NpcStats_StrongVoidBuff(iNPC))
+	{
+		npc.m_flSpeed = 200.0;
+		SetEntityRenderMode(npc.index, RENDER_TRANSCOLOR);
+		SetEntityRenderColor(npc.index, 200, 0, 200, 125);
+		if(IsValidEntity(npc.m_iWearable1))
+		{
+			SetEntityRenderMode(npc.m_iWearable1, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable1, 200, 0, 200, 125);
+		}
+		if(IsValidEntity(npc.m_iWearable2))
+		{
+			SetEntityRenderMode(npc.m_iWearable2, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable2, 200, 0, 200, 125);
+		}
+		if(IsValidEntity(npc.m_iWearable3))
+		{
+			SetEntityRenderMode(npc.m_iWearable3, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable3, 200, 0, 200, 125);
+		}
+		if(IsValidEntity(npc.m_iWearable4))
+		{
+			SetEntityRenderMode(npc.m_iWearable4, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable4, 200, 0, 200, 125);
+		}
+		if(IsValidEntity(npc.m_iWearable5))
+		{
+			SetEntityRenderMode(npc.m_iWearable5, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable5, 200, 0, 200, 125);
+		}
+		if(IsValidEntity(npc.m_iWearable6))
+		{
+			SetEntityRenderMode(npc.m_iWearable6, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable6, 200, 0, 200, 125);
+		}
+		if(GetGameTime(npc.index) >= npc.m_flShieldRegenCD)
+		{
+		    npc.m_flShieldRegenCD = GetGameTime(npc.index) + 5.0;
+			SensalGiveShield(npc.index, 2);
+		}
+	}
+	if(NpcStats_WeakVoidBuff(iNPC))
+	{
+		npc.m_flSpeed = 215.0;
+		SetEntityRenderMode(npc.index, RENDER_TRANSCOLOR);
+		SetEntityRenderColor(npc.index, 200, 0, 200, 190);
+		if(IsValidEntity(npc.m_iWearable1))
+		{
+			SetEntityRenderMode(npc.m_iWearable1, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable1, 200, 0, 200, 190);
+		}
+		if(IsValidEntity(npc.m_iWearable2))
+		{
+			SetEntityRenderMode(npc.m_iWearable2, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable2, 200, 0, 200, 190);
+		}
+		if(IsValidEntity(npc.m_iWearable3))
+		{
+			SetEntityRenderMode(npc.m_iWearable3, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable3, 200, 0, 200, 190);
+		}
+		if(IsValidEntity(npc.m_iWearable4))
+		{
+			SetEntityRenderMode(npc.m_iWearable4, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable4, 200, 0, 200, 190);
+		}
+		if(IsValidEntity(npc.m_iWearable5))
+		{
+			SetEntityRenderMode(npc.m_iWearable5, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable5, 200, 0, 200, 190);
+		}
+		if(IsValidEntity(npc.m_iWearable6))
+		{
+			SetEntityRenderMode(npc.m_iWearable6, RENDER_TRANSCOLOR);
+			SetEntityRenderColor(npc.m_iWearable6, 200, 0, 200, 190);
+		}
+		if(GetGameTime(npc.index) >= npc.m_flShieldRegenCD)
+		{
+		    npc.m_flShieldRegenCD = GetGameTime(npc.index) + 5.0;
+			SensalGiveShield(npc.index, 2);
+		}
+	}
+	else
+	{
+		npc.m_flSpeed = 227.5;
+		SetEntityRenderMode(npc.index, RENDER_NORMAL);
+		SetEntityRenderColor(npc.index, 200, 0, 200, 255);
+		if(IsValidEntity(npc.m_iWearable1))
+		{
+			SetEntityRenderMode(npc.m_iWearable1, RENDER_NORMAL);
+			SetEntityRenderColor(npc.m_iWearable1, 200, 0, 200, 255);
+		}
+		if(IsValidEntity(npc.m_iWearable2))
+		{
+			SetEntityRenderMode(npc.m_iWearable2, RENDER_NORMAL);
+			SetEntityRenderColor(npc.m_iWearable2, 200, 0, 200, 255);
+		}
+		if(IsValidEntity(npc.m_iWearable3))
+		{
+			SetEntityRenderMode(npc.m_iWearable3, RENDER_NORMAL);
+			SetEntityRenderColor(npc.m_iWearable3, 200, 0, 200, 255);
+		}
+		if(IsValidEntity(npc.m_iWearable4))
+		{
+			SetEntityRenderMode(npc.m_iWearable4, RENDER_NORMAL);
+			SetEntityRenderColor(npc.m_iWearable4, 200, 0, 200, 255);
+		}
+	}
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -302,11 +421,12 @@ static int VestanTankerSelfDefense(VestanTanker npc, float gameTime, int target,
 
 					if(IsValidEnemy(npc.index, target))
 					{
-						float damageDealt = 90.0;
+						float damageDealt = 100.0;
 						if(ShouldNpcDealBonusDamage(target))
 							damageDealt *= 3.0;
 
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_BULLET, -1, _, vecHit);
+						Elemental_AddVoidDamage(target, npc.index, 100, true, true);
 					}
 				}
 				delete swingTrace;
