@@ -108,6 +108,9 @@ methodmap DwellerVanguard < CClotBody
 		func_NPCDeath[npc.index] = DwellerVanguard_NPCDeath;
 		func_NPCOnTakeDamage[npc.index] = Generic_OnTakeDamage;
 		func_NPCThink[npc.index] = DwellerVanguard_ClotThink;
+
+		bool isVoided = StrContains(data, "voided") != -1;
+		npc.m_bVoided = isVoided;
 		
 		if (npc.m_bVoided)
 		{
@@ -120,9 +123,6 @@ methodmap DwellerVanguard < CClotBody
 		npc.m_flGetClosestTargetTime = 0.0;
 		npc.m_flNextMeleeAttack = 0.0;
 		npc.m_flAttackHappens = 0.0;
-
-		bool isVoided = StrContains(data, "voided") != -1;
-		npc.m_bVoided = isVoided;
 
 		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop_partner/weapons/c_models/c_shogun_katana/c_shogun_katana.mdl");
 		SetVariantString("1.15");
