@@ -169,7 +169,7 @@ static void ClotThink(int iNPC)
 		health = minhealth;
 	
 	float hpRatio = float(maxhealth) / float(health);
-	float hpRatio = float(health) / float(maxhealth);
+	float hpRatiobad = float(health) / float(maxhealth);
 
 	if(!NpcStats_IsEnemySilenced(npc.index))
 		npc.m_flSpeed = 100.0 + (hpRatio * 75.0);
