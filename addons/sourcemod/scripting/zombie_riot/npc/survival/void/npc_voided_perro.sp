@@ -164,15 +164,14 @@ static void ClotThink(int iNPC)
 
 	int maxhealth = ReturnEntityMaxHealth(npc.index);
 	int health = GetEntProp(npc.index, Prop_Data, "m_iHealth");
-	int minhealth = maxhealth / (Rogue_Paradox_RedMoon() ? 10 : 8);
+	int minhealth = maxhealth / (Rogue_Paradox_RedMoon() ? 8 : 4);
 	if(health < minhealth)
 		health = minhealth;
 	
 	float hpRatio = float(maxhealth) / float(health);
 	float hpRatiobad = float(health) / float(maxhealth);
 
-	if(!NpcStats_IsEnemySilenced(npc.index))
-		npc.m_flSpeed = 100.0 + (hpRatio * 75.0);
+	npc.m_flSpeed = 50.0 + (hpRatiobad * 150.0);
 	
 	if(target > 0)
 	{
@@ -205,9 +204,9 @@ static void ClotThink(int iNPC)
 					target = TR_GetEntityIndex(swingTrace);
 					if(target > 0)
 					{
-						float damage = 100.0 * hpRatio;
+						float damage = 100.0 * hpRatio * 2;
 						if(ShouldNpcDealBonusDamage(target))
-							damage *= 6.0;
+							damage *= 4.0;
 
 						npc.PlayMeleeHitSound();
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB);
