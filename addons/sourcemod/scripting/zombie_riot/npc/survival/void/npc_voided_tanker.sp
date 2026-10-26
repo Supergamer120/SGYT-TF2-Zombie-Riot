@@ -22,11 +22,11 @@ static const char g_IdleAlertedSounds[][] = {
 
 static const char g_RangeAttackSounds[] = "weapons/shotgun_shoot.wav";
 
-void VestanTanker_OnMapStart_NPC()
+void VoidedTanker_OnMapStart_NPC()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Tanker");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_tanker");
+	strcopy(data.Name, sizeof(data.Name), "Voided Tanker");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_tanker");
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_tanker");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -48,10 +48,10 @@ static void ClotPrecache()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int ally, const char[] data)
 {
-	return VestanTanker(vecPos, vecAng, ally, data);
+	return VoidedTanker(vecPos, vecAng, ally, data);
 }
 
-methodmap VestanTanker < CClotBody
+methodmap VoidedTanker < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -87,11 +87,11 @@ methodmap VestanTanker < CClotBody
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][1] = TempValueForProperty; }
 	}
 	
-	public VestanTanker(float vecPos[3], float vecAng[3], int ally, const char[] data)
+	public VoidedTanker(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		VestanTanker npc = view_as<VestanTanker>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.0", "22000", ally));
+		VoidedTanker npc = view_as<VoidedTanker>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.0", "22000", ally));
 		
-		i_NpcWeight[npc.index] = 1;
+		i_NpcWeight[npc.index] = 2;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
 		
 		int iActivity = npc.LookupActivity("ACT_MP_RUN_SECONDARY");
@@ -104,16 +104,16 @@ methodmap VestanTanker < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = VestanTanker_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = VestanTanker_OnTakeDamage;
-		func_NPCThink[npc.index] = VestanTanker_ClotThink;
+		func_NPCDeath[npc.index] = VoidedTanker_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = VoidedTanker_OnTakeDamage;
+		func_NPCThink[npc.index] = VoidedTanker_ClotThink;
 		
 		//IDLE
 		KillFeed_SetKillIcon(npc.index, "reserve_shooter");
 		npc.m_iState = 0;
 		npc.m_flGetClosestTargetTime = 0.0;
 		npc.m_flNextMeleeAttack = 0.0;
-		npc.m_flSpeed = 227.5;
+		npc.m_flSpeed = 220.0;
 		npc.m_flTrueArmor = 0.5;
 		
 		npc.m_flMeleeArmor = 0.9;
@@ -159,9 +159,9 @@ methodmap VestanTanker < CClotBody
 	}
 }
 
-static void VestanTanker_ClotThink(int iNPC)
+static void VoidedTanker_ClotThink(int iNPC)
 {
-	VestanTanker npc = view_as<VestanTanker>(iNPC);
+	VoidedTanker npc = view_as<VoidedTanker>(iNPC);
 	if(NpcStats_StrongVoidBuff(iNPC))
 	{
 		npc.m_flSpeed = 200.0;
@@ -205,7 +205,7 @@ static void VestanTanker_ClotThink(int iNPC)
 	}
 	if(NpcStats_WeakVoidBuff(iNPC))
 	{
-		npc.m_flSpeed = 215.0;
+		npc.m_flSpeed = 210.0;
 		SetEntityRenderMode(npc.index, RENDER_TRANSCOLOR);
 		SetEntityRenderColor(npc.index, 200, 0, 200, 190);
 		if(IsValidEntity(npc.m_iWearable1))
@@ -246,7 +246,7 @@ static void VestanTanker_ClotThink(int iNPC)
 	}
 	else
 	{
-		npc.m_flSpeed = 227.5;
+		npc.m_flSpeed = 220.0;
 		SetEntityRenderMode(npc.index, RENDER_NORMAL);
 		SetEntityRenderColor(npc.index, 200, 0, 200, 255);
 		if(IsValidEntity(npc.m_iWearable1))
@@ -316,7 +316,7 @@ static void VestanTanker_ClotThink(int iNPC)
 		float vecTarget[3]; WorldSpaceCenter(npc.m_iTarget, vecTarget );
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
 		float flDistanceToTarget = GetVectorDistance(vecTarget, VecSelfNpc, true);
-		switch(VestanTankerSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget))
+		switch(VoidedTankerSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget))
 		{
 			case 0:
 			{
@@ -350,9 +350,9 @@ static void VestanTanker_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-static Action VestanTanker_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+static Action VoidedTanker_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	VestanTanker npc = view_as<VestanTanker>(victim);
+	VoidedTanker npc = view_as<VoidedTanker>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -373,9 +373,9 @@ static Action VestanTanker_OnTakeDamage(int victim, int &attacker, int &inflicto
 	return Plugin_Changed;
 }
 
-static void VestanTanker_NPCDeath(int entity)
+static void VoidedTanker_NPCDeath(int entity)
 {
-	VestanTanker npc = view_as<VestanTanker>(entity);
+	VoidedTanker npc = view_as<VoidedTanker>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -394,7 +394,7 @@ static void VestanTanker_NPCDeath(int entity)
 		RemoveEntity(npc.m_iWearable1);
 }
 
-static int VestanTankerSelfDefense(VestanTanker npc, float gameTime, int target, float distance)
+static int VoidedTankerSelfDefense(VoidedTanker npc, float gameTime, int target, float distance)
 {
 	if(gameTime > npc.m_flNextMeleeAttack)
 	{
@@ -417,16 +417,16 @@ static int VestanTankerSelfDefense(VestanTanker npc, float gameTime, int target,
 					float origin[3], angles[3];
 					view_as<CClotBody>(npc.m_iWearable1).GetAttachment("muzzle", origin, angles);
 					ShootLaser(npc.m_iWearable1, "bullet_tracer02_blue", origin, vecHit, false );
-					npc.m_flNextMeleeAttack = gameTime + 0.75;
+					npc.m_flNextMeleeAttack = gameTime + 1.0;
 
 					if(IsValidEnemy(npc.index, target))
 					{
-						float damageDealt = 100.0;
+						float damageDealt = 150.0;
 						if(ShouldNpcDealBonusDamage(target))
 							damageDealt *= 3.0;
 
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_BULLET, -1, _, vecHit);
-						Elemental_AddVoidDamage(target, npc.index, 100, true, true);
+						Elemental_AddVoidDamage(target, npc.index, 150, true, true);
 					}
 				}
 				delete swingTrace;
