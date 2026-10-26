@@ -41,25 +41,25 @@ static const char g_MeleeAttackSounds[][] =
 	"weapons/pickaxe_swing3.wav"
 };
 
-void PerroOnMapStart()
+void VoidedPerroOnMapStart()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Perro");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_perro");
+	strcopy(data.Name, sizeof(data.Name), "Voided Perro");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_perro");
 	strcopy(data.Icon, sizeof(data.Icon), "soldier");
 	data.IconCustom = false;
 	data.Flags = 0;
-	data.Category = Type_Interitus;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 }
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return Perro(vecPos, vecAng, team);
+	return VoidedPerro(vecPos, vecAng, team);
 }
 
-methodmap Perro < CClotBody
+methodmap VoidedPerro < CClotBody
 {
 	public void PlayIdleSound()
 	{
@@ -86,9 +86,9 @@ methodmap Perro < CClotBody
 		EmitSoundToAll(g_MeleeHitSounds[GetRandomInt(0, sizeof(g_MeleeHitSounds) - 1)], this.index, SNDCHAN_AUTO, NORMAL_ZOMBIE_SOUNDLEVEL, _, NORMAL_ZOMBIE_VOLUME, _);	
 	}
 	
-	public Perro(float vecPos[3], float vecAng[3], int ally)
+	public VoidedPerro(float vecPos[3], float vecAng[3], int ally)
 	{
-		Perro npc = view_as<Perro>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "70000", ally));
+		VoidedPerro npc = view_as<VoidedPerro>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "70000", ally));
 		
 		i_NpcWeight[npc.index] = 3;
 		npc.SetActivity("ACT_MP_RUN_MELEE");
@@ -130,7 +130,7 @@ methodmap Perro < CClotBody
 
 static void ClotThink(int iNPC)
 {
-	Perro npc = view_as<Perro>(iNPC);
+	VoidedPerro npc = view_as<VoidedPerro>(iNPC);
 
 	float gameTime = GetGameTime(npc.index);
 	if(npc.m_flNextDelayTime > gameTime)
@@ -243,7 +243,7 @@ static void ClotThink(int iNPC)
 
 static void ClotDeath(int entity)
 {
-	Perro npc = view_as<Perro>(entity);
+	VoidedPerro npc = view_as<VoidedPerro>(entity);
 	if(!npc.m_bGib)
 		npc.PlayDeathSound();
 	
