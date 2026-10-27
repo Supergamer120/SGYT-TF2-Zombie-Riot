@@ -88,7 +88,7 @@ methodmap VoidedPerro < CClotBody
 	
 	public VoidedPerro(float vecPos[3], float vecAng[3], int ally)
 	{
-		VoidedPerro npc = view_as<VoidedPerro>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "70000", ally));
+		VoidedPerro npc = view_as<VoidedPerro>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "50000", ally));
 		
 		i_NpcWeight[npc.index] = 3;
 		npc.SetActivity("ACT_MP_RUN_MELEE");
@@ -110,19 +110,26 @@ methodmap VoidedPerro < CClotBody
 		npc.m_flAttackHappens = 0.0;
 		npc.m_flRangedArmor = 0.6;
 		
+		SetEntityRenderColor(npc.index, 125, 0, 125, 255);
+
 		npc.m_iWearable1 = npc.EquipItem("head", "models/weapons/c_models/c_pickaxe/c_pickaxe.mdl");
+		SetEntityRenderColor(npc.m_iWearable1, 125, 0, 125, 255);
 
 		npc.m_iWearable2 = npc.EquipItem("head", "models/workshop/player/items/soldier/fall17_attack_packs/fall17_attack_packs.mdl");
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable2, 125, 0, 125, 255);
 
 		npc.m_iWearable3 = npc.EquipItem("head", "models/workshop/player/items/soldier/coldfront_curbstompers/coldfront_curbstompers.mdl");
 		SetEntProp(npc.m_iWearable3, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable3, 125, 0, 125, 255);
 
 		npc.m_iWearable4 = npc.EquipItem("head", "models/workshop/player/items/soldier/sum23_stealth_bomber_style1/sum23_stealth_bomber_style1.mdl");
 		SetEntProp(npc.m_iWearable4, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable4, 125, 0, 125, 255);
 
 		npc.m_iWearable5 = npc.EquipItem("head", "models/workshop/player/items/soldier/hwn2021_war_dog/hwn2021_war_dog.mdl");
 		SetEntProp(npc.m_iWearable5, Prop_Send, "m_nSkin", 1);
+		SetEntityRenderColor(npc.m_iWearable5, 125, 0, 125, 255);
 
 		return npc;
 	}
@@ -172,6 +179,8 @@ static void ClotThink(int iNPC)
 	float hpRatiobad = float(health) / float(maxhealth);
 
 	npc.m_flSpeed = 50.0 + (hpRatiobad * 150.0);
+
+	fl_TotalArmor[npc.index] = 0.5 + (hpRatiobad * 0.5)
 	
 	if(target > 0)
 	{
@@ -210,6 +219,8 @@ static void ClotThink(int iNPC)
 
 						npc.PlayMeleeHitSound();
 						SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB);
+
+						Elemental_AddVoidDamage(target, npc.index, 100, true, false);
 					}
 				}
 
