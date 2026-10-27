@@ -333,8 +333,8 @@ void Rana_ArmorStick_Effect(int iNpc)
 	int particle_1 = InfoTargetParentAt({0.0,0.0,0.0}, "", 0.0); //This is the root bone basically
 
 	
-	int particle_2 = InfoTargetParentAt({0.0,0.0,30.0}, "", 0.0); //First offset we go by
-	int particle_3 = ParticleEffectAt({0.0,0.0,-80.0}, "rockettrail_fire", 0.0); //First offset we go by
+	int particle_2 = InfoTargetParentAt({0.0,0.0,20.0}, "", 0.0); //First offset we go by
+	int particle_3 = ParticleEffectAt({0.0,0.0,-50.0}, "rockettrail_fire", 0.0); //First offset we go by
 	
 	SetParent(particle_1, particle_2, "",_, true);
 	SetParent(particle_1, particle_3, "",_, true);
