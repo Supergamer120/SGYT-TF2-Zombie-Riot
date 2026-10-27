@@ -34,7 +34,7 @@ static const char g_MeleeHitSounds[][] = {
 	"weapons/airboat/airboat_gun_energy2.wav",
 };
 
-void AlminaRana_OnMapStart_NPC()
+void VoidedRana_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -43,8 +43,8 @@ void AlminaRana_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	PrecacheModel("models/player/medic.mdl");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Rana");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_rana");
+	strcopy(data.Name, sizeof(data.Name), "Voided Rana");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_rana");
 	strcopy(data.Icon, sizeof(data.Icon), "seargent_ideal");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -55,10 +55,10 @@ void AlminaRana_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return AlminaRana(vecPos, vecAng, team);
+	return VoidedRana(vecPos, vecAng, team);
 }
 
-methodmap AlminaRana < CClotBody
+methodmap VoidedRana < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -100,9 +100,9 @@ methodmap AlminaRana < CClotBody
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][0] = TempValueForProperty; }
 	}
 	
-	public AlminaRana(float vecPos[3], float vecAng[3], int ally)
+	public VoidedRana(float vecPos[3], float vecAng[3], int ally)
 	{
-		AlminaRana npc = view_as<AlminaRana>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "5000", ally, false, true));
+		VoidedRana npc = view_as<VoidedRana>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "5000", ally, false, true));
 		
 		i_NpcWeight[npc.index] = 3;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -119,18 +119,19 @@ methodmap AlminaRana < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_GIANT;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(AlminaRana_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(AlminaRana_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(AlminaRana_ClotThink);
-		Rana_ArmorStick_Effect(npc.index);
+		func_NPCDeath[npc.index] = view_as<Function>(VoidedRana_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(VoidedRana_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(VoidedRana_ClotThink);
+		VoidedRana_ArmorStick_Effect(npc.index);
 		
 		
 		npc.StartPathing();
-		npc.m_flSpeed = 300.0;
+		npc.m_flSpeed = 250.0;
 		
 		
 		int skin = 1;
 		SetEntProp(npc.index, Prop_Send, "m_nSkin", skin);
+		SetEntityRenderColor(npc.index, 200, 0, 200, 255);
 		
 		npc.m_iWearable1 = npc.EquipItem("head", "models/workshop/player/items/all_class/bak_teufort_knight/bak_teufort_knight_soldier.mdl");
 		npc.m_iWearable2 = npc.EquipItem("head", "model/workshop/player/items/soldier/inglorious_patriot_new/inglorious_patriot_new.mdl");
@@ -138,15 +139,16 @@ methodmap AlminaRana < CClotBody
 		SetEntProp(npc.m_iWearable1, Prop_Send, "m_nSkin", skin);
 		SetEntProp(npc.m_iWearable2, Prop_Send, "m_nSkin", skin);
 
-		SetEntityRenderColor(npc.m_iWearable2, 40, 57, 77, 255);
+		SetEntityRenderColor(npc.m_iWearable1, 200, 0, 200, 255);
+		SetEntityRenderColor(npc.m_iWearable2, 200, 0, 200, 255);
 
 		return npc;
 	}
 }
 
-public void AlminaRana_ClotThink(int iNPC)
+public void VoidedRana_ClotThink(int iNPC)
 {
-	AlminaRana npc = view_as<AlminaRana>(iNPC);
+	VoidedRana npc = view_as<VoidedRana>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -189,7 +191,7 @@ public void AlminaRana_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		AlminaRanaSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		VoidedRanaSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -199,9 +201,9 @@ public void AlminaRana_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action AlminaRana_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action VoidedRana_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	AlminaRana npc = view_as<AlminaRana>(victim);
+	VoidedRana npc = view_as<VoidedRana>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -216,9 +218,9 @@ public Action AlminaRana_OnTakeDamage(int victim, int &attacker, int &inflictor,
 }
 
 
-public void AlminaRana_NPCDeath(int entity)
+public void VoidedRana_NPCDeath(int entity)
 {
-	AlminaRana npc = view_as<AlminaRana>(entity);
+	VoidedRana npc = view_as<VoidedRana>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -242,7 +244,7 @@ public void AlminaRana_NPCDeath(int entity)
 
 }
 
-void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float distance)
+void VoidedRanaSelfDefense(VoidedRana npc, float gameTime, int target, float distance)
 {
 	if(npc.m_flAttackHappens)
 	{
@@ -321,7 +323,7 @@ void AlminaRanaSelfDefense(AlminaRana npc, float gameTime, int target, float dis
 
 
 
-void Rana_ArmorStick_Effect(int iNpc)
+void VoidedRana_ArmorStick_Effect(int iNpc)
 {
 	if(AtEdictLimit(EDICT_NPC))
 		return;
@@ -333,8 +335,8 @@ void Rana_ArmorStick_Effect(int iNpc)
 	int particle_1 = InfoTargetParentAt({0.0,0.0,0.0}, "", 0.0); //This is the root bone basically
 
 	
-	int particle_2 = InfoTargetParentAt({0.0,0.0,30.0}, "", 0.0); //First offset we go by
-	int particle_3 = ParticleEffectAt({0.0,0.0,-80.0}, "rockettrail_fire", 0.0); //First offset we go by
+	int particle_2 = InfoTargetParentAt({0.0,0.0,20.0}, "", 0.0); //First offset we go by
+	int particle_3 = ParticleEffectAt({0.0,0.0,-50.0}, "rockettrail_fire", 0.0); //First offset we go by
 	
 	SetParent(particle_1, particle_2, "",_, true);
 	SetParent(particle_1, particle_3, "",_, true);
@@ -344,7 +346,7 @@ void Rana_ArmorStick_Effect(int iNpc)
 	SetParent(iNpc, particle_1, "effect_hand_r",_);
 
 
-	int Laser_1 = ConnectWithBeamClient(particle_2, particle_3, 215, 150, 0, 6.0, 3.0, 1.0, LASERBEAM);
+	int Laser_1 = ConnectWithBeamClient(particle_2, particle_3, 200, 0, 200, 6.0, 3.0, 1.0, LASERBEAM);
 	
 
 	i_ExpidonsaEnergyEffect[iNpc][0] = EntIndexToEntRef(particle_1);
