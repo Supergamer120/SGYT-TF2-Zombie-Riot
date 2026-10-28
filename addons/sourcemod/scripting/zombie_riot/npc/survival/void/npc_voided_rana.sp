@@ -313,9 +313,9 @@ void VoidedRanaSelfDefense(VoidedRana npc, float gameTime, int target, float dis
 				npc.PlayMeleeSound();
 				npc.AddGesture("ACT_MP_ATTACK_STAND_MELEE");
 						
-				npc.m_flAttackHappens = gameTime + 0.25;
-				npc.m_flDoingAnimation = gameTime + 0.25;
-				npc.m_flNextMeleeAttack = gameTime + 0.9;
+				npc.m_flAttackHappens = gameTime + 0.35;
+				npc.m_flDoingAnimation = gameTime + 0.35;
+				npc.m_flNextMeleeAttack = gameTime + 1.0;
 			}
 		}
 	}
