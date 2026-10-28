@@ -1,4 +1,4 @@
-#pragma semicolon 1 //slightly slower than the slower of the 2 giant of these guys. slow attack speed that on hit gives void affliction. the armor range gives void affliction to players. and also gives 1 expi shield now.
+#pragma semicolon 1 //slightly slower than the slower of the 2 giant of these guys. slow attack speed that on hit gives void affliction. and also gives 1 expi shield now.
 #pragma newdecls required
 
 static const char g_DeathSounds[][] = {
@@ -270,6 +270,7 @@ void VoidedRanaSelfDefense(VoidedRana npc, float gameTime, int target, float dis
 						damageDealt *= 4.0;
 
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_CLUB, -1, _, vecHit);
+					Elemental_AddVoidDamage(target, npc.index, 55, true, false);
 
 					// Hit sound
 					npc.PlayMeleeHitSound();
@@ -353,4 +354,22 @@ void VoidedRana_ArmorStick_Effect(int iNpc)
 	i_ExpidonsaEnergyEffect[iNpc][1] = EntIndexToEntRef(particle_2);
 	i_ExpidonsaEnergyEffect[iNpc][2] = EntIndexToEntRef(particle_3);
 	i_ExpidonsaEnergyEffect[iNpc][3] = EntIndexToEntRef(Laser_1);
+}
+//later
+void VoidedRanaShield(int entity, int victim, float damage, int weapon)
+{
+	if(entity == victim)
+		return;
+
+	if (GetTeam(victim) == GetTeam(entity) && !i_IsABuilding[victim] && !b_NpcHasDied[victim])
+	{
+		VoidedRanaShieldInternal(entity,victim);
+	}
+}
+
+void VoidedRanaShieldInternal(int shielder, int victim)
+{
+	VoidedRana npc = view_as<VausTechicus>(shielder);
+	npc.m_flNextRangedSpecialAttack = FAR_FUTURE;
+	VausMagicaGiveShield(victim, 1);
 }
