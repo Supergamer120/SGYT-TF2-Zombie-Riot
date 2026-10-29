@@ -53,7 +53,7 @@ void DwellerVanguard_Precache()
 	strcopy(data.Icon, sizeof(data.Icon), "ds_vanguard");
 	data.IconCustom = true;
 	data.Flags = MVM_CLASS_FLAG_MISSION;
-	data.Category = Type_Dweller;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	NPCId = NPC_Add(data);
 }
