@@ -278,21 +278,25 @@ void VoidedRanaSelfDefense(VoidedRana npc, float gameTime, int target, float dis
 					{
 						if (IsInvuln(target))
 						{
-							npc.m_flArmorToGive = 400.0;
+							npc.m_flArmorToGive = 300.0;
+							VausMagicaGiveShield(target, 1);
 						}
 						else
 						{
-							npc.m_flArmorToGive = 700.0;
+							npc.m_flArmorToGive = 600.0;
+							VausMagicaGiveShield(target, 1);
 						}
 					}
 					else
 					{
-						npc.m_flArmorToGive = 400.0;
+						npc.m_flArmorToGive = 300.0;
+						VausMagicaGiveShield(target, 1);
 					}
 					if(NpcStats_AlminaIsEnemyMarked(target))
 						npc.m_flArmorToGive *= 1.5;
+						VausMagicaGiveShield(target, 2);
 						
-					ExpidonsaGroupHeal(npc.index, 150.0, 4, 0.0, 1.0, true,AlminaBeaconGiveArmor);
+					ExpidonsaGroupHeal(npc.index, 150.0, 4, 0.0, 1.0, true,VoidedRanaArmorAndShield);
 					AlminaArmorEffect(npc.index, 150.0);
 				} 
 			}
@@ -355,21 +359,13 @@ void VoidedRana_ArmorStick_Effect(int iNpc)
 	i_ExpidonsaEnergyEffect[iNpc][2] = EntIndexToEntRef(particle_3);
 	i_ExpidonsaEnergyEffect[iNpc][3] = EntIndexToEntRef(Laser_1);
 }
-//later
-void VoidedRanaShield(int entity, int victim, float damage, int weapon)
+void VoidedRanaArmorAndShield(int entity, int victim, float &healingammount)
 {
-	if(entity == victim)
+	if(i_NpcIsABuilding[victim])
 		return;
 
-	if (GetTeam(victim) == GetTeam(entity) && !i_IsABuilding[victim] && !b_NpcHasDied[victim])
-	{
-		VoidedRanaShieldInternal(entity,victim);
-	}
-}
-
-void VoidedRanaShieldInternal(int shielder, int victim)
-{
-	VoidedRana npc = view_as<VausTechicus>(shielder);
-	npc.m_flNextRangedSpecialAttack = FAR_FUTURE;
+	AlminaBeacon npc1 = view_as<AlminaBeacon>(entity);
+	GrantEntityArmor(victim, false, 2.0, 0.33, 0,
+	npc1.m_flArmorToGive * 0.5);
 	VausMagicaGiveShield(victim, 1);
 }
