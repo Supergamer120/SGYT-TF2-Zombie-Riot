@@ -47,7 +47,7 @@ void VoidedSupplier_OnMapStart_NPC()
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_suppliers");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Vesta;
+	data.Category = Type_Void;
 	data.Precache = ClotPrecache;
 	data.Func = ClotSummon;
 	int id = NPC_Add(data);
