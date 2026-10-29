@@ -39,11 +39,11 @@ static const char g_RangeAttackSounds[] = "weapons/barret_arm_zap.wav";
 
 static const char g_HealSound[] = "physics/metal/metal_box_strain1.wav";
 
-void VestanSupplier_OnMapStart_NPC()
+void VoidedSupplier_OnMapStart_NPC()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Supplier");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_supplier");
+	strcopy(data.Name, sizeof(data.Name), "Voided Supplier");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_supplier");
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_suppliers");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -66,10 +66,10 @@ static void ClotPrecache()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int ally, const char[] data)
 {
-	return VestanSupplier(vecPos, vecAng, ally, data);
+	return VoidedSupplier(vecPos, vecAng, ally, data);
 }
 
-methodmap VestanSupplier < CClotBody
+methodmap VoidedSupplier < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -119,9 +119,9 @@ methodmap VestanSupplier < CClotBody
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][3] = TempValueForProperty; }
 	}
 	
-	public VestanSupplier(float vecPos[3], float vecAng[3], int ally, const char[] data)
+	public VoidedSupplier(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		VestanSupplier npc = view_as<VestanSupplier>(CClotBody(vecPos, vecAng, "models/player/engineer.mdl", "1.0", "750", ally));
+		VoidedSupplier npc = view_as<VoidedSupplier>(CClotBody(vecPos, vecAng, "models/player/engineer.mdl", "1.0", "750", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -132,9 +132,9 @@ methodmap VestanSupplier < CClotBody
 		SetVariantInt(3);
 		AcceptEntityInput(npc.index, "SetBodyGroup");
 
-		func_NPCDeath[npc.index] = VestanSupplier_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = VestanSupplier_OnTakeDamage;
-		func_NPCThink[npc.index] = VestanSupplier_ClotThink;
+		func_NPCDeath[npc.index] = VoidedSupplier_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = VoidedSupplier_OnTakeDamage;
+		func_NPCThink[npc.index] = VoidedSupplier_ClotThink;
 		
 		npc.m_flNextMeleeAttack = 0.0;
 		
@@ -202,9 +202,9 @@ methodmap VestanSupplier < CClotBody
 	}
 }
 
-static void VestanSupplier_ClotThink(int iNPC)
+static void VoidedSupplier_ClotThink(int iNPC)
 {
-	VestanSupplier npc = view_as<VestanSupplier>(iNPC);
+	VoidedSupplier npc = view_as<VoidedSupplier>(iNPC);
 	if(npc.m_flNextRangedAttackHappening < GetGameTime(npc.index))
 	{
 		npc.m_flNextRangedAttackHappening = GetGameTime(npc.index) + 5.0;
@@ -250,7 +250,7 @@ static void VestanSupplier_ClotThink(int iNPC)
 		float vecTarget[3]; WorldSpaceCenter(npc.m_iTarget, vecTarget);
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
 		float flDistanceToTarget = GetVectorDistance(vecTarget, VecSelfNpc, true);
-		switch(VestanSupplier_Work(npc, GetGameTime(npc.index)))
+		switch(VoidedSupplier_Work(npc, GetGameTime(npc.index)))
 		{
 			case 0:
 			{
@@ -313,7 +313,7 @@ static void VestanSupplier_ClotThink(int iNPC)
 	}
 }
 
-static int VestanSupplier_Work(VestanSupplier npc, float gameTime)
+static int VoidedSupplier_Work(VoidedSupplier npc, float gameTime)
 {
 	//Ranged units will behave differently.
 	//Get the closest visible target via distance checks, not via pathing check.
@@ -375,7 +375,7 @@ static void SupplierGiveArmor(int entity, int victim)
 	if(i_NpcIsABuilding[victim])
 		return;
 
-	VestanSupplier npc = view_as<VestanSupplier>(entity);
+	VoidedSupplier npc = view_as<VoidedSupplier>(entity);
 	GrantEntityArmor(victim, false, 2.0, npc.m_flExtraArmorResist, 0,
 	(npc.m_flArmorToGive * 0.5) * fl_Extra_Damage[npc.index]);
 }
@@ -385,14 +385,14 @@ static void SupplierGiveArmorSignalled(int entity, int victim)
 	if(i_NpcIsABuilding[victim])
 		return;
 
-	VestanSupplier npc = view_as<VestanSupplier>(entity);
+	VoidedSupplier npc = view_as<VoidedSupplier>(entity);
 	GrantEntityArmor(victim, false, 2.0, npc.m_flExtraArmorResist, 0,
 	(npc.m_flArmorToGive * 0.75) * fl_Extra_Damage[npc.index]);
 }
 
-static Action VestanSupplier_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+static Action VoidedSupplier_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	VestanSupplier npc = view_as<VestanSupplier>(victim);
+	VoidedSupplier npc = view_as<VoidedSupplier>(victim);
 	if(attacker <= 0)
 		return Plugin_Continue;
 		
@@ -404,9 +404,9 @@ static Action VestanSupplier_OnTakeDamage(int victim, int &attacker, int &inflic
 	return Plugin_Changed;
 }
 
-static void VestanSupplier_NPCDeath(int entity)
+static void VoidedSupplier_NPCDeath(int entity)
 {
-	VestanSupplier npc = view_as<VestanSupplier>(entity);
+	VoidedSupplier npc = view_as<VoidedSupplier>(entity);
 	if(!npc.m_bGib)
 		npc.PlayDeathSound();	
 	
