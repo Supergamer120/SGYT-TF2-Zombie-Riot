@@ -80,8 +80,8 @@ static const char g_MeleeAttackSounds[][] = {
 };
 
 
-static float f_ObuchSameEnemyAttacked[MAXENTITIES];
-void MedivalObuch_OnMapStart_NPC()
+static float f_VoidedObuchSameEnemyAttacked[MAXENTITIES];
+void VoidedlObuch_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -92,12 +92,12 @@ void MedivalObuch_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_DefaultMeleeMissSounds));   i++) { PrecacheSound(g_DefaultMeleeMissSounds[i]);   }
 	PrecacheModel(COMBINE_CUSTOM_MODEL);
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Obuch");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_medival_obuch");
+	strcopy(data.Name, sizeof(data.Name), "Voided Obuch");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_obuch");
 	strcopy(data.Icon, sizeof(data.Icon), "obuch");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Medieval;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 }
