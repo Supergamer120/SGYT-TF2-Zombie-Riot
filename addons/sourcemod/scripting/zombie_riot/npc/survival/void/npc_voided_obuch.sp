@@ -80,8 +80,8 @@ static const char g_MeleeAttackSounds[][] = {
 };
 
 
-static float f_VoidedObuchSameEnemyAttacked[MAXENTITIES];
-void VoidedlObuch_OnMapStart_NPC()
+static float f_ObuchSameEnemyAttacked[MAXENTITIES];
+void VoidedObuch_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -104,9 +104,9 @@ void VoidedlObuch_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return MedivalObuch(vecPos, vecAng, team);
+	return VoidedObuch(vecPos, vecAng, team);
 }
-methodmap MedivalObuch < CClotBody
+methodmap VoidedObuch < CClotBody
 {
 	public void PlayIdleSound() {
 		if(this.m_flNextIdleSound > GetGameTime(this.index))
@@ -164,9 +164,9 @@ methodmap MedivalObuch < CClotBody
 		
 	}
 	
-	public MedivalObuch(float vecPos[3], float vecAng[3], int ally)
+	public VoidedObuch(float vecPos[3], float vecAng[3], int ally)
 	{
-		MedivalObuch npc = view_as<MedivalObuch>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.15", "15000", ally));
+		VoidedObuch npc = view_as<VoidedObuch>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.15", "15000", ally));
 		SetVariantInt(1);
 		AcceptEntityInput(npc.index, "SetBodyGroup");		
 		i_NpcWeight[npc.index] = 2;
@@ -184,9 +184,9 @@ methodmap MedivalObuch < CClotBody
 		npc.m_iNpcStepVariation = STEPTYPE_COMBINE_METRO;
 		
 	
-		func_NPCDeath[npc.index] = MedivalObuch_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = MedivalObuch_OnTakeDamage;
-		func_NPCThink[npc.index] = MedivalObuch_ClotThink;
+		func_NPCDeath[npc.index] = VoidedObuch_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = VoidedObuch_OnTakeDamage;
+		func_NPCThink[npc.index] = VoidedObuch_ClotThink;
 
 		npc.m_iState = 0;
 		npc.m_flNextRangedAttack = 0.0;
@@ -200,7 +200,7 @@ methodmap MedivalObuch < CClotBody
 		npc.m_flSpeed = 300.0;
 		
 
-		f_ObuchSameEnemyAttacked[npc.index] = 1.0;
+		f_VoidedObuchSameEnemyAttacked[npc.index] = 1.0;
 		
 		npc.m_iWearable1 = npc.EquipItem("weapon_bone", "models/workshop/weapons/c_models/c_powerjack/c_powerjack.mdl");
 		SetVariantString("1.0");
@@ -222,9 +222,9 @@ methodmap MedivalObuch < CClotBody
 }
 
 
-public void MedivalObuch_ClotThink(int iNPC)
+public void VoidedObuch_ClotThink(int iNPC)
 {
-	MedivalObuch npc = view_as<MedivalObuch>(iNPC);
+	VoidedObuch npc = view_as<VoidedObuch>(iNPC);
 	
 
 	float gameTime = GetGameTime(iNPC);
@@ -416,13 +416,13 @@ public void MedivalObuch_ClotThink(int iNPC)
 	npc.PlayIdleSound();
 }
 
-public Action MedivalObuch_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action VoidedObuch_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
 	//Valid attackers only.
 	if(attacker <= 0)
 		return Plugin_Continue;
 		
-	MedivalObuch npc = view_as<MedivalObuch>(victim);
+	VoidedObuch npc = view_as<VoidedObuch>(victim);
 	
 	
 	if (npc.m_flHeadshotCooldown < GetGameTime(npc.index))
@@ -435,9 +435,9 @@ public Action MedivalObuch_OnTakeDamage(int victim, int &attacker, int &inflicto
 	return Plugin_Changed;
 }
 
-public void MedivalObuch_NPCDeath(int entity)
+public void VoidedObuch_NPCDeath(int entity)
 {
-	MedivalObuch npc = view_as<MedivalObuch>(entity);
+	VoidedObuch npc = view_as<VoidedObuch>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
