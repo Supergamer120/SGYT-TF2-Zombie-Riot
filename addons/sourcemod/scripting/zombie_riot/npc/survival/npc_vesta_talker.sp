@@ -61,6 +61,9 @@ methodmap Talker < CClotBody
 
 		SetEntityRenderMode(npc.index, RENDER_NONE);
 
+		b_NameNoTranslation[npc.index] = false;
+		c_NpcName[npc.index] = "Castellan";
+
 		npc.m_iTalkWaveAt = 0;
 		npc.m_iTalkWaveAt = 0;
 		int WaveAmAt;
@@ -179,27 +182,27 @@ stock void NpcTalker_Wave1Talk(Talker npc)
 			{
 				case 1:
 				{
-					CPrintToChatAll("{rare}???{default}: So the day has finally arrived, welcome back E-");
+					NPCTalkMessage(npc.index, "So the day has finally arrived, welcome back E-");
 				}
 				case 2:
 				{
-					CPrintToChatAll("{rare}???{default}: Hang on a minute...my sensors are going off, you're not one of them.");
+					NPCTalkMessage(npc.index, "Hang on a minute...my sensors are going off, you're not one of them.");
 				}
 				case 3:
 				{
-					CPrintToChatAll("{rare}???{default}: The system tells me that none of you are related to them.");
+					NPCTalkMessage(npc.index, "The system tells me that none of you are related to them.");
 				}
 				case 4:
 				{
-					CPrintToChatAll("{rare}???{default}: That's probably why the self-defense mechanisms kicked in.");
+					NPCTalkMessage(npc.index, "That's probably why the self-defense mechanisms kicked in.");
 				}
 				case 5:
 				{
-					CPrintToChatAll("{rare}???{default}: But maybe it was for a good reason...");
+					NPCTalkMessage(npc.index, "But maybe it was for a good reason...");
 				}
 				case 6:
 				{
-					CPrintToChatAll("{rare}???{default}: What are you doing in here? And how did you find this place?");
+					NPCTalkMessage(npc.index, "What are you doing in here? And how did you find this place?");
 					i_TalkDelayCheck = -1;
 				}
 			}
