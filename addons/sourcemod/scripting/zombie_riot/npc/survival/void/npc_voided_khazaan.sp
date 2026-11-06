@@ -40,7 +40,7 @@ static const char g_MeleeHitSounds[][] = {
 };
 
 
-void DesertKhazaan_OnMapStart_NPC()
+void VoidedKhazaan_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -48,8 +48,8 @@ void DesertKhazaan_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeAttackSounds)); i++) { PrecacheSound(g_MeleeAttackSounds[i]); }
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Khazaan");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_khazaan");
+	strcopy(data.Name, sizeof(data.Name), "Voided Khazaan");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_khazaan");
 	strcopy(data.Icon, sizeof(data.Icon), "heavy_champ");
 	data.IconCustom = false;
 	data.Flags = 0;
@@ -60,10 +60,10 @@ void DesertKhazaan_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return DesertKhazaan(vecPos, vecAng, team);
+	return VoidedKhazaan(vecPos, vecAng, team);
 }
 
-methodmap DesertKhazaan < CClotBody
+methodmap VoidedKhazaan < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -102,9 +102,9 @@ methodmap DesertKhazaan < CClotBody
 	}
 	
 	
-	public DesertKhazaan(float vecPos[3], float vecAng[3], int ally)
+	public VoidedKhazaan(float vecPos[3], float vecAng[3], int ally)
 	{
-		DesertKhazaan npc = view_as<DesertKhazaan>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.0", "900", ally));
+		VoidedKhazaan npc = view_as<VoidedKhazaan>(CClotBody(vecPos, vecAng, "models/player/heavy.mdl", "1.0", "900", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -121,9 +121,9 @@ methodmap DesertKhazaan < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(DesertKhazaan_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(DesertKhazaan_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(DesertKhazaan_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(VoidedKhazaan_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(VoidedKhazaan_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(VoidedKhazaan_ClotThink);
 		
 		
 		
@@ -151,9 +151,9 @@ methodmap DesertKhazaan < CClotBody
 	}
 }
 
-public void DesertKhazaan_ClotThink(int iNPC)
+public void VoidedKhazaan_ClotThink(int iNPC)
 {
-	DesertKhazaan npc = view_as<DesertKhazaan>(iNPC);
+	VoidedKhazaan npc = view_as<VoidedKhazaan>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -202,7 +202,7 @@ public void DesertKhazaan_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		DesertKhazaanSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		VoidedKhazaanSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -212,9 +212,9 @@ public void DesertKhazaan_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action DesertKhazaan_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action VoidedKhazaan_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	DesertKhazaan npc = view_as<DesertKhazaan>(victim);
+	VoidedKhazaan npc = view_as<VoidedKhazaan>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -228,9 +228,9 @@ public Action DesertKhazaan_OnTakeDamage(int victim, int &attacker, int &inflict
 	return Plugin_Changed;
 }
 
-public void DesertKhazaan_NPCDeath(int entity)
+public void VoidedKhazaan_NPCDeath(int entity)
 {
-	DesertKhazaan npc = view_as<DesertKhazaan>(entity);
+	VoidedKhazaan npc = view_as<VoidedKhazaan>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -246,7 +246,7 @@ public void DesertKhazaan_NPCDeath(int entity)
 
 }
 
-void DesertKhazaanSelfDefense(DesertKhazaan npc, float gameTime, int target, float distance)
+void VoidedKhazaanSelfDefense(VoidedKhazaan npc, float gameTime, int target, float distance)
 {
 	if(npc.m_flAttackHappens)
 	{
