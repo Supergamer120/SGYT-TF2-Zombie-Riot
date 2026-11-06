@@ -37,11 +37,11 @@ static const char g_MeleeAttackSounds[][] =
 	"weapons/machete_swing.wav",
 };
 
-void AegirOnMapStart()
+void VoidedAegirOnMapStart()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Aegir");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_aegir");
+	strcopy(data.Name, sizeof(data.Name), "Voided Aegir");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_aegir");
 	strcopy(data.Icon, sizeof(data.Icon), "pyro");
 	data.IconCustom = false;
 	data.Flags = 0;
@@ -52,10 +52,10 @@ void AegirOnMapStart()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return Aegir(vecPos, vecAng, team);
+	return VoidedAegir(vecPos, vecAng, team);
 }
 
-methodmap Aegir < CClotBody
+methodmap VoidedAegir < CClotBody
 {
 	public void PlayIdleSound()
 	{
@@ -82,9 +82,9 @@ methodmap Aegir < CClotBody
 		EmitSoundToAll(g_MeleeHitSounds[GetRandomInt(0, sizeof(g_MeleeHitSounds) - 1)], this.index, SNDCHAN_AUTO, NORMAL_ZOMBIE_SOUNDLEVEL, _, NORMAL_ZOMBIE_VOLUME, _);	
 	}
 	
-	public Aegir(float vecPos[3], float vecAng[3], int ally)
+	public VoidedAegir(float vecPos[3], float vecAng[3], int ally)
 	{
-		Aegir npc = view_as<Aegir>(CClotBody(vecPos, vecAng, "models/player/pyro.mdl", "1.0", "35000", ally));
+		VoidedAegir npc = view_as<VoidedAegir>(CClotBody(vecPos, vecAng, "models/player/pyro.mdl", "1.0", "35000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		npc.SetActivity("ACT_MP_RUN_MELEE");
@@ -128,7 +128,7 @@ methodmap Aegir < CClotBody
 
 static void ClotThink(int iNPC)
 {
-	Aegir npc = view_as<Aegir>(iNPC);
+	VoidedAegir npc = view_as<VoidedAegir>(iNPC);
 
 	float gameTime = GetGameTime(npc.index);
 	if(npc.m_flNextDelayTime > gameTime)
@@ -197,7 +197,7 @@ static void ClotThink(int iNPC)
 						
 						if(target <= MaxClients && (Armor_Charge[target] < 0 || TF2_IsPlayerInCondition(target, TFCond_Milked) || TF2_IsPlayerInCondition(target, TFCond_Jarated)))
 						{
-							damage *= Rogue_Paradox_RedMoon() ? 60.0 : 6.0;
+							damage *= Rogue_Paradox_RedMoon() ? 40.0 : 4.0;
 						}
 
 						npc.PlayMeleeHitSound();
@@ -235,7 +235,7 @@ static void ClotThink(int iNPC)
 
 static void ClotDeath(int entity)
 {
-	Aegir npc = view_as<Aegir>(entity);
+	VoidedAegir npc = view_as<VoidedAegir>(entity);
 	if(!npc.m_bGib)
 		npc.PlayDeathSound();
 	
