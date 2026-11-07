@@ -36,7 +36,7 @@ static const char g_MeleeHitSounds[][] = {
 	"weapons/blade_slice_4.wav"
 };
 
-void AnarchyHitman_OnMapStart_NPC()
+void VoidedHitman_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -45,22 +45,22 @@ void AnarchyHitman_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	PrecacheModel("models/player/medic.mdl");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Hitman");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_hitman");
+	strcopy(data.Name, sizeof(data.Name), "Voided Hitman");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_hitman");
 	strcopy(data.Icon, sizeof(data.Icon), "spy");
 	data.IconCustom = false;
 	data.Flags = 0;
-	data.Category = Type_Interitus;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 }
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return AnarchyHitman(vecPos, vecAng, team);
+	return VoidedHitman(vecPos, vecAng, team);
 }
 
-methodmap AnarchyHitman < CClotBody
+methodmap VoidedHitman < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -99,9 +99,9 @@ methodmap AnarchyHitman < CClotBody
 	}
 	
 	
-	public AnarchyHitman(float vecPos[3], float vecAng[3], int ally)
+	public VoidedHitman(float vecPos[3], float vecAng[3], int ally)
 	{
-		AnarchyHitman npc = view_as<AnarchyHitman>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "3000", ally));
+		VoidedHitman npc = view_as<VoidedHitman>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "3000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -116,9 +116,9 @@ methodmap AnarchyHitman < CClotBody
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 		f_HeadshotDamageMultiNpc[npc.index] = 5.0;
 
-		func_NPCDeath[npc.index] = view_as<Function>(AnarchyHitman_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(AnarchyHitman_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(AnarchyHitman_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(VoidedHitman_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(VoidedHitman_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(VoidedHitman_ClotThink);
 		
 		
 		
@@ -151,9 +151,9 @@ methodmap AnarchyHitman < CClotBody
 	}
 }
 
-public void AnarchyHitman_ClotThink(int iNPC)
+public void VoidedHitman_ClotThink(int iNPC)
 {
-	AnarchyHitman npc = view_as<AnarchyHitman>(iNPC);
+	VoidedHitman npc = view_as<VoidedHitman>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -196,7 +196,7 @@ public void AnarchyHitman_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		AnarchyHitmanSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		VoidedHitmanSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -206,9 +206,9 @@ public void AnarchyHitman_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action AnarchyHitman_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action VoidedHitman_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	AnarchyHitman npc = view_as<AnarchyHitman>(victim);
+	VoidedHitman npc = view_as<VoidedHitman>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -247,9 +247,9 @@ public Action AnarchyHitman_OnTakeDamage(int victim, int &attacker, int &inflict
 	return Plugin_Changed;
 }
 
-public void AnarchyHitman_NPCDeath(int entity)
+public void VoidedHitman_NPCDeath(int entity)
 {
-	AnarchyHitman npc = view_as<AnarchyHitman>(entity);
+	VoidedHitman npc = view_as<VoidedHitman>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -269,7 +269,7 @@ public void AnarchyHitman_NPCDeath(int entity)
 
 }
 
-void AnarchyHitmanSelfDefense(AnarchyHitman npc, float gameTime, int target, float distance)
+void VoidedHitmanSelfDefense(VoidedHitman npc, float gameTime, int target, float distance)
 {
 	if(npc.m_flAttackHappens)
 	{
