@@ -20,7 +20,7 @@ static const char g_RageAttackSounds[] = "weapons/doom_rocket_launcher.wav";
 void VoidedArtillerist_OnMapStart_NPC()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Voidrd Artillerist");
+	strcopy(data.Name, sizeof(data.Name), "Voided Artillerist");
 	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_artillerist");
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_mortar");
 	data.IconCustom = true;
@@ -44,10 +44,10 @@ static void ClotPrecache()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int ally, const char[] data)
 {
-	return VestaArtillerist(vecPos, vecAng, ally, data);
+	return VoidedArtillerist(vecPos, vecAng, ally, data);
 }
 
-methodmap VestaArtillerist < CClotBody
+methodmap VoidedArtillerist < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -93,9 +93,9 @@ methodmap VestaArtillerist < CClotBody
 		public set(float TempValueForProperty) 	{ fl_AbilityOrAttack[this.index][3] = TempValueForProperty; }
 	}
 	
-	public VestaArtillerist(float vecPos[3], float vecAng[3], int ally, const char[] data)
+	public VoidedArtillerist(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		VestaArtillerist npc = view_as<VestaArtillerist>(CClotBody(vecPos, vecAng, "models/player/medic.mdl", "1.0", "3000", ally));
+		VoidedArtillerist npc = view_as<VoidedArtillerist>(CClotBody(vecPos, vecAng, "models/player/medic.mdl", "1.0", "3000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -108,9 +108,9 @@ methodmap VestaArtillerist < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = VestaArtillerist_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = VestaArtillerist_OnTakeDamage;
-		func_NPCThink[npc.index] = VestaArtillerist_ClotThink;
+		func_NPCDeath[npc.index] = VoidedArtillerist_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = VoidedArtillerist_OnTakeDamage;
+		func_NPCThink[npc.index] = VoidedArtillerist_ClotThink;
 		
 		//IDLE
 		KillFeed_SetKillIcon(npc.index, "tf_projectile_rocket");
@@ -206,9 +206,9 @@ methodmap VestaArtillerist < CClotBody
 	}
 }
 
-static void VestaArtillerist_ClotThink(int iNPC)
+static void VoidedArtillerist_ClotThink(int iNPC)
 {
-	VestaArtillerist npc = view_as<VestaArtillerist>(iNPC);
+	VoidedArtillerist npc = view_as<VoidedArtillerist>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 		return;
 	npc.m_flNextDelayTime = GetGameTime(npc.index) + DEFAULT_UPDATE_DELAY_FLOAT;
@@ -250,7 +250,7 @@ static void VestaArtillerist_ClotThink(int iNPC)
 		float vecTarget[3]; WorldSpaceCenter(npc.m_iTarget, vecTarget);
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
 		float flDistanceToTarget = GetVectorDistance(vecTarget, VecSelfNpc, true);
-		switch(VestaArtilleristSelfDefense(npc,GetGameTime(npc.index), flDistanceToTarget))
+		switch(VoidedArtilleristSelfDefense(npc,GetGameTime(npc.index), flDistanceToTarget))
 		{
 			case -1:
 			{
@@ -342,9 +342,9 @@ static void VestaArtillerist_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-static Action VestaArtillerist_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+static Action VoidedArtillerist_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	VestaArtillerist npc = view_as<VestaArtillerist>(victim);
+	VoidedArtillerist npc = view_as<VoidedArtillerist>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -358,9 +358,9 @@ static Action VestaArtillerist_OnTakeDamage(int victim, int &attacker, int &infl
 	return Plugin_Changed;
 }
 
-static void VestaArtillerist_NPCDeath(int entity)
+static void VoidedArtillerist_NPCDeath(int entity)
 {
-	VestaArtillerist npc = view_as<VestaArtillerist>(entity);
+	VoidedArtillerist npc = view_as<VoidedArtillerist>(entity);
 	if(!npc.m_bGib)
 		npc.PlayDeathSound();	
 		
@@ -380,7 +380,7 @@ static void VestaArtillerist_NPCDeath(int entity)
 		RemoveEntity(npc.m_iWearable1);
 }
 
-static int VestaArtilleristSelfDefense(VestaArtillerist npc, float gameTime, float distance)
+static int VoidedArtilleristSelfDefense(VoidedArtillerist npc, float gameTime, float distance)
 {
 	float vecTarget[3]; WorldSpaceCenter(npc.m_iTarget, vecTarget);
 	int Enemy_I_See = Can_I_See_Enemy(npc.index, npc.m_iTarget);
