@@ -46,7 +46,7 @@ static const char g_MeleeAttackBackstabSounds[][] = {
 	"player/doubledonk.wav",
 };
 
-void WinterAirbornExplorer_OnMapStart_NPC()
+void VoidedAirbornExplorer_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_JumpSound));	   i++) { PrecacheSound(g_JumpSound[i]);	   }
@@ -57,8 +57,8 @@ void WinterAirbornExplorer_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeAttackBackstabSounds)); i++) { PrecacheSound(g_MeleeAttackBackstabSounds[i]); }
 	PrecacheModel("models/player/medic.mdl");
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Airborn Explorer");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_airborn_explorer");
+	strcopy(data.Name, sizeof(data.Name), "Voided Airborn Explorer");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_airborn_explorer");
 	strcopy(data.Icon, sizeof(data.Icon), "soldier_jug_market_1");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -70,10 +70,10 @@ void WinterAirbornExplorer_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return WinterAirbornExplorer(vecPos, vecAng, team);
+	return VoidedAirbornExplorer(vecPos, vecAng, team);
 }
 
-methodmap WinterAirbornExplorer < CClotBody
+methodmap VoidedAirbornExplorer < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -123,9 +123,9 @@ methodmap WinterAirbornExplorer < CClotBody
 	}
 	
 	
-	public WinterAirbornExplorer(float vecPos[3], float vecAng[3], int ally)
+	public VoidedAirbornExplorer(float vecPos[3], float vecAng[3], int ally)
 	{
-		WinterAirbornExplorer npc = view_as<WinterAirbornExplorer>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "2500", ally));
+		VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(CClotBody(vecPos, vecAng, "models/player/soldier.mdl", "1.0", "2500", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -142,9 +142,9 @@ methodmap WinterAirbornExplorer < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(WinterAirbornExplorer_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(WinterAirbornExplorer_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(WinterAirbornExplorer_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(VoidedAirbornExplorer_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(VoidedAirbornExplorer_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(VoidedAirbornExplorer_ClotThink);
 		
 		
 		
@@ -173,9 +173,9 @@ methodmap WinterAirbornExplorer < CClotBody
 	}
 }
 
-public void WinterAirbornExplorer_ClotThink(int iNPC)
+public void VoidedAirbornExplorer_ClotThink(int iNPC)
 {
-	WinterAirbornExplorer npc = view_as<WinterAirbornExplorer>(iNPC);
+	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(iNPC);
 	if (!npc.IsOnGround())
 	{
 		npc.m_flRangedArmor = 2.0;
@@ -227,7 +227,7 @@ public void WinterAirbornExplorer_ClotThink(int iNPC)
 		{
 			npc.SetGoalEntity(npc.m_iTarget);
 		}
-		WinterAirbornExplorerSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		VoidedAirbornExplorerSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 	}
 	else
 	{
@@ -237,9 +237,9 @@ public void WinterAirbornExplorer_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action WinterAirbornExplorer_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action VoidedAirbornExplorer_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	WinterAirbornExplorer npc = view_as<WinterAirbornExplorer>(victim);
+	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -253,9 +253,9 @@ public Action WinterAirbornExplorer_OnTakeDamage(int victim, int &attacker, int 
 	return Plugin_Changed;
 }
 
-public void WinterAirbornExplorer_NPCDeath(int entity)
+public void VoidedAirbornExplorer_NPCDeath(int entity)
 {
-	WinterAirbornExplorer npc = view_as<WinterAirbornExplorer>(entity);
+	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -275,7 +275,7 @@ public void WinterAirbornExplorer_NPCDeath(int entity)
 
 }
 
-void WinterAirbornExplorerSelfDefense(WinterAirbornExplorer npc, float gameTime, int target, float distance)
+void VoidedAirbornExplorerSelfDefense(VoidedAirbornExplorer npc, float gameTime, int target, float distance)
 {
 	if (npc.IsOnGround())
 	{
