@@ -62,7 +62,7 @@ void VoidedAirbornExplorer_OnMapStart_NPC()
 	strcopy(data.Icon, sizeof(data.Icon), "soldier_jug_market_1");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Interitus;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	int id = NPC_Add(data);
 	Rogue_Paradox_AddWinterNPC(id);
