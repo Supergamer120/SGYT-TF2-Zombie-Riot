@@ -17,15 +17,15 @@ static const char g_ExplosionSounds[][]= {
 
 static const char g_RageAttackSounds[] = "weapons/doom_rocket_launcher.wav";
 
-void VestaArtillerist_OnMapStart_NPC()
+void VoidedArtillerist_OnMapStart_NPC()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Vestan Artillerist");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_vestan_artillerist");
+	strcopy(data.Name, sizeof(data.Name), "Voidrd Artillerist");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_artillerist");
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_mortar");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Vesta;
+	data.Category = Type_Void;
 	data.Precache = ClotPrecache;
 	data.Func = ClotSummon;
 	NPC_Add(data);
