@@ -35,7 +35,7 @@ static const char g_MeleeHitSounds[][] = {
 	"weapons/blade_hit3.wav",
 	"weapons/blade_hit4.wav",
 };
-void Almina_inqusitor_trainee_OnMapStart_NPC()
+void Voided_inqusitor_trainee_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_HurtSounds));		i++) { PrecacheSound(g_HurtSounds[i]);		}
@@ -44,8 +44,8 @@ void Almina_inqusitor_trainee_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_MeleeHitSounds)); i++) { PrecacheSound(g_MeleeHitSounds[i]); }
 	for (int i = 0; i < (sizeof(g_RangedAttackSounds)); i++) { PrecacheSound(g_RangedAttackSounds[i]); }
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Inquisitor Trainee");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_inqusitor_trainee");
+	strcopy(data.Name, sizeof(data.Name), "Voided Inquisitor Trainee");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_inqusitor_trainee");
 	strcopy(data.Icon, sizeof(data.Icon), "shattertide_1");
 	data.IconCustom = true;
 	data.Flags = 0;
@@ -57,9 +57,9 @@ void Almina_inqusitor_trainee_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return Alminainqusitor_trainee(vecPos, vecAng, team);
+	return Voidedinqusitor_trainee(vecPos, vecAng, team);
 }
-methodmap Alminainqusitor_trainee < CClotBody
+methodmap Voidedinqusitor_trainee < CClotBody
 {
 	public void PlayIdleAlertSound() 
 	{
@@ -102,9 +102,9 @@ methodmap Alminainqusitor_trainee < CClotBody
 	}
 	
 	
-	public Alminainqusitor_trainee(float vecPos[3], float vecAng[3], int ally)
+	public Voidedinqusitor_trainee(float vecPos[3], float vecAng[3], int ally)
 	{
-		Alminainqusitor_trainee npc = view_as<Alminainqusitor_trainee>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "5000", ally));
+		Voidedinqusitor_trainee npc = view_as<Voidedinqusitor_trainee>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "5000", ally));
 		
 		i_NpcWeight[npc.index] = 3;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -118,9 +118,9 @@ methodmap Alminainqusitor_trainee < CClotBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
 
-		func_NPCDeath[npc.index] = view_as<Function>(Alminainqusitor_trainee_NPCDeath);
-		func_NPCOnTakeDamage[npc.index] = view_as<Function>(Alminainqusitor_trainee_OnTakeDamage);
-		func_NPCThink[npc.index] = view_as<Function>(Alminainqusitor_trainee_ClotThink);
+		func_NPCDeath[npc.index] = view_as<Function>(Voidedinqusitor_trainee_NPCDeath);
+		func_NPCOnTakeDamage[npc.index] = view_as<Function>(Voidedinqusitor_trainee_OnTakeDamage);
+		func_NPCThink[npc.index] = view_as<Function>(Voidedinqusitor_trainee_ClotThink);
 		
 		b_NpcAppliesMarkDebuff[npc.index] = true;
 		
@@ -151,9 +151,9 @@ methodmap Alminainqusitor_trainee < CClotBody
 	}
 }
 
-public void Alminainqusitor_trainee_ClotThink(int iNPC)
+public void Voidedinqusitor_trainee_ClotThink(int iNPC)
 {
-	Alminainqusitor_trainee npc = view_as<Alminainqusitor_trainee>(iNPC);
+	Voidedinqusitor_trainee npc = view_as<Voidedinqusitor_trainee>(iNPC);
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
 	{
 		return;
@@ -186,7 +186,7 @@ public void Alminainqusitor_trainee_ClotThink(int iNPC)
 	
 		float VecSelfNpc[3]; WorldSpaceCenter(npc.index, VecSelfNpc);
 		float flDistanceToTarget = GetVectorDistance(vecTarget, VecSelfNpc, true);
-		int ActionDo = Alminainqusitor_traineeSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
+		int ActionDo = Voidedinqusitor_traineeSelfDefense(npc,GetGameTime(npc.index), npc.m_iTarget, flDistanceToTarget); 
 		switch(ActionDo)
 		{
 			case 0:
@@ -226,9 +226,9 @@ public void Alminainqusitor_trainee_ClotThink(int iNPC)
 	npc.PlayIdleAlertSound();
 }
 
-public Action Alminainqusitor_trainee_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action Voidedinqusitor_trainee_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
-	Alminainqusitor_trainee npc = view_as<Alminainqusitor_trainee>(victim);
+	Voidedinqusitor_trainee npc = view_as<Voidedinqusitor_trainee>(victim);
 		
 	if(attacker <= 0)
 		return Plugin_Continue;
@@ -242,9 +242,9 @@ public Action Alminainqusitor_trainee_OnTakeDamage(int victim, int &attacker, in
 	return Plugin_Changed;
 }
 
-public void Alminainqusitor_trainee_NPCDeath(int entity)
+public void Voidedinqusitor_trainee_NPCDeath(int entity)
 {
-	Alminainqusitor_trainee npc = view_as<Alminainqusitor_trainee>(entity);
+	Voidedinqusitor_trainee npc = view_as<Voidedinqusitor_trainee>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();	
@@ -266,7 +266,7 @@ public void Alminainqusitor_trainee_NPCDeath(int entity)
 		RemoveEntity(npc.m_iWearable1);
 }
 
-int Alminainqusitor_traineeSelfDefense(Alminainqusitor_trainee npc, float gameTime, int target, float distance)
+int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTime, int target, float distance)
 {
 	if(npc.m_iAttacksTillReload >= 1)
 	{
