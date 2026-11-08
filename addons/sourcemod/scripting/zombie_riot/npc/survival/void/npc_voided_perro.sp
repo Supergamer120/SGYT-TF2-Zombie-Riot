@@ -1,5 +1,5 @@
 #pragma semicolon 1  //instead of getting faster the lower hp they have. they instead get slower and get res. and instead of 4x max damage it's 8x or 10x
-#pragma newdecls required
+#pragma newdecls required //done
 
 static const char g_DeathSounds[][] =
 {
