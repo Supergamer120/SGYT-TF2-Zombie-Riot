@@ -1,5 +1,5 @@
 #pragma semicolon 1 //slightly slower than the slower of the 2 giant of these guys. slow attack speed that on hit gives void affliction. and also gives 1 expi shield now.
-#pragma newdecls required
+#pragma newdecls required //done
 
 static const char g_DeathSounds[][] = {
 	"vo/soldier_paincrticialdeath01.mp3",
