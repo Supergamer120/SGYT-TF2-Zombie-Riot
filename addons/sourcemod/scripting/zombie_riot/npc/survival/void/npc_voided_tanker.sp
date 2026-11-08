@@ -1,5 +1,5 @@
 #pragma semicolon 1 //passivly gains expi shield. attacks give void affliction
-#pragma newdecls required
+#pragma newdecls required //done
 
 static const char g_DeathSounds[][] = {
 	"vo/heavy_negativevocalization01.mp3",
