@@ -49,7 +49,7 @@ void Voided_inqusitor_trainee_OnMapStart_NPC()
 	strcopy(data.Icon, sizeof(data.Icon), "shattertide_1");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_AlminaExpiAlliance;
+	data.Category = Type_Void;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 }
@@ -125,7 +125,7 @@ methodmap Voidedinqusitor_trainee < CClotBody
 		b_NpcAppliesMarkDebuff[npc.index] = true;
 		
 		npc.StartPathing();
-		npc.m_flSpeed = 310.0;
+		npc.m_flSpeed = 300.0;
 		npc.m_iAttacksTillReload = 0;
 		
 		
@@ -203,7 +203,7 @@ public void Voidedinqusitor_trainee_ClotThink(int iNPC)
 				{
 					npc.SetGoalEntity(npc.m_iTarget);
 				}
-				npc.m_flSpeed = 310.0;
+				npc.m_flSpeed = 300.0;
 				npc.m_bAllowBackWalking = false;
 			}
 			case 1:
@@ -212,7 +212,7 @@ public void Voidedinqusitor_trainee_ClotThink(int iNPC)
 				float vBackoffPos[3];
 				BackoffFromOwnPositionAndAwayFromEnemy(npc, npc.m_iTarget,_,vBackoffPos);
 				npc.SetGoalVector(vBackoffPos, true); //update more often, we need it
-				npc.m_flSpeed = 250.0;
+				npc.m_flSpeed = 200.0;
 			}
 		}
 
@@ -334,7 +334,7 @@ int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTi
 		}
 		else
 		{
-			//too far away.
+			//too far away
 			return 0;
 		}
 		//they have more then 1 bullet, use gunmode.
