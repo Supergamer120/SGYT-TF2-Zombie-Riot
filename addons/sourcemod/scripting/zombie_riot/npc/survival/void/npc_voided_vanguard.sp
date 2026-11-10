@@ -256,6 +256,7 @@ public void DwellerVanguard_ClotThink(int iNPC)
 						if (npc.m_bVoided)
 						{
 							SDKHooks_TakeDamage(target, npc.index, npc.index, ShouldNpcDealBonusDamage(target) ? 1500.0 : 1275.0, DMG_CLUB);
+							Elemental_AddVoidDamage(target, npc.index, 150, true, false);
 						}
 						else
 						{
