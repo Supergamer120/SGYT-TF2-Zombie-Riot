@@ -178,7 +178,7 @@ public void VoidedAirbornExplorer_ClotThink(int iNPC)
 	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(iNPC);
 	if (!npc.IsOnGround())
 	{
-		npc.m_flRangedArmor = 2.0;
+		npc.m_flRangedArmor = 1.0;
 	}
 	else
 	{
