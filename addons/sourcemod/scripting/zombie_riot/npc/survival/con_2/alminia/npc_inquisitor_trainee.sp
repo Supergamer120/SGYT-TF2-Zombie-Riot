@@ -315,7 +315,7 @@ int Alminainqusitor_traineeSelfDefense(Alminainqusitor_trainee npc, float gameTi
 
 						if(IsValidEnemy(npc.index, target))
 						{
-							float damageDealt = 30.0;
+							float damageDealt = 20.0;
 							if(ShouldNpcDealBonusDamage(target))
 								damageDealt *= 1.5;
 
@@ -396,7 +396,7 @@ int Alminainqusitor_traineeSelfDefense(Alminainqusitor_trainee npc, float gameTi
 				
 				if(IsValidEnemy(npc.index, target))
 				{
-					float damageDealt = 50.0;
+					float damageDealt = 35.0;
 					
 					if(ShouldNpcDealBonusDamage(target))
 						damageDealt *= 1.5;
@@ -409,7 +409,7 @@ int Alminainqusitor_traineeSelfDefense(Alminainqusitor_trainee npc, float gameTi
 					//gimic of new wavetype, but silenceable.
 					
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DamageType, -1, _, vecHit);
-					npc.m_iAttacksTillReload += 6;
+					npc.m_iAttacksTillReload += 3;
 					npc.m_flNextMeleeAttack = gameTime + 0.2;
 
 					bool DoEffect = false;
