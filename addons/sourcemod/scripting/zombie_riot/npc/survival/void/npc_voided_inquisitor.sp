@@ -268,7 +268,7 @@ public void Voidedinqusitor_trainee_NPCDeath(int entity)
 
 int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTime, int target, float distance)
 {
-	if(npc.m_iAttacksTillReload >= 1)
+	if(npc.m_iAttacksTillReload >= 0)
 	{
 		if(npc.m_iChanged_WalkCycle != 1)
 		{
@@ -315,12 +315,13 @@ int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTi
 
 						if(IsValidEnemy(npc.index, target))
 						{
-							float damageDealt = 30.0;
+							float damageDealt = 300.0;
 							if(ShouldNpcDealBonusDamage(target))
 								damageDealt *= 1.5;
 
 
 							SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_BULLET, -1, _, vecHit);
+							Elemental_AddVoidDamage(target, npc.index, 150, true, false);
 						}
 					}
 					delete swingTrace;
@@ -334,7 +335,7 @@ int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTi
 		}
 		else
 		{
-			//too far away
+			//too far away.
 			return 0;
 		}
 		//they have more then 1 bullet, use gunmode.
@@ -409,7 +410,7 @@ int Voidedinqusitor_traineeSelfDefense(Voidedinqusitor_trainee npc, float gameTi
 					//gimic of new wavetype, but silenceable.
 					
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DamageType, -1, _, vecHit);
-					npc.m_iAttacksTillReload += 6;
+					npc.m_iAttacksTillReload += 1;
 					npc.m_flNextMeleeAttack = gameTime + 0.2;
 
 					bool DoEffect = false;
