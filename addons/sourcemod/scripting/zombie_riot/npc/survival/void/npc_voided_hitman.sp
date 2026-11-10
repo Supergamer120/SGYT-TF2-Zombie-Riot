@@ -1,4 +1,4 @@
-#pragma semicolon 1 //reverse hitman kinda. still glass cannon, kinda. high damage, fast, mid hp, have dodge, but take 50% less melee damge and 250% ranged damage. and attacks do void affliction
+#pragma semicolon 1 //hitman but not as fragile. they take huge headshot damage but are smaller
 #pragma newdecls required
 
 static const char g_DeathSounds[][] = {
@@ -101,7 +101,7 @@ methodmap VoidedHitman < CClotBody
 	
 	public VoidedHitman(float vecPos[3], float vecAng[3], int ally)
 	{
-		VoidedHitman npc = view_as<VoidedHitman>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "1.0", "3000", ally));
+		VoidedHitman npc = view_as<VoidedHitman>(CClotBody(vecPos, vecAng, "models/player/spy.mdl", "0.6", "5000", ally));
 		
 		i_NpcWeight[npc.index] = 1;
 		FormatEx(c_HeadPlaceAttachmentGibName[npc.index], sizeof(c_HeadPlaceAttachmentGibName[]), "head");
@@ -114,7 +114,7 @@ methodmap VoidedHitman < CClotBody
 		npc.m_iBleedType = BLEEDTYPE_NORMAL;
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;	
 		npc.m_iNpcStepVariation = STEPTYPE_NORMAL;
-		f_HeadshotDamageMultiNpc[npc.index] = 5.0;
+		f_HeadshotDamageMultiNpc[npc.index] = 10.0;
 
 		func_NPCDeath[npc.index] = view_as<Function>(VoidedHitman_NPCDeath);
 		func_NPCOnTakeDamage[npc.index] = view_as<Function>(VoidedHitman_OnTakeDamage);
@@ -123,8 +123,8 @@ methodmap VoidedHitman < CClotBody
 		
 		
 		npc.StartPathing();
-		npc.m_flSpeed = 550.0;
-		npc.m_flMeleeArmor = 2.5;
+		npc.m_flSpeed = 400.0;
+		npc.m_flMeleeArmor = 1.0;
 		npc.m_flRangedArmor = 0.5;
 		npc.Anger = false;
 		
@@ -290,12 +290,13 @@ void VoidedHitmanSelfDefense(VoidedHitman npc, float gameTime, int target, float
 				
 				if(IsValidEnemy(npc.index, target))
 				{
-					float damageDealt = 175.0;
+					float damageDealt = 150.0;
 					if(ShouldNpcDealBonusDamage(target))
 						damageDealt *= 8.5;
 
 					
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_CLUB, -1, _, vecHit);
+					Elemental_AddVoidDamage(target, npc.index, 100, true, false);
 
 					// Hit sound
 					npc.PlayMeleeHitSound();
