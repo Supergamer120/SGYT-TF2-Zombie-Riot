@@ -327,7 +327,7 @@ void VoidedAirbornExplorerSelfDefense(VoidedAirbornExplorer npc, float gameTime,
 					npc.PlayJumpSound();
 							
 					npc.m_flDoingAnimation = gameTime + 0.15;
-					npc.m_flNextRangedAttack = gameTime + 5.85;
+					npc.m_flNextRangedAttack = gameTime + 3.65;
 				}
 			}
 			else
