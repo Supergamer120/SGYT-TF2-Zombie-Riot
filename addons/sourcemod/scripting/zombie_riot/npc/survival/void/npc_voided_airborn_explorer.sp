@@ -149,7 +149,7 @@ methodmap VoidedAirbornExplorer < CClotBody
 		
 		
 		npc.StartPathing();
-		npc.m_flSpeed = 280.0;
+		npc.m_flSpeed = 250.0;
 		
 		
 		int skin = (ally==TFTeam_Red&&ZR_Get_Modifier()!=2 ? 0 : 1);
