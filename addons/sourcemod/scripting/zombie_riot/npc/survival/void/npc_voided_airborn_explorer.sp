@@ -178,11 +178,11 @@ public void VoidedAirbornExplorer_ClotThink(int iNPC)
 	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(iNPC);
 	if (!npc.IsOnGround())
 	{
-		npc.m_flRangedArmor = 1.0;
+		npc.m_flRangedArmor = 0.75;
 	}
 	else
 	{
-		npc.m_flRangedArmor = 1.0;
+		npc.m_flRangedArmor = 0.75;
 	}
 	
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
