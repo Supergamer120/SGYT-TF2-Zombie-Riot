@@ -264,7 +264,7 @@ public void PortalGate_ClotThink(PortalGate npc, int iNPC)
 			}
 		}
 		//Wave 30-40 (THE LAST OF THE RAID RUSH)
-		if(wave >= 31 && !Aperture_IsBossDead(APERTURE_BOSS_CHIMERA))
+		if(wave >= 31 && wave <= 41 && !Aperture_IsBossDead(APERTURE_BOSS_CHIMERA))
 		{
 			switch(GetRandomInt(0,12))
 			{
@@ -302,7 +302,7 @@ public void PortalGate_ClotThink(PortalGate npc, int iNPC)
 				}
 			}
 		}
-		if(wave >= 31 && Aperture_IsBossDead(APERTURE_BOSS_CHIMERA))
+		if(wave >= 31 && wave <= 41 && Aperture_IsBossDead(APERTURE_BOSS_CHIMERA))
 		{
 			switch(GetRandomInt(0,11))
 			{
@@ -361,8 +361,7 @@ public void PortalGate_ClotThink(PortalGate npc, int iNPC)
 		{
 			switch(GetRandomInt(0,12))
 			{
-				{
-					case 0:
+				case 0:
 				{
 					PortalGateSpawn(npc.index, "npc_refragmented_headcrabzombie", pos, ang, team, 25000);
 				}
