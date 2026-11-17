@@ -133,8 +133,8 @@ methodmap XenoFortifiedEarlyZombie < CClotBody
 	{
 		XenoFortifiedEarlyZombie npc = view_as<XenoFortifiedEarlyZombie>(CClotBody(vecPos, vecAng, "models/zombie/classic.mdl", "1.15", "200000", ally));
 		
-		bool m_bisVeryEarly = StrContains(data, "very") != -1;
-		m_bIsVeryEarly = isVeryEarly;
+		bool isVeryEarly = StrContains(data, "very") != -1;
+		npc.m_bIsVeryEarly = isVeryEarly;
 
 		i_NpcWeight[npc.index] = 1;
 
@@ -185,7 +185,7 @@ methodmap XenoFortifiedEarlyZombie < CClotBody
 		return npc;
 	}
 	
-	property bool m_bIsVeryEarly
+	property bool npc.m_bIsVeryEarly
 	{
 		public get() { return view_as<bool>(this.m_iMedkitAnnoyance); }
 		public set(bool value) { this.m_iMedkitAnnoyance = value ? 1 : 0; }
