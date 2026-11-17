@@ -118,7 +118,7 @@ methodmap XenoPatientFew < CClotBody
 		XenoPatientFew npc = view_as<XenoPatientFew>(CClotBody(vecPos, vecAng, "models/zombie/poison.mdl", "2.2", "1500000", ally, false, true));
 		
 		bool isVeryPatient = StrContains(data, "very") != -1;
-		m_bIsVeryPatient = isVeryPatient;
+		npc.m_bIsVeryPatient = isVeryPatient;
 
 		//float ModelSize = 2.2;
 		if(npc.m_bIsVeryPatient)
@@ -172,7 +172,7 @@ methodmap XenoPatientFew < CClotBody
 		return npc;
 	}
 	
-	property bool m_bIsVeryPatient
+	property bool npc.m_bIsVeryPatient
 	{
 		public get() { return view_as<bool>(this.m_iMedkitAnnoyance); }
 		public set(bool value) { this.m_iMedkitAnnoyance = value ? 1 : 0; }
