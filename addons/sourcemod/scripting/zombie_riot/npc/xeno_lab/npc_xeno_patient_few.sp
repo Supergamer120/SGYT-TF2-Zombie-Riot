@@ -1,6 +1,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+static bool b_IsVeryPatient[MAXENTITIES];
+
 static char g_DeathSounds[][] = {
 	"npc/zombie_poison/pz_die1.wav",
 	"npc/zombie_poison/pz_die2.wav",
@@ -67,6 +69,12 @@ static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team, co
 
 methodmap XenoPatientFew < CClotBody
 {
+	property bool m_bIsVeryPatient
+	{
+		public get() { return b_IsVeryPatient[this.index]; }
+		public set(bool value) { b_IsVeryPatient[this.index] = value; }
+	}
+
 	public void PlayIdleSound() {
 		if(this.m_flNextIdleSound > GetGameTime(this.index))
 			return;
@@ -115,16 +123,16 @@ methodmap XenoPatientFew < CClotBody
 	
 	public XenoPatientFew(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		XenoPatientFew npc = view_as<XenoPatientFew>(CClotBody(vecPos, vecAng, "models/zombie/poison.mdl", "2.2", "1500000", ally, false, true));
-		
+		// super, blegh :P - pixel
 		bool isVeryPatient = StrContains(data, "very") != -1;
+
+		XenoPatientFew npc = view_as<XenoPatientFew>(CClotBody(vecPos, vecAng, "models/zombie/poison.mdl", isVeryPatient ? "3.5" : "2.2", "1500000", ally, false, true));
+		
 		npc.m_bIsVeryPatient = isVeryPatient;
 
-		//float ModelSize = 2.2;
 		if(npc.m_bIsVeryPatient)
 		{
 			i_NpcWeight[npc.index] = 4;
-			//ModelSize = 3.5;
 			FormatEx(c_NpcName[npc.index], sizeof(c_NpcName[]), "Xeno Very Patient Few");
 		}
 		else
@@ -172,11 +180,6 @@ methodmap XenoPatientFew < CClotBody
 		return npc;
 	}
 	
-	property bool npc.m_bIsVeryPatient
-	{
-		public get() { return view_as<bool>(this.m_iMedkitAnnoyance); }
-		public set(bool value) { this.m_iMedkitAnnoyance = value ? 1 : 0; }
-	}
 }
 
 
@@ -202,6 +205,7 @@ public void XenoPatientFew_ClotThink(int iNPC)
 			{
 				SetEntityRenderMode(npc.index, RENDER_NORMAL);
 				SetEntityRenderColor(npc.index, 60, 255, 60, 255);
+				npc.flXenoInfectedSpecialHurtTime = 0.0;
 				npc.m_flSpeed = 100.0;
 			}
 		}
@@ -212,6 +216,7 @@ public void XenoPatientFew_ClotThink(int iNPC)
 			{
 				SetEntityRenderMode(npc.index, RENDER_NORMAL);
 				SetEntityRenderColor(npc.index, 50, 255, 50, 255);
+				npc.flXenoInfectedSpecialHurtTime = 0.0;
 				npc.m_flSpeed = 150.0;
 			}
 		}
