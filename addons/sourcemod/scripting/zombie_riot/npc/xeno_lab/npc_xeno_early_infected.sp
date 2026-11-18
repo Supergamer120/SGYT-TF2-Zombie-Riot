@@ -1,6 +1,8 @@
 #pragma semicolon 1
 #pragma newdecls required
 
+static bool b_IsVeryEarly[MAXENTITIES];
+
 static char g_DeathSounds[][] = {
 	"npc/zombie/zombie_die1.wav",
 	"npc/zombie/zombie_die2.wav",
@@ -83,6 +85,12 @@ static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team, co
 
 methodmap XenoFortifiedEarlyZombie < CClotBody
 {
+	property bool m_bIsVeryEarly
+		{
+			public get() { return b_IsVeryEarly[this.index]; }
+			public set(bool value) { b_IsVeryEarly[this.index] = value; }
+		}
+
 	public void PlayIdleSound() {
 		if(this.m_flNextIdleSound > GetGameTime(this.index))
 			return;
@@ -131,17 +139,16 @@ methodmap XenoFortifiedEarlyZombie < CClotBody
 	
 	public XenoFortifiedEarlyZombie(float vecPos[3], float vecAng[3], int ally, const char[] data)
 	{
-		XenoFortifiedEarlyZombie npc = view_as<XenoFortifiedEarlyZombie>(CClotBody(vecPos, vecAng, "models/zombie/classic.mdl", "1.15", "200000", ally));
+		XenoFortifiedEarlyZombie npc = view_as<XenoFortifiedEarlyZombie>(CClotBody(vecPos, vecAng, "models/zombie/classic.mdl", isVeryPatient ? "1.5" : "1.15", "200000", ally));
 		
 		bool isVeryEarly = StrContains(data, "very") != -1;
 		npc.m_bIsVeryEarly = isVeryEarly;
 
 		i_NpcWeight[npc.index] = 1;
 
-		//float ModelSize = 1.15;
 		if(npc.m_bIsVeryEarly)
 		{
-			//ModelSize = 1.5;
+			i_NpcWeight[npc.index] = 2;
 			FormatEx(c_NpcName[npc.index], sizeof(c_NpcName[]), "Xeno Very Early Infected");
 		}
 		
