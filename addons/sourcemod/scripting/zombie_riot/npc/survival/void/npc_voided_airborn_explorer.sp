@@ -178,11 +178,11 @@ public void VoidedAirbornExplorer_ClotThink(int iNPC)
 	VoidedAirbornExplorer npc = view_as<VoidedAirbornExplorer>(iNPC);
 	if (!npc.IsOnGround())
 	{
-		npc.m_flRangedArmor = 0.75;
+		npc.m_flRangedArmor = 0.50;
 	}
 	else
 	{
-		npc.m_flRangedArmor = 0.75;
+		npc.m_flRangedArmor = 1.00;
 	}
 	
 	if(npc.m_flNextDelayTime > GetGameTime(npc.index))
@@ -372,6 +372,7 @@ void VoidedAirbornExplorerSelfDefense(VoidedAirbornExplorer npc, float gameTime,
 					{
 						npc.PlayMeleeBackstabSound(target);
 						damageDealt *= 4.0;
+						Elemental_AddVoidDamage(target, npc.index, 50, true, false);
 					}
 
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_CLUB, -1, _, vecHit);
