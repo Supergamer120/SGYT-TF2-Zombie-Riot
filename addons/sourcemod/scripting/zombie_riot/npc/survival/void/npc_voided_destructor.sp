@@ -23,15 +23,15 @@ static const char g_IdleAlertedSounds[][] =
 
 static const char g_ExplosionSounds[] = "weapons/explode1.wav";
 
-void VestaDestructor_Precache()
+void VoidedDestructor_Precache()
 {
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "Vesta Destructor");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_destructor");
+	strcopy(data.Name, sizeof(data.Name), "Voided Destructor");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_voided_destructor");
 	strcopy(data.Icon, sizeof(data.Icon), "victoria_destructor");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_Vesta;
+	data.Category = Type_Void;
 	data.Precache = ClotPrecache;
 	data.Func = ClotSummon;
 	NPC_Add(data);
@@ -47,10 +47,10 @@ static void ClotPrecache()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return VestaDestructor(vecPos, vecAng, team);
+	return VoidedDestructor(vecPos, vecAng, team);
 }
 
-methodmap VestaDestructor < CSeaBody
+methodmap VoidedDestructor < CSeaBody
 {
 	public void PlayIdleSound()
 	{
@@ -73,9 +73,9 @@ methodmap VestaDestructor < CSeaBody
 		EmitSoundToAll(g_ExplosionSounds, this.index, SNDCHAN_VOICE, NORMAL_ZOMBIE_SOUNDLEVEL, _, NORMAL_ZOMBIE_VOLUME, GetRandomInt(80,125));
 	}
 	
-	public VestaDestructor(float vecPos[3], float vecAng[3], int ally)
+	public VoidedDestructor(float vecPos[3], float vecAng[3], int ally)
 	{
-		VestaDestructor npc = view_as<VestaDestructor>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.3", "4000", ally, false, .isGiant = true));
+		VoidedDestructor npc = view_as<VoidedDestructor>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.4", "5000", ally, false, .isGiant = true));
 
 		SetVariantInt(16);
 		AcceptEntityInput(npc.index, "SetBodyGroup");
@@ -87,12 +87,12 @@ methodmap VestaDestructor < CSeaBody
 		npc.m_iStepNoiseType = STEPSOUND_NORMAL;
 		npc.m_iNpcStepVariation = STEPTYPE_COMBINE;
 		
-		func_NPCDeath[npc.index] = VestaDestructor_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = VestaDestructor_OnTakeDamage;
-		func_NPCThink[npc.index] = VestaDestructor_ClotThink;
+		func_NPCDeath[npc.index] = VoidedDestructor_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = VoidedDestructor_OnTakeDamage;
+		func_NPCThink[npc.index] = VoidedDestructor_ClotThink;
 		
 		KillFeed_SetKillIcon(npc.index, "firedeath");
-		npc.m_flSpeed = 225.0;
+		npc.m_flSpeed = 220.0;
 		npc.m_flGetClosestTargetTime = 0.0;
 		npc.m_flNextMeleeAttack = 0.0;
 		ApplyStatusEffect(npc.index, npc.index, "Fluid Movement", FAR_FUTURE);	
@@ -115,15 +115,15 @@ methodmap VestaDestructor < CSeaBody
 		SetVariantString("1.0");
 		AcceptEntityInput(npc.m_iWearable4, "SetModelScale");
 
-		npc.m_flMeleeArmor = 1.25;
+		npc.m_flMeleeArmor = 1.0;
 		npc.m_flRangedArmor = 0.5;
 		return npc;
 	}
 }
 
-static void VestaDestructor_ClotThink(int iNPC)
+static void VoidedDestructor_ClotThink(int iNPC)
 {
-	VestaDestructor npc = view_as<VestaDestructor>(iNPC);
+	VoidedDestructor npc = view_as<VoidedDestructor>(iNPC);
 
 	float gameTime = GetGameTime(npc.index);
 	if(npc.m_flNextDelayTime > gameTime)
@@ -172,13 +172,13 @@ static void VestaDestructor_ClotThink(int iNPC)
 		{
 			npc.m_flNextMeleeAttack = gameTime + 3.0;
 
-			float radius = 250.0;
+			float radius = 400.0;
 			if(NpcStats_VestanCallToArms(npc.index))
-				radius *= 1.5;
+				radius = 500;
 
 			npc.PlayExplosionSound();
 			spawnRing_Vectors(vecMe, radius, 0.0, 0.0, 50.0, "materials/sprites/laserbeam.vmt", 100, 150, 255, 175, 1, 0.5, 6.0, 0.1, 1, 640.0);
-			Explode_Logic_Custom(25.0, -1, npc.index, -1, vecMe, radius, _, 0.75, true, _, false, _, VestaDestructor_ExplodePost);
+			Explode_Logic_Custom(25.0, -1, npc.index, -1, vecMe, radius, _, 0.75, true, _, false, _, VoidedDestructor_ExplodePost);
 		}
 	}
 	else
@@ -189,17 +189,18 @@ static void VestaDestructor_ClotThink(int iNPC)
 	npc.PlayIdleSound();
 }
 
-static void VestaDestructor_ExplodePost(int attacker, int victim, float damage, int weapon)
+static void VoidedDestructor_ExplodePost(int attacker, int victim, float damage, int weapon)
 {
 	NPC_Ignite(victim, attacker,8.0, -1, 5.5);
+	Elemental_AddVoidDamage(target, npc.index, 55, true, false);
 }
 
-static Action VestaDestructor_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+static Action VoidedDestructor_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
 	if(attacker < 1)
 		return Plugin_Continue;
 	
-	VestaDestructor npc = view_as<VestaDestructor>(victim);
+	VoidedDestructor npc = view_as<VoidedDestructor>(victim);
 	float gameTime = GetGameTime(npc.index);
 	if(npc.m_flHeadshotCooldown < gameTime)
 	{
@@ -209,9 +210,9 @@ static Action VestaDestructor_OnTakeDamage(int victim, int &attacker, int &infli
 	return Plugin_Changed;
 }
 
-static void VestaDestructor_NPCDeath(int entity)
+static void VoidedDestructor_NPCDeath(int entity)
 {
-	VestaDestructor npc = view_as<VestaDestructor>(entity);
+	VoidedDestructor npc = view_as<VoidedDestructor>(entity);
 	if(!npc.m_bGib)
 		npc.PlayDeathSound();
 	
