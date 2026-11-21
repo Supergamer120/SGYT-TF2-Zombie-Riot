@@ -296,7 +296,7 @@ void VoidedHitmanSelfDefense(VoidedHitman npc, float gameTime, int target, float
 
 					
 					SDKHooks_TakeDamage(target, npc.index, npc.index, damageDealt, DMG_CLUB, -1, _, vecHit);
-					Elemental_AddVoidDamage(target, npc.index, 100, true, false);
+					Elemental_AddVoidDamage(target, npc.index, 25, true, false);
 
 					// Hit sound
 					npc.PlayMeleeHitSound();
