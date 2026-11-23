@@ -126,7 +126,7 @@ methodmap Whiteflower_Ekas_Piloteer < CClotBody
 			switch(GetRandomInt(0,2))
 			{
 				case 0:
-					NpcSpeechBubble(this.index, "The clan of Whiteflower stands tall.", 7, {255,0,0,255}, {0.0,0.0,120.0}, "");
+					NpcSpeechBubble(this.index, "The clan of Deep stands tall.", 7, {255,0,0,255}, {0.0,0.0,120.0}, "");
 				case 1:
 					NpcSpeechBubble(this.index, "You are nothing before us.", 7, {255,9,9,255}, {0.0,0.0,120.0}, "");
 				case 2:
@@ -290,7 +290,7 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 		if(npc.m_flTimeUntillSummonRocket && npc.m_flTimeUntillSummonRocket < gameTime)
 		{
 			npc.m_flTimeUntillSummonRocket = 0.0;
-			npc.m_iAttacksTillReload = 6;
+			npc.m_iAttacksTillReload = 10;
 			if(IsValidEnemy(npc.index, npc.m_iTarget))
 			{
 				npc.PlayRocketSound();
