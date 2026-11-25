@@ -195,7 +195,7 @@ methodmap Whiteflower_Ekas_Piloteer < CClotBody
 		SetVariantString("1.5");
 		AcceptEntityInput(npc.m_iWearable3, "SetModelScale");
 
-		npc.m_iAttacksTillReload = 6;
+		npc.m_iAttacksTillReload = 15;
 		
 		npc.StartPathing();
 		
@@ -286,11 +286,39 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 			npc.m_iChanged_WalkCycle = 5;
 			npc.AddGesture("ACT_METROPOLICE_DEPLOY_MANHACK", .SetGestureSpeed = 2.0);
 			npc.m_flTimeUntillSummonRocket = gameTime + 0.5;
+
+			int health = ReturnEntityMaxHealth(npc.index) / 4;
+
+			float pos[3]; GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", pos);
+			float ang[3]; GetEntPropVector(npc.index, Prop_Data, "m_angRotation", ang);
+			
+			if(MaxEnemiesAllowedSpawnNext(1) > (EnemyNpcAlive - EnemyNpcAliveStatic))
+			{
+				int entity;
+				entity = NPC_CreateByName("npc_merlton_boss", -1, pos, ang, GetTeam(npc.index), "clone");
+
+				if(entity > MaxClients)
+				{
+					if(GetTeam(npc.index) != TFTeam_Red)
+						Zombies_Currently_Still_Ongoing++;
+					
+					SetEntProp(entity, Prop_Data, "m_iHealth", health);
+					SetEntProp(entity, Prop_Data, "m_iMaxHealth", health);
+					
+					fl_Extra_MeleeArmor[entity] = fl_Extra_MeleeArmor[npc.index];
+					fl_Extra_RangedArmor[entity] = fl_Extra_RangedArmor[npc.index];
+					fl_Extra_Speed[entity] = fl_Extra_Speed[npc.index] * 1.0;
+					fl_Extra_Damage[entity] = fl_Extra_Damage[npc.index] * 0.9;
+					float ModelSize = GetEntPropFloat(entity, Prop_Send, "m_flModelScale");
+					SetEntPropFloat(entity, Prop_Send, "m_flModelScale", ModelSize); 
+	
+				}
+			}
 		}
 		if(npc.m_flTimeUntillSummonRocket && npc.m_flTimeUntillSummonRocket < gameTime)
 		{
 			npc.m_flTimeUntillSummonRocket = 0.0;
-			npc.m_iAttacksTillReload = 10;
+			npc.m_iAttacksTillReload = 15;
 			if(IsValidEnemy(npc.index, npc.m_iTarget))
 			{
 				npc.PlayRocketSound();
@@ -305,6 +333,8 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 				CreateDataTimer(0.5, WhiteflowerTank_Rocket_Stand, pack, TIMER_FLAG_NO_MAPCHANGE);
 				pack.WriteCell(EntIndexToEntRef(RocketGet));
 				pack.WriteCell(EntIndexToEntRef(npc.m_iTarget));
+				if(!NpcStats_IsEnemySilenced(npc.index))
+					SeaFounder_SpawnAbyss(pos);
 			}
 		}
 		if(npc.m_flTimeUntillKickDone < gameTime)
@@ -404,7 +434,7 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 					GetVectorAngles(vecDirShooting, vecDirShooting);
 					vecDirShooting[1] = eyePitch[1];
 
-					npc.m_flNextRangedAttack = gameTime + 0.1;
+					npc.m_flNextRangedAttack = gameTime + 0.5;
 					npc.m_iAttacksTillReload--;
 					
 					float x = GetRandomFloat( -0.03, 0.03 );
@@ -423,7 +453,7 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 					
 					// E2 L0 = 6.0, E2 L5 = 7.0
 					KillFeed_SetKillIcon(npc.index, "pistol");
-					float damage = 60.0;
+					float damage = 50.0;
 					FireBullet(npc.index, npc.m_iWearable1, vecSelf, vecDir, damage, 9000.0, DMG_BULLET, "bullet_tracer01_red");
 					npc.PlayKilledEnemySound(npc.m_iTarget);
 
