@@ -8247,13 +8247,29 @@
 		"it"		"Ribelle"
 		"ko" 		"두 번째 용병"
 	}
+	"Dweller DDT"
+	{
+		"en"	"Dweller DDT"
+	}
+	"Dweller DDT Desc"
+	{
+		"en"	""
+	}
+	"Dweller Ekas Piloteer"
+	{
+		"en"	"Dweller Ekas Piloteer"
+	}
+	"Dweller Ekas Piloteer Desc"
+	{
+		"en"	""
+	}
 	"Voided Vanguard"
 	{
 		"en"	"Voided Vanguard"
 	}
 	"Voided Vanguard Desc"
 	{
-		"en"	"A Vanguard taken by the void.\nThey work similarly to their sea-infected and uninfected counterparts.\n-Very slow.\n-Big damage\n-(When signalled) max cap for damage is enhanced"
+		"en"	"A Vanguard taken by the void.\nThey work similarly to their sea-infected and uninfected counterparts.\n-Very slow.\n-Big damage."
 	}
 	"Voided Tanker"
 	{
@@ -8261,7 +8277,7 @@
 	}
 	"Voided Tanker Desc"
 	{
-		"en"	"Vestan Tanker now infected by the void.\n-Takes max 10% of its maxhp as single burst damage.\n-Passively gains Expidonsan shield.\nWhen on Void Creep gains more shield."
+		"en"	"Vestan Tanker now infected by the void.\n-Takes max 10% of its maxhp as single burst damage.\n-Passively gains Expidonsan shield.\nWhen on Void Creep gains more shield.\n-(When signalled) max cap for damage is enhanced"
 	}
 	"Voided Rana"
 	{
