@@ -49,7 +49,7 @@ static char g_RangedAttack[][] = {
 	"weapons/pistol/pistol_fire2.wav",
 };
 
-public void Whiteflower_Ekas_Piloteer_OnMapStart_NPC()
+public void Dweller_Ekas_Piloteer_OnMapStart_NPC()
 {
 	for (int i = 0; i < (sizeof(g_DeathSounds));	   i++) { PrecacheSound(g_DeathSounds[i]);	   }
 	for (int i = 0; i < (sizeof(g_MeleeAttackSounds));	i++) { PrecacheSound(g_MeleeAttackSounds[i]);	}
@@ -61,12 +61,12 @@ public void Whiteflower_Ekas_Piloteer_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_RangedAttack));	i++) { PrecacheSound(g_RangedAttack[i]);	}
 	for (int i = 0; i < (sizeof(g_RocketSound));	i++) { PrecacheSound(g_RocketSound[i]);	}
 	NPCData data;
-	strcopy(data.Name, sizeof(data.Name), "W.F. Ekas Piloteer");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_whiteflower_ekas_piloteer");
+	strcopy(data.Name, sizeof(data.Name), "Dweller Ekas Piloteer");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_dweller_ekas_piloteer");
 	strcopy(data.Icon, sizeof(data.Icon), "combine_pistol");
 	data.IconCustom = true;
 	data.Flags = 0;
-	data.Category = Type_WhiteflowerSpecial;
+	data.Category = Type_Dweller;
 	data.Func = ClotSummon;
 	NPC_Add(data);
 	PrecacheSound("weapons/sentry_rocket.wav");
@@ -74,10 +74,10 @@ public void Whiteflower_Ekas_Piloteer_OnMapStart_NPC()
 
 static any ClotSummon(int client, float vecPos[3], float vecAng[3], int team)
 {
-	return Whiteflower_Ekas_Piloteer(vecPos, vecAng, team);
+	return Dweller_Ekas_Piloteer(vecPos, vecAng, team);
 }
 
-methodmap Whiteflower_Ekas_Piloteer < CClotBody
+methodmap Dweller_Ekas_Piloteer < CClotBody
 {
 	public void PlayIdleSound()
 	{
@@ -150,9 +150,9 @@ methodmap Whiteflower_Ekas_Piloteer < CClotBody
 	}
 	
 	
-	public Whiteflower_Ekas_Piloteer(float vecPos[3], float vecAng[3], int ally)
+	public Dweller_Ekas_Piloteer(float vecPos[3], float vecAng[3], int ally)
 	{
-		Whiteflower_Ekas_Piloteer npc = view_as<Whiteflower_Ekas_Piloteer>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.15", "300", ally, false,_,_,_,_));
+		Dweller_Ekas_Piloteer npc = view_as<Dweller_Ekas_Piloteer>(CClotBody(vecPos, vecAng, COMBINE_CUSTOM_MODEL, "1.15", "300", ally, false,_,_,_,_));
 
 		SetVariantInt(1);
 		AcceptEntityInput(npc.index, "SetBodyGroup");				
@@ -178,9 +178,9 @@ methodmap Whiteflower_Ekas_Piloteer < CClotBody
 		f3_SpawnPosition[npc.index][2] = vecPos[2];	
 		
 
-		func_NPCDeath[npc.index] = Whiteflower_Ekas_Piloteer_NPCDeath;
-		func_NPCOnTakeDamage[npc.index] = Whiteflower_Ekas_Piloteer_OnTakeDamage;
-		func_NPCThink[npc.index] = Whiteflower_Ekas_Piloteer_ClotThink;
+		func_NPCDeath[npc.index] = Dweller_Ekas_Piloteer_NPCDeath;
+		func_NPCOnTakeDamage[npc.index] = Dweller_Ekas_Piloteer_OnTakeDamage;
+		func_NPCThink[npc.index] = Dweller_Ekas_Piloteer_ClotThink;
 		
 	
 		npc.m_iWearable1 = npc.EquipItem("weapon_bone", "models/weapons/w_pistol.mdl");
@@ -205,9 +205,9 @@ methodmap Whiteflower_Ekas_Piloteer < CClotBody
 }
 
 
-public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
+public void Dweller_Ekas_Piloteer_ClotThink(int iNPC)
 {
-	Whiteflower_Ekas_Piloteer npc = view_as<Whiteflower_Ekas_Piloteer>(iNPC);
+	Dweller_Ekas_Piloteer npc = view_as<Dweller_Ekas_Piloteer>(iNPC);
 
 	float gameTime = GetGameTime(npc.index);
 
@@ -519,13 +519,13 @@ public void Whiteflower_Ekas_Piloteer_ClotThink(int iNPC)
 }
 
 
-public Action Whiteflower_Ekas_Piloteer_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
+public Action Dweller_Ekas_Piloteer_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
 	//Valid attackers only.
 	if(attacker <= 0)
 		return Plugin_Continue;
 
-	Whiteflower_Ekas_Piloteer npc = view_as<Whiteflower_Ekas_Piloteer>(victim);
+	Dweller_Ekas_Piloteer npc = view_as<Dweller_Ekas_Piloteer>(victim);
 
 	float gameTime = GetGameTime(npc.index);
 
@@ -537,9 +537,9 @@ public Action Whiteflower_Ekas_Piloteer_OnTakeDamage(int victim, int &attacker, 
 	return Plugin_Changed;
 }
 
-public void Whiteflower_Ekas_Piloteer_NPCDeath(int entity)
+public void Dweller_Ekas_Piloteer_NPCDeath(int entity)
 {
-	Whiteflower_Ekas_Piloteer npc = view_as<Whiteflower_Ekas_Piloteer>(entity);
+	Dweller_Ekas_Piloteer npc = view_as<Dweller_Ekas_Piloteer>(entity);
 	if(!npc.m_bGib)
 	{
 		npc.PlayDeathSound();
