@@ -363,11 +363,13 @@ public void DwellerDDT_ClotThink(int iNPC)
 
 public Action DwellerDDT_OnTakeDamage(int victim, int &attacker, int &inflictor, float &damage, int &damagetype, int &weapon, float damageForce[3], float damagePosition[3], int damagecustom)
 {
+
+	DwellerDDT npc = view_as<DwellerDDT>(victim);
 	//Valid attackers only.
+
 	if(attacker <= 0)
 		return Plugin_Continue;
 		
-	DwellerDDT npc = view_as<DwellerDDT>(victim);
 	/*
 	if(attacker > MaxClients && !IsValidEnemy(npc.index, attacker, true))
 		return Plugin_Continue;
