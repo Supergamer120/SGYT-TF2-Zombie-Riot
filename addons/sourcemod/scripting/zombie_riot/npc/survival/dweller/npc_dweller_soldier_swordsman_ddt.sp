@@ -243,13 +243,13 @@ public void DwellerDDT_ClotThink(int iNPC)
 	
 	int PrimaryThreatIndex = npc.m_iTarget;
 	
-
+/*
 	npc.m_flSpeed[npc.index] = npc.m_flSpeed[npc.index] + 25.0;
 	if(npc.m_flSpeed[npc.index] > 500.0)
 	{
 		npc.m_flSpeed[npc.index] = 500.0;
 	}
-
+*/
 	if(IsValidEnemy(npc.index, PrimaryThreatIndex, true))
 	{
 			float vecTarget[3]; WorldSpaceCenter(PrimaryThreatIndex, vecTarget);
@@ -317,13 +317,14 @@ public void DwellerDDT_ClotThink(int iNPC)
 										else
 											SDKHooks_TakeDamage(target, npc.index, npc.index, 100.0, DMG_CLUB, -1, _, vecHit);
 
-											if(GetTeam(npc.index) != TFTeam_Red)
+										if(GetTeam(npc.index) != TFTeam_Red)
+										{
+											npc.m_flSpeed[npc.index] = npc.m_flSpeed[npc.index] * 1.0;
+											if(npc.m_flSpeed[npc.index] < 200.0)
 											{
-												npc.m_flSpeed[npc.index] = npc.m_flSpeed[npc.index] * 1.0;
-												if(npc.m_flSpeed[npc.index] < 200.0)
-												{
-													npc.m_flSpeed[npc.index] = 200.0;
-												}
+												npc.m_flSpeed[npc.index] = 200.0;
+											}
+										}
 									  Elemental_AddNervousDamage(target, npc.index, 50);
 									}
 									
