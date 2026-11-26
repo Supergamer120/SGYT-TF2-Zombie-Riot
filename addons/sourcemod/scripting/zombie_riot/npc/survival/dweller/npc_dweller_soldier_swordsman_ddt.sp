@@ -206,7 +206,7 @@ methodmap DwellerDDT < CClotBody
 
 public void DwellerDDT_ClotThink(int iNPC)
 {
-	DwellerDDT npc = view_as<DwellerDT>(iNPC);
+	DwellerDDT npc = view_as<DwellerDDT>(iNPC);
 	
 	SetVariantInt(1);
 	AcceptEntityInput(iNPC, "SetBodyGroup");
