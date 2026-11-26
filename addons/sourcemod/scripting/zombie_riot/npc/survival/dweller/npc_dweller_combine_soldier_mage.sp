@@ -173,19 +173,23 @@ methodmap DwellerCombineMage < CClotBody
 		npc.m_fbGunout = false;
 		
 		npc.m_iState = 0;
-		npc.m_flSpeed = 230.0;
+		npc.m_flSpeed = 200.0;
 		npc.m_flNextRangedAttack = 0.0;
 		npc.m_flNextRangedSpecialAttack = 0.0;
 		npc.m_flAttackHappenswillhappen = false;
 		npc.m_fbRangedSpecialOn = false;
 
+		SetEntityRenderColor(npc.index, 100, 100, 255, 255);
+
 		npc.m_iWearable1 = npc.EquipItem("weapon_bone", "models/workshop_partner/weapons/c_models/c_tw_eagle/c_tw_eagle.mdl");
 		SetVariantString("0.7");
 		AcceptEntityInput(npc.m_iWearable1 , "SetModelScale");
+		SetEntityRenderColor(npc.m_iWearable1, 100, 100, 255, 255);
 		
 		npc.m_iWearable2 = npc.EquipItem("partyhat", "models/player/items/all_class/trn_wiz_hat_spy.mdl");
 		SetVariantString("1.25");
 		AcceptEntityInput(npc.m_iWearable2, "SetModelScale");
+		SetEntityRenderColor(npc.m_iWearable2, 100, 100, 255, 255);
 		
 		return npc;
 	}
@@ -262,6 +266,48 @@ static void Internal_ClotThink(int iNPC)
 			} else {
 				npc.SetGoalEntity(PrimaryThreatIndex);
 			}
+
+			if(npc.m_flJumpCooldown < GetGameTime(npc.index) && VoidArea_TouchingAbyss(npc.m_iTarget))
+			{
+				if(Can_I_See_Enemy_Only(npc.index, npc.m_iTarget))
+				{
+					static float hullcheckmaxs[3];
+					static float hullcheckmins[3];
+					hullcheckmaxs = view_as<float>( { 24.0, 24.0, 82.0 } );
+					hullcheckmins = view_as<float>( { -24.0, -24.0, 0.0 } );	
+
+					float PreviousPos[3];
+					WorldSpaceCenter(npc.index, PreviousPos);
+					//randomly around the target.
+					vecTarget[0] += GetRandomFloat(-15.0, 15.0);
+					vecTarget[1] += GetRandomFloat(-15.0, 15.0);
+				
+					bool Succeed = Npc_Teleport_Safe(npc.index, vecTarget, hullcheckmins, hullcheckmaxs, true);
+					if(Succeed)
+					{
+						npc.PlayTeleportSound();
+						ParticleEffectAt(PreviousPos, "teleported_blue", 0.5); //This is a permanent particle, gotta delete it manually...
+					
+						float WorldSpaceVec[3]; WorldSpaceCenter(npc.index, WorldSpaceVec);
+						ParticleEffectAt(WorldSpaceVec, "teleported_blue", 0.5); //This is a permanent particle, gotta delete it manually...
+						float VecEnemy[3]; WorldSpaceCenter(npc.m_iTarget, VecEnemy);
+						npc.FaceTowards(VecEnemy, 15000.0);
+						npc.FaceTowards(vecTarget, 15000.0);
+						npc.m_flJumpCooldown = GetGameTime(npc.index) + 999.0;
+						npc.m_flAttackHappens_bullshit = GetGameTime(npc.index)+1.5;
+						static float flPos[3]; 
+						GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", flPos);
+						flPos[2] += 5.0;
+						int particle = ParticleEffectAt(flPos, "utaunt_headless_glow", 1.5);
+						SetParent(npc.index, particle);
+					}
+					else
+					{
+						npc.m_flJumpCooldown = GetGameTime(npc.index) + 0.25;
+					}
+				}
+			}
+
 			if(npc.m_flNextRangedSpecialAttack < GetGameTime(npc.index) && flDistanceToTarget > 14400 && flDistanceToTarget < 250000)
 			{
 				int Enemy_I_See;
