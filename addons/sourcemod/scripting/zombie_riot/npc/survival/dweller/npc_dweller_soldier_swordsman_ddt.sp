@@ -319,10 +319,10 @@ public void DwellerDDT_ClotThink(int iNPC)
 
 										if(GetTeam(npc.index) != TFTeam_Red)
 										{
-											npc.m_flSpeed[npc.index] = npc.m_flSpeed[npc.index] * 1.0;
-											if(npc.m_flSpeed[npc.index] < 200.0)
+											npc.m_flSpeed = npc.m_flSpeed * 1.0;
+											if(npc.m_flSpeed < 200.0)
 											{
-												npc.m_flSpeed[npc.index] = 200.0;
+												npc.m_flSpeed = 200.0;
 											}
 										}
 									  Elemental_AddNervousDamage(target, npc.index, 50);
