@@ -286,14 +286,15 @@ public void Dweller_Ekas_Piloteer_ClotThink(int iNPC)
 			npc.m_iChanged_WalkCycle = 5;
 			npc.AddGesture("ACT_METROPOLICE_DEPLOY_MANHACK", .SetGestureSpeed = 2.0);
 			npc.m_flTimeUntillSummonRocket = gameTime + 0.5;
-			if(!NpcStats_IsEnemySilenced(npc.index))
-				SeaFounder_SpawnAbyss(pos);
 
 			int health = ReturnEntityMaxHealth(npc.index) / 4;
 
 			float pos[3]; GetEntPropVector(npc.index, Prop_Data, "m_vecAbsOrigin", pos);
 			float ang[3]; GetEntPropVector(npc.index, Prop_Data, "m_angRotation", ang);
 			
+			if(!NpcStats_IsEnemySilenced(npc.index))
+				SeaFounder_SpawnAbyss(pos);
+
 			if(MaxEnemiesAllowedSpawnNext(1) > (EnemyNpcAlive - EnemyNpcAliveStatic))
 			{
 				int entity;
