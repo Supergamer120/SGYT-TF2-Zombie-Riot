@@ -324,7 +324,7 @@ public void DwellerDDT_ClotThink(int iNPC)
 												npc.m_flSpeed = 200.0;
 											}
 										}
-									  Elemental_AddNervousDamage(target, npc.index, 50);
+									  Elemental_AddNervousDamage(target, npc.index, 10);
 									}
 									
 									// Hit particle
