@@ -8253,7 +8253,15 @@
 	}
 	"Dweller DDT Desc"
 	{
-		"en"	""
+		"en"	"They lost their speed. But the infection makes them faster after each hit.\n-On melee, increases their speed, with a max."
+	}
+		"Dweller W.F. Mage"
+	{
+		"en"	"Dweller W.F. Mage"
+	}
+	"Dweller W.F. Mage Desc"
+	{
+		"en"	"Channels their magic through any Abyssal Weeds they come in contact with.\nLetting them teleport to any who oppose the sea only once.\n-Shoots projectiles at long range\n-Melee once close\n-Teleports to any on Abyssal Weeds only once."
 	}
 	"Dweller Ekas Piloteer"
 	{
@@ -8261,7 +8269,7 @@
 	}
 	"Dweller Ekas Piloteer Desc"
 	{
-		"en"	""
+		"en"	"As their Ekas got infected, so did they.\nThe Sea now gives them the ability to summon their Dweller-infected Ekas to aid in battle.\n-Shoots bullets then runs up to you to kick\nAfter kick:\n-Spawns Abyssal Weeds.\n-Spawns a Merlton \n-Launches a rocket at you and reloads his pistol"
 	}
 	"Voided Vanguard"
 	{
