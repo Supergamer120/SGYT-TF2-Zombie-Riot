@@ -2705,6 +2705,14 @@
 		"it"		"Frattale sagomatore di percorsi"
 		"ko"		"반영자의 분신"
 	}
+	"Sunken Mirroring"
+	{
+		"en"		"Sunken Mirroring"
+		"ru" 		"Создатель пути"
+		"chi"		"塑路者"
+		"it"		"Modellatore di sentieri"
+		"ko"		"반영자"
+	}
 	"Barracks Teutonic Knight"
 	{
 		"en"		"Teutonic Knight"
