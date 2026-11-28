@@ -65,7 +65,7 @@ void DwellerDDT_OnMapStart_NPC()
 
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Dweller DDT");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_dweller_soldier_swordsman_ddt");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_dweller_combine_soldier_swordsman_ddt");
 	strcopy(data.Icon, sizeof(data.Icon), "demoknight");
 	data.IconCustom = false;
 	data.Flags = 0;
