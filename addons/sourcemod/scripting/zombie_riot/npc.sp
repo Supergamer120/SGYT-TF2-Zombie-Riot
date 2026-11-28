@@ -919,6 +919,7 @@ void NPC_ConfigSetup()
 
 	// Survival
 	DwellerDDT_OnMapStart_NPC();
+	DwellerCombineMage_OnMapStart_NPC();
 	Dweller_Ekas_Piloteer_OnMapStart_NPC();
 	VoidedVanguard_Precache();
 	VoidedTanker_OnMapStart_NPC();
@@ -2373,6 +2374,7 @@ Action NpcSpecificOnTakeDamage(int victim, int &attacker, int &inflictor, float 
 
 
 #include "npc/survival/dweller/npc_dweller_soldier_swordsman_ddt.sp"
+#include "npc/survival/dweller/npc_dweller_combine_soldier_mage.sp"
 #include "npc/survival/dweller/npc_dweller_ekas_piloteer.sp"
 #include "npc/survival/void/npc_voided_vanguard.sp"
 #include "npc/survival/void/npc_voided_tanker.sp"
