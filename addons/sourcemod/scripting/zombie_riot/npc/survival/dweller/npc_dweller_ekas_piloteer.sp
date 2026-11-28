@@ -62,7 +62,7 @@ public void Dweller_Ekas_Piloteer_OnMapStart_NPC()
 	for (int i = 0; i < (sizeof(g_RocketSound));	i++) { PrecacheSound(g_RocketSound[i]);	}
 	NPCData data;
 	strcopy(data.Name, sizeof(data.Name), "Dweller Ekas Piloteer");
-	strcopy(data.Plugin, sizeof(data.Plugin), "npc_dweller_ekas_piloteer");
+	strcopy(data.Plugin, sizeof(data.Plugin), "npc_dweller_combine_ekas_piloteer");
 	strcopy(data.Icon, sizeof(data.Icon), "combine_pistol");
 	data.IconCustom = true;
 	data.Flags = 0;
