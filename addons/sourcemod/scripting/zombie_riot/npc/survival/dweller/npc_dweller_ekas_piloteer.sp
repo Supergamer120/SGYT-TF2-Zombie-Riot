@@ -195,6 +195,10 @@ methodmap Dweller_Ekas_Piloteer < CClotBody
 		SetVariantString("1.5");
 		AcceptEntityInput(npc.m_iWearable3, "SetModelScale");
 
+		SetEntityRenderColor(npc.index, 100, 100, 255, 255);
+		SetEntityRenderColor(npc.m_iWearable2, 100, 100, 255, 255);
+		SetEntityRenderColor(npc.m_iWearable3, 100, 100, 255, 255);
+
 		npc.m_iAttacksTillReload = 15;
 		
 		npc.StartPathing();
