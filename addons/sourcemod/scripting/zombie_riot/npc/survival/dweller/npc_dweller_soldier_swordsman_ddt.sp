@@ -191,7 +191,6 @@ methodmap DwellerDDT < CClotBody
 		AcceptEntityInput(npc.m_iWearable2, "SetModelScale");
 		
 		SetEntityRenderColor(npc.index, 100, 100, 255, 255);
-		SetEntityRenderColor(npc.m_iWearable1, 100, 100, 255, 255);
 		SetEntityRenderColor(npc.m_iWearable2, 100, 100, 255, 255);
 		
 		npc.StartPathing();
