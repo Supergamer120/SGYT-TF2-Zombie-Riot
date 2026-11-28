@@ -184,7 +184,6 @@ methodmap DwellerCombineMage < CClotBody
 		npc.m_iWearable1 = npc.EquipItem("weapon_bone", "models/workshop_partner/weapons/c_models/c_tw_eagle/c_tw_eagle.mdl");
 		SetVariantString("0.7");
 		AcceptEntityInput(npc.m_iWearable1 , "SetModelScale");
-		SetEntityRenderColor(npc.m_iWearable1, 100, 100, 255, 255);
 		
 		npc.m_iWearable2 = npc.EquipItem("partyhat", "models/player/items/all_class/trn_wiz_hat_spy.mdl");
 		SetVariantString("1.25");
