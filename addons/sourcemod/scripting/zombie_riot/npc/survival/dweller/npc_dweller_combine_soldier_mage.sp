@@ -379,7 +379,7 @@ static void Internal_ClotThink(int iNPC)
 									float damage = 60.0;
 									if(iRuinaWave()>20)
 									{
-										damage=125.0;
+										damage=100.0;
 									}
 									if(ShouldNpcDealBonusDamage(target))
 									{
@@ -387,6 +387,7 @@ static void Internal_ClotThink(int iNPC)
 									}
 									SDKHooks_TakeDamage(target, npc.index, npc.index, damage, DMG_CLUB, -1, _, vecHit);
 									
+									Elemental_AddNervousDamage(target, npc.index, 25);
 									Custom_Knockback(npc.index, target, 250.0);
 									
 									// Hit particle
