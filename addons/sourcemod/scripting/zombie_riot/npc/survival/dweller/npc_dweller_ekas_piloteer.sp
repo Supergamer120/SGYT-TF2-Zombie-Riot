@@ -263,7 +263,8 @@ public void Dweller_Ekas_Piloteer_ClotThink(int iNPC)
 					
 					float vecHit[3];
 					TR_GetEndPosition(vecHit, swingTrace);
-					float damage = 350.0;
+					float damage = 150.0;
+					Elemental_AddNervousDamage(target, npc.index, 50);
 
 					
 					if(target > 0) 
@@ -334,7 +335,7 @@ public void Dweller_Ekas_Piloteer_ClotThink(int iNPC)
 				vecSelf[2] += 50.0;
 				vecSelf[0] += GetRandomFloat(-10.0, 10.0);
 				vecSelf[1] += GetRandomFloat(-10.0, 10.0);
-				float RocketDamage = 400.0;
+				float RocketDamage = 200.0;
 				int RocketGet = npc.FireRocket(vecSelf, RocketDamage, 300.0);
 				DataPack pack;
 				CreateDataTimer(0.5, WhiteflowerTank_Rocket_Stand, pack, TIMER_FLAG_NO_MAPCHANGE);
